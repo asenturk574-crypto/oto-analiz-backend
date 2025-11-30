@@ -15,8 +15,7 @@ class AnalyzeRequest(BaseModel):
     url: Optional[str] = ""
     usage: Optional[str] = ""
     description: Optional[str] = ""
-    # Budget string olsun ki Flutter'dan gelen string sorun çıkarmasın
-    budget: Optional[str] = None
+    budget: Optional[str] = None  # string kalsın
     city: Optional[str] = ""
     note: Optional[str] = ""
     # "normal" veya "premium"
@@ -191,48 +190,53 @@ KULLANICI VE ARAÇ BİLGİLERİ:
         model_name = "gpt-4.1"
 
     else:
-        # NORMAL (ÜCRETSİZ) ANALİZ – KISA AMA KİŞİYE ÖZEL
+        # NORMAL (ÜCRETSİZ) ANALİZ – ÇOK KISA AMA KİŞİYE ÖZEL
         prompt = f"""
 Sen Türkiye'de ikinci el araç piyasasını iyi bilen bir araç danışmanısın.
 Aşağıdaki bilgiler bir kullanıcının profili ve bir araç ilanı hakkındadır.
 
 NORMAL analiz modundasın.
 Bu modda PREMIUM kadar detay VERME.
-Kısa, net ve kişiye özel yorum yap.
+KISA ve HIZLI bir özet ver.
+TOPLAM EN FAZLA 10–12 CÜMLE KULLAN.
+GEREKSİZ TEKRAR YAPMA.
 
-Analizi şu başlıklarla ve KISA şekilde yaz:
+Analizi şu basit yapıda yaz:
 
-1) Araç Özeti (1–2 cümle)
-- Markayı, modeli, motoru ve genel durumu ilan metninden çıkarabildiğin kadar özetle.
+1) Araç Özeti:
+- SADECE 1 CÜMLE. Markayı, modeli, motoru ve genel durumu kısaca özetle.
 
-2) Sizin Kullanım Amacınıza Uygunluk
-- Kullanıcının kullanım amacı, şehri ve notlarına göre bu aracın ne kadar uygun olduğunu 1 cümlede açıkla.
-- Sonuna parantez içinde "uygun / sınırda / pek uygun değil" yaz.
+2) Kullanım Amacına Uygunluk:
+- SADECE 1 CÜMLE. Kullanıcının kullanım amacına göre bu araç ne kadar uygun?
+- Cümlenin SONUNA parantez içinde şunu ekle: (uygun / sınırda / pek uygun değil)
 
-3) Motor & Yakıt Değerlendirmesi
-- Motor tipi (dizel/benzin/LPG/hibrid) ve kullanıcı beklentisine göre yakıt-masraf dengesini 1–2 cümlede özetle.
-- Sonunda "risk seviyesi: düşük / orta / yüksek" ekle.
+3) Motor & Yakıt:
+- EN FAZLA 2 CÜMLE. Motor tipi ve yakıt tüketimini, kullanıcının beklentisine göre değerlendir.
+- Son cümlenin SONUNA "risk seviyesi: düşük / orta / yüksek" ekle.
 
-4) Şanzıman Yorumu
-- İlan metninden şanzıman tipini tahmin etmeye çalış (otomatik/manuel, DSG/CVT/Tork vb. mümkünse).
-- Tek cümlede şehir içi kullanım açısından konfor ve güvenilirlik yorumu yap.
-- Sonuna "güvenilirlik: düşük / orta / yüksek" yaz.
+4) Şanzıman:
+- SADECE 1 CÜMLE. Şanzımanı şehir içi kullanım açısından kısaca yorumla.
+- Cümlenin SONUNA "güvenilirlik: düşük / orta / yüksek" yaz.
 
-5) Artılar (Sizin kullanımınıza göre)
-- Kullanıcının kullanım amacı, şehir ve beklentilerine göre bu araç için 2 madde artı yaz.
-- Maddeler kısa olsun.
+5) Artılar:
+- EN FAZLA 2 MADDE. Maddeler çok kısa olsun, 1 satırı geçmesin.
+- Maddeleri kullanıcının kullanım amacına göre yaz.
 
-6) Eksiler (Sizin kullanımınıza göre)
-- Aynı şekilde, bu kullanıcı için 2 madde eksi yaz.
-- Maddeler kısa olsun.
+6) Eksiler:
+- EN FAZLA 2 MADDE. Maddeler çok kısa olsun, 1 satırı geçmesin.
+- Kullanıcının kullanım amacına göre gerçekten önemli olabilecek eksileri yaz.
 
-7) Fiyat Yorumu
-- Verilen bütçeyi ve araç tipini dikkate alarak fiyatın piyasaya göre "uygun / normal / biraz yüksek" olduğunu 1 cümlede yorumla.
+7) Fiyat Yorumu:
+- SADECE 1 CÜMLE. Fiyatı piyasaya göre "uygun / normal / biraz yüksek" olarak değerlendir ve kısa sebep ekle.
 
-8) Sonuç (tek cümle)
-- "Alınabilir", "Pazarlıkla değerlendirilebilir" veya "Daha temiz alternatiflere bakmak daha mantıklı" formatında net ve kısa bir karar yaz.
+8) Sonuç:
+- SADECE 1 CÜMLE. Şu formatlardan birini kullan:
+  - "Sonuç: Alınabilir."
+  - "Sonuç: Pazarlıkla değerlendirilebilir."
+  - "Sonuç: Daha temiz alternatiflere bakmak daha mantıklı."
 
-Gereksiz uzun anlatım yapma, kullanıcıyı yormadan net konuş.
+BU YAPININ DIŞINA ÇIKMA.
+Madde sayısını ve cümle sayısını aşma.
 
 KULLANICI VE ARAÇ BİLGİLERİ:
 
