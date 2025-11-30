@@ -19,8 +19,8 @@ class AnalyzeRequest(BaseModel):
     budget: Optional[str] = None
     city: Optional[str] = ""
     note: Optional[str] = ""
-    # free / premium
-    mode: Optional[str] = "premium"
+    # "normal" veya "premium"
+    mode: Optional[str] = "normal"
 
 
 @app.get("/")
@@ -69,9 +69,12 @@ async def run_analysis(request: AnalyzeRequest):
 
     user_info_block = "\n\n".join(parts)
 
-    # -------------------- PROMPT --------------------
+    # -------------------- PROMPT SEÇİMİ --------------------
 
-    if request.mode == "premium":
+    mode = (request.mode or "normal").lower()
+
+    if mode == "premium":
+        # UZUN, DETAYLI PREMIUM ANALİZ
         prompt = f"""
 Sen Türkiye'de ikinci el araç piyasasını çok iyi bilen, yıllardır ekspertiz yapan
 ve aynı zamanda kullanıcı dostu bir araç danışmanısın.
@@ -185,31 +188,57 @@ KULLANICI VE ARAÇ BİLGİLERİ:
 
 {user_info_block}
 """
+        model_name = "gpt-4.1"
+
     else:
-        # FREE: kısa özet mod
+        # NORMAL (ÜCRETSİZ) ANALİZ – KISA AMA KİŞİYE ÖZEL
         prompt = f"""
-Sen Türkiye'de ikinci el araç piyasasını iyi bilen bir uzmansın.
-Aşağıda bir kullanıcı profili ve bir araç ilanı hakkında bilgiler var.
+Sen Türkiye'de ikinci el araç piyasasını iyi bilen bir araç danışmanısın.
+Aşağıdaki bilgiler bir kullanıcının profili ve bir araç ilanı hakkındadır.
 
-FREE moddasın, bu yüzden:
-- En fazla 8-10 cümlelik bir özet analiz yap.
-- Detaylı başlıklar, uzun listeler verme.
-- Basit, net, anlaşılır konuş.
+NORMAL analiz modundasın.
+Bu modda PREMIUM kadar detay VERME.
+Kısa, net ve kişiye özel yorum yap.
 
-Kısaca şunlara değin:
-- Araç genel olarak mantıklı mı?
-- Kullanım amacına ne kadar uyuyor? (şehir içi, aile, uzun yol vb.)
-- Kilometre ve yaşına göre risk seviyesi (düşük / orta / yüksek).
-- Masraf seviyesi (düşük / orta / yüksek).
-- Bu araç alınır mı, yoksa daha temiz/daha düşük km bakmak daha mı mantıklı?
-- Son cümlende "Alınır / Alınmaz / Pazarlıkla değerlendirilebilir" formatında net bir karar ver.
+Analizi şu başlıklarla ve KISA şekilde yaz:
+
+1) Araç Özeti (1–2 cümle)
+- Markayı, modeli, motoru ve genel durumu ilan metninden çıkarabildiğin kadar özetle.
+
+2) Sizin Kullanım Amacınıza Uygunluk
+- Kullanıcının kullanım amacı, şehri ve notlarına göre bu aracın ne kadar uygun olduğunu 1 cümlede açıkla.
+- Sonuna parantez içinde "uygun / sınırda / pek uygun değil" yaz.
+
+3) Motor & Yakıt Değerlendirmesi
+- Motor tipi (dizel/benzin/LPG/hibrid) ve kullanıcı beklentisine göre yakıt-masraf dengesini 1–2 cümlede özetle.
+- Sonunda "risk seviyesi: düşük / orta / yüksek" ekle.
+
+4) Şanzıman Yorumu
+- İlan metninden şanzıman tipini tahmin etmeye çalış (otomatik/manuel, DSG/CVT/Tork vb. mümkünse).
+- Tek cümlede şehir içi kullanım açısından konfor ve güvenilirlik yorumu yap.
+- Sonuna "güvenilirlik: düşük / orta / yüksek" yaz.
+
+5) Artılar (Sizin kullanımınıza göre)
+- Kullanıcının kullanım amacı, şehir ve beklentilerine göre bu araç için 2 madde artı yaz.
+- Maddeler kısa olsun.
+
+6) Eksiler (Sizin kullanımınıza göre)
+- Aynı şekilde, bu kullanıcı için 2 madde eksi yaz.
+- Maddeler kısa olsun.
+
+7) Fiyat Yorumu
+- Verilen bütçeyi ve araç tipini dikkate alarak fiyatın piyasaya göre "uygun / normal / biraz yüksek" olduğunu 1 cümlede yorumla.
+
+8) Sonuç (tek cümle)
+- "Alınabilir", "Pazarlıkla değerlendirilebilir" veya "Daha temiz alternatiflere bakmak daha mantıklı" formatında net ve kısa bir karar yaz.
+
+Gereksiz uzun anlatım yapma, kullanıcıyı yormadan net konuş.
 
 KULLANICI VE ARAÇ BİLGİLERİ:
 
 {user_info_block}
 """
-
-    model_name = "gpt-4.1-mini" if request.mode == "free" else "gpt-4.1"
+        model_name = "gpt-4.1-mini"
 
     try:
         completion = client.chat.completions.create(
@@ -230,7 +259,7 @@ KULLANICI VE ARAÇ BİLGİLERİ:
         analysis_text = completion.choices[0].message.content
 
         return {
-            "mode": request.mode,
+            "mode": mode,
             "analysis": analysis_text,
         }
 
