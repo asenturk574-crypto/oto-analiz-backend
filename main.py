@@ -1,234 +1,241 @@
 import os
-import requests
-from bs4 import BeautifulSoup
-from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
 from typing import Optional
+
+from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel
 from openai import OpenAI
-from dotenv import load_dotenv
 
-load_dotenv()
-
-client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
+# OpenAI client (OPENAI_API_KEY env'den gelecek)
+client = OpenAI()
 
 app = FastAPI()
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-
-# ------------------------------
-#  SCRAPER – URL’den otomatik bilgi çekme
-# ------------------------------
-
-def scrape_listing(url: str):
-    data = {}
-
-    try:
-        headers = {
-            "User-Agent": "Mozilla/5.0"
-        }
-        resp = requests.get(url, headers=headers, timeout=10)
-        resp.raise_for_status()
-    except Exception as e:
-        print("Scrape hata:", e)
-        return data
-
-    soup = BeautifulSoup(resp.text, "html.parser")
-
-    # Fiyat
-    price = soup.select_one(".classifiedInfo .price") or soup.select_one(".price")
-    if price:
-        raw = price.get_text(strip=True)
-        digits = "".join([c for c in raw if c.isdigit()])
-        if digits:
-            data["price"] = float(digits)
-        data["currency"] = "TRY"
-
-    # Başlık
-    title_el = soup.select_one("h1")
-    if title_el:
-        data["title"] = title_el.get_text(strip=True)
-
-    # Açıklama
-    desc_el = soup.select_one("#classifiedDescription") or soup.select_one(".description")
-    if desc_el:
-        data["description"] = desc_el.get_text(" ", strip=True)
-
-    # KM / YIL / YAKIT / VİTES (sahibinden için tablo parse)
-    table_rows = soup.select(".classifiedInfoList li")
-    for row in table_rows:
-        text = row.get_text(" ", strip=True).lower()
-        if "km" in text:
-            digits = "".join([c for c in text if c.isdigit()])
-            if digits:
-                data["km"] = int(digits)
-        if "model" in text:
-            digits = "".join([c for c in text if c.isdigit()])
-            if digits:
-                data["year"] = int(digits)
-        if "yakıt" in text:
-            if "dizel" in text:
-                data["fuel"] = "Dizel"
-            elif "benzin" in text:
-                data["fuel"] = "Benzin"
-        if "vites" in text:
-            if "otomatik" in text:
-                data["gear"] = "Otomatik"
-            elif "manuel" in text:
-                data["gear"] = "Manuel"
-
-    return data
-
-
-
-# ------------------------------
-#   API REQUEST MODELLERİ
-# ------------------------------
 
 class AnalyzeRequest(BaseModel):
-    url: Optional[str] = None
-    user_budget: Optional[float] = None
-
-    title: Optional[str] = None
-    price: Optional[float] = None
-    currency: Optional[str] = "TRY"
-    year: Optional[int] = None
-    km: Optional[int] = None
-    fuel: Optional[str] = None
-    gear: Optional[str] = None
-    body_type: Optional[str] = None
-    city: Optional[str] = None
-    description: Optional[str] = None
-
-    is_premium: bool = False
-
-
-class AnalyzeResponse(BaseModel):
-    analysis: str
-
+    url: Optional[str] = ""
+    usage: Optional[str] = ""
+    description: Optional[str] = ""
+    # Budget string olsun ki Flutter'dan gelen string sorun çıkarmasın
+    budget: Optional[str] = None
+    city: Optional[str] = ""
+    note: Optional[str] = ""
+    # free / premium
+    mode: Optional[str] = "premium"
 
 
 @app.get("/")
 async def root():
-    return {"message": "Oto Analiz backend çalışıyor."}
+    return {"status": "ok", "message": "Oto Analiz backend çalışıyor."}
 
 
-
-# ------------------------------
-# ANALİZ ENDPOINT
-# ------------------------------
-
-@app.post("/analyze", response_model=AnalyzeResponse)
-async def analyze_car(data: AnalyzeRequest):
-
-    # 🔥 URL geldiyse ve diğer bilgiler boşsa otomatik scrape et
-    if data.url:
-        scraped = scrape_listing(data.url)
-        for key, value in scraped.items():
-            # Eğer kullanıcı manuel girmemişse scrape’den geleni doldur
-            if getattr(data, key, None) in (None, "", 0):
-                setattr(data, key, value)
-
-    # ------------------------------
-    # İLAN METNİ OLUŞTUR
-    # ------------------------------
-    ilan = []
-
-    if data.title: ilan.append(f"Başlık: {data.title}")
-    if data.price: ilan.append(f"Fiyat: {data.price} {data.currency}")
-    if data.year: ilan.append(f"Model Yılı: {data.year}")
-    if data.km: ilan.append(f"Kilometre: {data.km}")
-    if data.fuel: ilan.append(f"Yakıt: {data.fuel}")
-    if data.gear: ilan.append(f"Vites: {data.gear}")
-    if data.body_type: ilan.append(f"Segment: {data.body_type}")
-    if data.city: ilan.append(f"Şehir: {data.city}")
-    if data.description: ilan.append(f"Açıklama: {data.description}")
-
-    ilan_metni = "\n".join(ilan) if ilan else "İlan bilgisi yok."
-
-    # Kullanıcı bütçe bilgisi
-    butce = (
-        f"{data.user_budget} {data.currency}"
-        if data.user_budget else "Belirtilmemiş"
-    )
-
-    premium = "EVET" if data.is_premium else "HAYIR"
+@app.post("/analyze")
+async def analyze(request: AnalyzeRequest):
+    """
+    Ana analiz endpoint'i.
+    Flutter'dan gelen body buraya düşüyor.
+    """
+    result = await run_analysis(request)
+    return result
 
 
-    # ------------------------------
-    # PROMPT
-    # ------------------------------
+async def run_analysis(request: AnalyzeRequest):
+    if not request.description and not request.url:
+        raise HTTPException(
+            status_code=400,
+            detail="Analiz için en az ilan açıklaması veya ilan linki (url) gerekir.",
+        )
 
-    system_prompt = """
-Sen Türkiye'deki 2.el araç piyasasını çok iyi bilen kesin bir ekspertiz uzmanısın.
-FİYAT UYDURMA. Sana gelen fiyatı aynen kullan.
-"""
+    parts = []
 
-    if data.is_premium:
-        user_prompt = f"""
-Aşağıdaki ilanı premium detayda analiz et.
+    # Kullanıcı profili
+    if request.usage:
+        parts.append(f"Kullanım amacı: {request.usage}")
 
-Bütçe: {butce}
-Premium: {premium}
+    if request.budget is not None and request.budget != "":
+        parts.append(f"Kullanıcının hedef bütçesi: {request.budget} TL civarı")
 
-İLAN:
-{ilan_metni}
+    if request.city:
+        parts.append(f"Kullanıcının bulunduğu şehir: {request.city}")
 
-KURALLAR:
-- İLAN FİYATINI ASLA DEĞİŞTİRME.
-- KENDİNCE YENİ FİYAT UYDURMA.
-- MASRAF TAHMİNİ YAPABİLİRSİN AMA İLAN FİYATINI DEĞİŞTİRME.
+    if request.note:
+        parts.append(f"Kullanıcının ek notları / beklentileri:\n{request.note}")
 
-FORMAT:
-1) Kısa Özet
-2) Olumlu Yönler
-3) Riskler / Masraflar
-4) Kronik Sorunlar
-5) Fiyat & Piyasa Analizi
-6) Pazarlık Payı Tahmini
-7) Ekspertizde Baktırılacak Noktalar
-8) Son Karar (AL / DÜŞÜN / UZAK DUR)
+    # Araç / ilan bilgisi
+    if request.description:
+        parts.append(f"İlan açıklaması:\n{request.description}")
+
+    if request.url:
+        parts.append(f"İlan linki (sadece referans): {request.url}")
+
+    user_info_block = "\n\n".join(parts)
+
+    # -------------------- PROMPT --------------------
+
+    if request.mode == "premium":
+        prompt = f"""
+Sen Türkiye'de ikinci el araç piyasasını çok iyi bilen, yıllardır ekspertiz yapan
+ve aynı zamanda kullanıcı dostu bir araç danışmanısın.
+
+Aşağıda sana bir kullanıcının profili ve bir araç ilanının metinleri veriliyor.
+
+Senin görevin, bu aracı KULLANICININ KRİTERLERİNE GÖRE analiz etmek ve
+başlık başlık profesyonel ama anlaşılır bir rapor üretmek.
+
+Her zaman KULLANICI PROFİLİ + ARAÇ PROFİLİ + TÜRKİYE PİYASASI
+üzerinden mantıklı, tutarlı yorum yap.
+
+Kullanıcı tüm alanları doldurmak zorunda değildir. Bir alan boşsa:
+- "Bu bilgi verilmediği için genel Türkiye koşulları üzerinden yorum yapılmıştır." gibi not düş
+- Asla analiz vermekten kaçınma, genel kullanım mantığına göre bilgi ver.
+
+ÇIKTIMI MUTLAKA AŞAĞIDAKİ BAŞLIKLARLA VE SIRAYLA VER:
+
+1) Araç Özeti
+- Markayı, modeli, motor tipini, yılını, kilometreyi ilan metninden çıkarabildiğin kadar özetle.
+- Aracın karakterini 2-3 cümleyle anlat (konfor, performans, aile kullanımı, segment, kimlere hitap ettiği).
+
+2) Kullanıcı Profili & Uygunluk
+- Kullanıcının kullanım amacı, bütçesi, şehri ve ek notlarına göre bir profil çıkar.
+- Kullanıcının önceliklerini özetle (konfor, düşük masraf, performans, aile, park kolaylığı vb.).
+- Bu araç bu profile ne kadar uyuyor? "Uygunluk: uygun / sınırda / zayıf" diye net bir ifade yaz.
+
+3) Motor Analizi
+- Motor tipine göre (dizel / benzin / LPG / hibrit) genel yorum yap.
+- Turbo mu, atmosferik mi? Yokuşta ve tam dolu kullanımda performansı nasıl olur?
+- 1.0–1.2 gibi küçük hacimli motor büyük bir kasada ise özellikle bunu belirt.
+- Dizel + kısa mesafe kullanımda DPF/EGR riskini, LPG'de soğuk çalışmada ve uzun vadede yaşanabilecek sorunları açıkla.
+- "Motor risk seviyesi: düşük / orta / yüksek" diye net bir cümle yaz.
+
+4) Şanzıman Analizi
+- İlan metninden şanzıman tipini (DSG/DCT, CVT, tork konvertörlü, robotize, manuel) anlamaya çalış.
+- Her şanzıman tipi için:
+  - DSG/DCT: performanslıdır ama dur-kalk trafikte kavrama ısınması ve pahalı arıza riskinden bahset.
+  - CVT: şehir içi için konforlu ama yüksek yükte bağırma ve kayış/kasnak maliyetinden bahset.
+  - Tork konvertörlü: dayanıklılığı, ağır kasada avantajını, arıza olursa revizyon maliyetini anlat.
+  - Robotize: düşük hızda vuruntu, kavrama aşınması ama nispeten düşük tamir maliyetinden bahset.
+  - Manuel: masraf açısından avantajlı ama yoğun trafikte yorucu olduğunu anlat.
+- Kullanıcının şehir içi / uzun yol kullanımına göre bu şanzımanın uygunluğunu yorumla.
+- "Şanzıman risk seviyesi: düşük / orta / yüksek" diye yaz.
+
+5) Araç Boyutu & Kullanım Ortamı
+- Araç B/C/D segment mi, sedan mı, hatchback mi, SUV mu tahmin etmeye çalış.
+- Şehir içi dar sokak, park sorunu gibi durumlarda büyük gövdeli araçların dezavantajlarını anlat.
+- Uzun yol ve aile için geniş sedan/SUV'in avantajlarını, şehir içi parkta dezavantajlarını belirt.
+
+6) Yakıt Uygunluğu
+- Kullanıcının yakıt tercihi ile aracın yakıt tipini karşılaştır.
+- Dizel + uzun yol için avantajları, dizel + kısa mesafe için riskleri açıkla.
+- Benzinli için yakıt tüketimi / sessizlik, LPG için masraf avantajı / bagaj kaybı ve ayar sorunlarından bahset.
+- "Yakıt uygunluğu: uygun / sınırda / zayıf" diye net bir ifade yaz.
+
+7) Kronik Sorunlar & Risk Listesi
+- Bu araç tipi/motor/şanzıman için bilinen kronik sorunları 3–6 maddelik bir listede yaz.
+- Her maddenin sonuna parantez içinde risk seviyesi yaz: (risk: düşük), (risk: orta), (risk: yüksek).
+
+8) Masraf Analizi (Kısa & Orta Vade)
+- Yakın vadede (bakım, lastik, fren, ufak tamirler) çıkabilecek muhtemel masraf seviyesini yorumla.
+- Orta vadede (triger, debriyaj, şanzıman yağı, turbo bakımı, enjektör) muhtemel masraf seviyesini anlat.
+- Rakam verme, "düşük / orta / yüksek" seviye kullan.
+- "Genel masraf seviyesi: düşük / orta / yüksek" diye net bir cümle yaz.
+
+9) Sigorta, Kasko ve Parça Bulunabilirliği
+- Bu segment ve yaşta bir araç için kasko ve sigorta maliyet seviyesini (düşük/orta/yüksek) yorumla.
+- Parça bulunabilirliği: kolay / orta / zor şeklinde değerlendir.
+- Özel servis ve yan sanayi parça ile kullanılabilirlik hakkında genel bir yorum yap.
+
+10) Piyasa & Satılabilirlik
+- Türkiye ikinci el piyasasında bu modelin tutulup tutulmadığını yorumla.
+- Motor/şanzıman kombinasyonunun alıcı kitlesi geniş mi dar mı, bunu belirt.
+- Piyasasını "Piyasa: hızlı / normal / yavaş" olarak değerlendir.
+- Satılabilirliği "Satılabilirlik: kolay / ortalama / zor" diye yaz.
+
+11) Kullanıcıya Özel Uyarılar
+- Özellikle KULLANICI PROFİLİ ile ARAÇ PROFİLİNİN çeliştiği noktaları maddeler halinde yaz.
+- Örn: kısa mesafe + dizel, küçük motor + ağır kasa, DSG + yoğun trafik, büyük kasa + dar sokaklar, bütçe sınırı vs.
+- En az 3, en fazla 7 madde yaz.
+
+12) Fiyat & Pazarlık Yorumu
+- Verilen bütçe bilgisine ve araç tipine göre fiyatın "uygun / normal / yüksek" olup olmadığını yorumla.
+- Net rakam söyleme, ama pazarlık payı hakkında genel yorum yap.
+- "Bu fiyata daha düşük km/daha temiz alternatif bulunabilir mi?" sorusuna kısaca değin.
+
+13) Alternatif Araç Önerileri
+- Kullanıcının profilini ve bütçesini dikkate alarak 2–3 alternatif model öner.
+- Her araç için çok kısa sebep yaz (daha düşük masraf, şehir içi uygunluğu, aile kullanımı, daha sorunsuz şanzıman vb.).
+- Marka fanlığı yapma, objektif kal.
+
+14) Puanlama (10 Üzerinden)
+- Alt başlıklarda 10 üzerinden puan ver:
+  - Kullanım amacına uygunluk
+  - Motor-masraf dengesi
+  - Şanzıman güvenilirliği
+  - Yakıt-maliyet dengesi
+  - Aile/şehir içi uygunluğu
+  - İkinci el piyasası
+- En sonda "Genel skor: X / 10" yaz.
+
+15) Sonuç & Karar (TEK NET CÜMLE)
+- En sonda ayrı bir satırda şu formatta net bir karar yaz:
+  - "Karar: Ekspertiz temizse alınabilir."
+  - "Karar: Ancak ciddi pazarlıkla değerlendirilebilir."
+  - "Karar: Bu kilometrede bu fiyata çok mantıklı değil."
+  - "Karar: Bütçeyi biraz artırarak daha temiz seçenek bakmak daha mantıklı olur."
+
+KULLANICI VE ARAÇ BİLGİLERİ:
+
+{user_info_block}
 """
     else:
-        user_prompt = f"""
-Aşağıdaki ilanı hızlı analiz et.
+        # FREE: kısa özet mod
+        prompt = f"""
+Sen Türkiye'de ikinci el araç piyasasını iyi bilen bir uzmansın.
+Aşağıda bir kullanıcı profili ve bir araç ilanı hakkında bilgiler var.
 
-Bütçe: {butce}
+FREE moddasın, bu yüzden:
+- En fazla 8-10 cümlelik bir özet analiz yap.
+- Detaylı başlıklar, uzun listeler verme.
+- Basit, net, anlaşılır konuş.
 
-İLAN:
-{ilan_metni}
+Kısaca şunlara değin:
+- Araç genel olarak mantıklı mı?
+- Kullanım amacına ne kadar uyuyor? (şehir içi, aile, uzun yol vb.)
+- Kilometre ve yaşına göre risk seviyesi (düşük / orta / yüksek).
+- Masraf seviyesi (düşük / orta / yüksek).
+- Bu araç alınır mı, yoksa daha temiz/daha düşük km bakmak daha mı mantıklı?
+- Son cümlende "Alınır / Alınmaz / Pazarlıkla değerlendirilebilir" formatında net bir karar ver.
 
-FİYATI DEĞİŞTİRME. SANA GELEN FİYAT: {data.price}
+KULLANICI VE ARAÇ BİLGİLERİ:
 
-FORMAT:
-1) Özet
-2) Olumlu Yönler
-3) Riskler
-4) Bütçe Uygun mu?
-5) Son Karar
+{user_info_block}
 """
 
+    model_name = "gpt-4.1-mini" if request.mode == "free" else "gpt-4.1"
 
-    # ------------------------------
-    #   OPENAI ÇAĞRISI
-    # ------------------------------
+    try:
+        completion = client.chat.completions.create(
+            model=model_name,
+            messages=[
+                {
+                    "role": "system",
+                    "content": (
+                        "Sen uzman bir ikinci el araç ekspertiz ve fiyat değerlendirme danışmanısın. "
+                        "Kullanıcıya net, dürüst, anlaşılır ve kişiye özel yorum yap."
+                    ),
+                },
+                {"role": "user", "content": prompt},
+            ],
+            temperature=0.4,
+        )
 
-    response = client.chat.completions.create(
-        model="gpt-4.1-mini",
-        messages=[
-            {"role": "system", "content": system_prompt},
-            {"role": "user", "content": user_prompt}
-        ],
-        temperature=0.4
-    )
+        analysis_text = completion.choices[0].message.content
 
-    text = response.choices[0].message.content.strip()
+        return {
+            "mode": request.mode,
+            "analysis": analysis_text,
+        }
 
-    return AnalyzeResponse(analysis=text)
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Analiz sırasında hata oluştu: {e}",
+        )
