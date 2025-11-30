@@ -1,274 +1,95 @@
-import os
-from typing import Optional
-
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
+from typing import Optional
 from openai import OpenAI
-
-# OpenAI client (OPENAI_API_KEY env'den gelecek)
-client = OpenAI()
+import os
 
 app = FastAPI()
 
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 class AnalyzeRequest(BaseModel):
     url: Optional[str] = ""
     usage: Optional[str] = ""
     description: Optional[str] = ""
-    budget: Optional[str] = None  # string kalsın
+    budget: Optional[str] = None
     city: Optional[str] = ""
     note: Optional[str] = ""
-    # "normal" veya "premium"
-    mode: Optional[str] = "normal"
-
-
-@app.get("/")
-async def root():
-    return {"status": "ok", "message": "Oto Analiz backend çalışıyor."}
-
+    mode: Optional[str] = "normal"   # <<< DEFAULT NORMAL
 
 @app.post("/analyze")
-async def analyze(request: AnalyzeRequest):
-    """
-    Ana analiz endpoint'i.
-    Flutter'dan gelen body buraya düşüyor.
-    """
-    result = await run_analysis(request)
-    return result
-
-
 async def run_analysis(request: AnalyzeRequest):
-    if not request.description and not request.url:
-        raise HTTPException(
-            status_code=400,
-            detail="Analiz için en az ilan açıklaması veya ilan linki (url) gerekir.",
-        )
 
-    parts = []
+    # -------------------------------------------------
+    # NORMAL TEMPLATE (Kısa – sade – kullanıcıya özel)
+    # -------------------------------------------------
+    normal_prompt = f"""
+Kısa ve sade bir ikinci el araç analizi oluştur.
 
-    # Kullanıcı profili
-    if request.usage:
-        parts.append(f"Kullanım amacı: {request.usage}")
+Kullanıcı Bilgileri:
+- Kullanım amacı: {request.usage}
+- Açıklama: {request.description}
+- Bütçe: {request.budget}
+- Şehir: {request.city}
+- Ek notlar: {request.note}
 
-    if request.budget is not None and request.budget != "":
-        parts.append(f"Kullanıcının hedef bütçesi: {request.budget} TL civarı")
+Kurallar:
+- Analiz 6–8 kısa bölümden oluşsun
+- Her bölüm maximum 2 cümle
+- Kullanıcıya göre yorum yap
+- Premium kadar detay verme
+- Maddeleri kısa tut
+- Teknik derinlik yok, sade konuş
 
-    if request.city:
-        parts.append(f"Kullanıcının bulunduğu şehir: {request.city}")
+Format:
+1) Araç Özeti (1–2 cümle)
+2) Kullanıcı Profiline Uygunluk (1–2 cümle)
+3) Motor – Yakıt Yorumu (1–2 cümle)
+4) Şanzıman Yorumu (1 cümle)
+5) Artılar (2 madde)
+6) Eksiler (2 madde)
+7) Fiyat Yorumu (1 cümle)
+8) Sonuç (tek net cümle)
+    """
 
-    if request.note:
-        parts.append(f"Kullanıcının ek notları / beklentileri:\n{request.note}")
+    # -------------------------------------------------
+    # PREMIUM TEMPLATE (Uzun – derin – detaylı)
+    # -------------------------------------------------
+    premium_prompt = f"""
+Detaylı, profesyonel ve tamamen kullanıcıya özel bir premium ikinci el araç analizi oluştur.
 
-    # Araç / ilan bilgisi
-    if request.description:
-        parts.append(f"İlan açıklaması:\n{request.description}")
+Kullanıcı Bilgileri:
+- Kullanım amacı: {request.usage}
+- Açıklama: {request.description}
+- Bütçe: {request.budget}
+- Şehir: {request.city}
+- Ek notlar: {request.note}
 
-    if request.url:
-        parts.append(f"İlan linki (sadece referans): {request.url}")
+Kurallar:
+- 12–15 başlık olsun
+- Her başlık 3–5 cümle olsun
+- Motor, şanzıman, kronik sorunlar, masraf, piyasa, uygunluk, alternatif araçlar vb.
+- Kullanıcının kullanım senaryosuna özel yorum yap
+- Premium analiz yine çok dolu ve detaylı olsun
 
-    user_info_block = "\n\n".join(parts)
+Format tamamen premium seviyesinde olsun.
+    """
 
-    # -------------------- PROMPT SEÇİMİ --------------------
-
-    mode = (request.mode or "normal").lower()
-
-    if mode == "premium":
-        # UZUN, DETAYLI PREMIUM ANALİZ
-        prompt = f"""
-Sen Türkiye'de ikinci el araç piyasasını çok iyi bilen, yıllardır ekspertiz yapan
-ve aynı zamanda kullanıcı dostu bir araç danışmanısın.
-
-Aşağıda sana bir kullanıcının profili ve bir araç ilanının metinleri veriliyor.
-
-Senin görevin, bu aracı KULLANICININ KRİTERLERİNE GÖRE analiz etmek ve
-başlık başlık profesyonel ama anlaşılır bir rapor üretmek.
-
-Her zaman KULLANICI PROFİLİ + ARAÇ PROFİLİ + TÜRKİYE PİYASASI
-üzerinden mantıklı, tutarlı yorum yap.
-
-Kullanıcı tüm alanları doldurmak zorunda değildir. Bir alan boşsa:
-- "Bu bilgi verilmediği için genel Türkiye koşulları üzerinden yorum yapılmıştır." gibi not düş
-- Asla analiz vermekten kaçınma, genel kullanım mantığına göre bilgi ver.
-
-ÇIKTIMI MUTLAKA AŞAĞIDAKİ BAŞLIKLARLA VE SIRAYLA VER:
-
-1) Araç Özeti
-- Markayı, modeli, motor tipini, yılını, kilometreyi ilan metninden çıkarabildiğin kadar özetle.
-- Aracın karakterini 2-3 cümleyle anlat (konfor, performans, aile kullanımı, segment, kimlere hitap ettiği).
-
-2) Kullanıcı Profili & Uygunluk
-- Kullanıcının kullanım amacı, bütçesi, şehri ve ek notlarına göre bir profil çıkar.
-- Kullanıcının önceliklerini özetle (konfor, düşük masraf, performans, aile, park kolaylığı vb.).
-- Bu araç bu profile ne kadar uyuyor? "Uygunluk: uygun / sınırda / zayıf" diye net bir ifade yaz.
-
-3) Motor Analizi
-- Motor tipine göre (dizel / benzin / LPG / hibrit) genel yorum yap.
-- Turbo mu, atmosferik mi? Yokuşta ve tam dolu kullanımda performansı nasıl olur?
-- 1.0–1.2 gibi küçük hacimli motor büyük bir kasada ise özellikle bunu belirt.
-- Dizel + kısa mesafe kullanımda DPF/EGR riskini, LPG'de soğuk çalışmada ve uzun vadede yaşanabilecek sorunları açıkla.
-- "Motor risk seviyesi: düşük / orta / yüksek" diye net bir cümle yaz.
-
-4) Şanzıman Analizi
-- İlan metninden şanzıman tipini (DSG/DCT, CVT, tork konvertörlü, robotize, manuel) anlamaya çalış.
-- Her şanzıman tipi için:
-  - DSG/DCT: performanslıdır ama dur-kalk trafikte kavrama ısınması ve pahalı arıza riskinden bahset.
-  - CVT: şehir içi için konforlu ama yüksek yükte bağırma ve kayış/kasnak maliyetinden bahset.
-  - Tork konvertörlü: dayanıklılığı, ağır kasada avantajını, arıza olursa revizyon maliyetini anlat.
-  - Robotize: düşük hızda vuruntu, kavrama aşınması ama nispeten düşük tamir maliyetinden bahset.
-  - Manuel: masraf açısından avantajlı ama yoğun trafikte yorucu olduğunu anlat.
-- Kullanıcının şehir içi / uzun yol kullanımına göre bu şanzımanın uygunluğunu yorumla.
-- "Şanzıman risk seviyesi: düşük / orta / yüksek" diye yaz.
-
-5) Araç Boyutu & Kullanım Ortamı
-- Araç B/C/D segment mi, sedan mı, hatchback mi, SUV mu tahmin etmeye çalış.
-- Şehir içi dar sokak, park sorunu gibi durumlarda büyük gövdeli araçların dezavantajlarını anlat.
-- Uzun yol ve aile için geniş sedan/SUV'in avantajlarını, şehir içi parkta dezavantajlarını belirt.
-
-6) Yakıt Uygunluğu
-- Kullanıcının yakıt tercihi ile aracın yakıt tipini karşılaştır.
-- Dizel + uzun yol için avantajları, dizel + kısa mesafe için riskleri açıkla.
-- Benzinli için yakıt tüketimi / sessizlik, LPG için masraf avantajı / bagaj kaybı ve ayar sorunlarından bahset.
-- "Yakıt uygunluğu: uygun / sınırda / zayıf" diye net bir ifade yaz.
-
-7) Kronik Sorunlar & Risk Listesi
-- Bu araç tipi/motor/şanzıman için bilinen kronik sorunları 3–6 maddelik bir listede yaz.
-- Her maddenin sonuna parantez içinde risk seviyesi yaz: (risk: düşük), (risk: orta), (risk: yüksek).
-
-8) Masraf Analizi (Kısa & Orta Vade)
-- Yakın vadede (bakım, lastik, fren, ufak tamirler) çıkabilecek muhtemel masraf seviyesini yorumla.
-- Orta vadede (triger, debriyaj, şanzıman yağı, turbo bakımı, enjektör) muhtemel masraf seviyesini anlat.
-- Rakam verme, "düşük / orta / yüksek" seviye kullan.
-- "Genel masraf seviyesi: düşük / orta / yüksek" diye net bir cümle yaz.
-
-9) Sigorta, Kasko ve Parça Bulunabilirliği
-- Bu segment ve yaşta bir araç için kasko ve sigorta maliyet seviyesini (düşük/orta/yüksek) yorumla.
-- Parça bulunabilirliği: kolay / orta / zor şeklinde değerlendir.
-- Özel servis ve yan sanayi parça ile kullanılabilirlik hakkında genel bir yorum yap.
-
-10) Piyasa & Satılabilirlik
-- Türkiye ikinci el piyasasında bu modelin tutulup tutulmadığını yorumla.
-- Motor/şanzıman kombinasyonunun alıcı kitlesi geniş mi dar mı, bunu belirt.
-- Piyasasını "Piyasa: hızlı / normal / yavaş" olarak değerlendir.
-- Satılabilirliği "Satılabilirlik: kolay / ortalama / zor" diye yaz.
-
-11) Kullanıcıya Özel Uyarılar
-- Özellikle KULLANICI PROFİLİ ile ARAÇ PROFİLİNİN çeliştiği noktaları maddeler halinde yaz.
-- Örn: kısa mesafe + dizel, küçük motor + ağır kasa, DSG + yoğun trafik, büyük kasa + dar sokaklar, bütçe sınırı vs.
-- En az 3, en fazla 7 madde yaz.
-
-12) Fiyat & Pazarlık Yorumu
-- Verilen bütçe bilgisine ve araç tipine göre fiyatın "uygun / normal / yüksek" olup olmadığını yorumla.
-- Net rakam söyleme, ama pazarlık payı hakkında genel yorum yap.
-- "Bu fiyata daha düşük km/daha temiz alternatif bulunabilir mi?" sorusuna kısaca değin.
-
-13) Alternatif Araç Önerileri
-- Kullanıcının profilini ve bütçesini dikkate alarak 2–3 alternatif model öner.
-- Her araç için çok kısa sebep yaz (daha düşük masraf, şehir içi uygunluğu, aile kullanımı, daha sorunsuz şanzıman vb.).
-- Marka fanlığı yapma, objektif kal.
-
-14) Puanlama (10 Üzerinden)
-- Alt başlıklarda 10 üzerinden puan ver:
-  - Kullanım amacına uygunluk
-  - Motor-masraf dengesi
-  - Şanzıman güvenilirliği
-  - Yakıt-maliyet dengesi
-  - Aile/şehir içi uygunluğu
-  - İkinci el piyasası
-- En sonda "Genel skor: X / 10" yaz.
-
-15) Sonuç & Karar (TEK NET CÜMLE)
-- En sonda ayrı bir satırda şu formatta net bir karar yaz:
-  - "Karar: Ekspertiz temizse alınabilir."
-  - "Karar: Ancak ciddi pazarlıkla değerlendirilebilir."
-  - "Karar: Bu kilometrede bu fiyata çok mantıklı değil."
-  - "Karar: Bütçeyi biraz artırarak daha temiz seçenek bakmak daha mantıklı olur."
-
-KULLANICI VE ARAÇ BİLGİLERİ:
-
-{user_info_block}
-"""
-        model_name = "gpt-4.1"
-
-    else:
-        # NORMAL (ÜCRETSİZ) ANALİZ – ÇOK KISA AMA KİŞİYE ÖZEL
-        prompt = f"""
-Sen Türkiye'de ikinci el araç piyasasını iyi bilen bir araç danışmanısın.
-Aşağıdaki bilgiler bir kullanıcının profili ve bir araç ilanı hakkındadır.
-
-NORMAL analiz modundasın.
-Bu modda PREMIUM kadar detay VERME.
-KISA ve HIZLI bir özet ver.
-TOPLAM EN FAZLA 10–12 CÜMLE KULLAN.
-GEREKSİZ TEKRAR YAPMA.
-
-Analizi şu basit yapıda yaz:
-
-1) Araç Özeti:
-- SADECE 1 CÜMLE. Markayı, modeli, motoru ve genel durumu kısaca özetle.
-
-2) Kullanım Amacına Uygunluk:
-- SADECE 1 CÜMLE. Kullanıcının kullanım amacına göre bu araç ne kadar uygun?
-- Cümlenin SONUNA parantez içinde şunu ekle: (uygun / sınırda / pek uygun değil)
-
-3) Motor & Yakıt:
-- EN FAZLA 2 CÜMLE. Motor tipi ve yakıt tüketimini, kullanıcının beklentisine göre değerlendir.
-- Son cümlenin SONUNA "risk seviyesi: düşük / orta / yüksek" ekle.
-
-4) Şanzıman:
-- SADECE 1 CÜMLE. Şanzımanı şehir içi kullanım açısından kısaca yorumla.
-- Cümlenin SONUNA "güvenilirlik: düşük / orta / yüksek" yaz.
-
-5) Artılar:
-- EN FAZLA 2 MADDE. Maddeler çok kısa olsun, 1 satırı geçmesin.
-- Maddeleri kullanıcının kullanım amacına göre yaz.
-
-6) Eksiler:
-- EN FAZLA 2 MADDE. Maddeler çok kısa olsun, 1 satırı geçmesin.
-- Kullanıcının kullanım amacına göre gerçekten önemli olabilecek eksileri yaz.
-
-7) Fiyat Yorumu:
-- SADECE 1 CÜMLE. Fiyatı piyasaya göre "uygun / normal / biraz yüksek" olarak değerlendir ve kısa sebep ekle.
-
-8) Sonuç:
-- SADECE 1 CÜMLE. Şu formatlardan birini kullan:
-  - "Sonuç: Alınabilir."
-  - "Sonuç: Pazarlıkla değerlendirilebilir."
-  - "Sonuç: Daha temiz alternatiflere bakmak daha mantıklı."
-
-BU YAPININ DIŞINA ÇIKMA.
-Madde sayısını ve cümle sayısını aşma.
-
-KULLANICI VE ARAÇ BİLGİLERİ:
-
-{user_info_block}
-"""
-        model_name = "gpt-4.1-mini"
+    # Hangi mod?
+    prompt = normal_prompt
+    if request.mode == "premium":
+        prompt = premium_prompt
 
     try:
-        completion = client.chat.completions.create(
-            model=model_name,
-            messages=[
-                {
-                    "role": "system",
-                    "content": (
-                        "Sen uzman bir ikinci el araç ekspertiz ve fiyat değerlendirme danışmanısın. "
-                        "Kullanıcıya net, dürüst, anlaşılır ve kişiye özel yorum yap."
-                    ),
-                },
-                {"role": "user", "content": prompt},
-            ],
-            temperature=0.4,
+        response = client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[{"role": "user", "content": prompt}]
         )
 
-        analysis_text = completion.choices[0].message.content
-
         return {
-            "mode": mode,
-            "analysis": analysis_text,
+            "mode": request.mode,
+            "analysis": response.choices[0].message.content
         }
 
     except Exception as e:
-        raise HTTPException(
-            status_code=500,
-            detail=f"Analiz sırasında hata oluştu: {e}",
-        )
+        raise HTTPException(status_code=500, detail=f"Analiz sırasında hata oluştu: {e}")
