@@ -10,13 +10,13 @@ from pydantic import BaseModel
 
 app = FastAPI(
     title="Oto Analiz Backend",
-    description="İlan metnine göre ikinci el araç analizi yapan servis.",
-    version="1.1.0",
+    description="İlan ve araç metinlerine göre normal, premium analiz ve araç karşılaştırma yapan servis.",
+    version="1.2.0",
 )
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],          # İleride domainlere göre kısıtlayabilirsin.
+    allow_origins=["*"],  # İleride domain bazlı kısıtlayabilirsin
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -34,16 +34,25 @@ class AnalyzeResponse(BaseModel):
     analysis: str
 
 
+class CompareRequest(BaseModel):
+    vehicle1: str
+    vehicle2: str
+
+
+class CompareResponse(BaseModel):
+    comparison: str
+
+
 OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
 OPENAI_API_URL = "https://api.openai.com/v1/chat/completions"
-OPENAI_MODEL = "gpt-4o-mini"
+OPENAI_MODEL = "gpt-4o-mini"   # Şimdilik tek model; ileride normal/premium ayrıştırırız.
 
 
 def _call_openai(system_prompt: str, user_content: str) -> str:
     if not OPENAI_API_KEY:
         raise HTTPException(
             status_code=500,
-            detail="OPENAI_API_KEY tanımlı değil. Lütfen Render ortam değişkenlerine ekle.",
+            detail="OPENAI_API_KEY tanımlı değil. Lütfen Render ortam değişkenlerine ekle."
         )
 
     headers = {
@@ -57,7 +66,7 @@ def _call_openai(system_prompt: str, user_content: str) -> str:
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": user_content},
         ],
-        "temperature": 0.7,
+        "temperature": 0.75,
     }
 
     try:
@@ -111,16 +120,49 @@ def generate_premium_analysis(text: str) -> str:
         "1) Araç Profili ve Kullanım Amacı\n"
         "2) Motor & Şanzıman & Kilometre Değerlendirmesi\n"
         "3) Yakıt Tipi, Yakıt Tüketimi ve Güncel Yakıt Fiyatlarına Göre Maliyet\n"
-        "4) Tramer, Boya, Değişen ve Kaza Riski\n"
+        "4) Tramer, Boya, Değişen ve Kaza Geçmişi Yorumu\n"
         "5) İlan Sahibinin Yazdıkları: Güvenilirlik ve Dikkat Çeken Noktalar\n"
-        "6) Yakın Vadede Çıkabilecek Muhtemel Masraflar (parça/parça yaz)\n"
-        "7) Ortalama Piyasa Değeri Tahmini (net fiyat söyleme, aralık ver)\n"
-        "8) Fiyat/Fayda Yorumu ve Alınır mı?/Alınmaz mı? şeklinde net bir sonuç\n\n"
+        "6) Yakın Vadede Çıkabilecek Muhtemel Masraflar (maddeler halinde yaz)\n"
+        "7) Ortalama Piyasa Değeri Tahmini (net tek fiyat verme, aralık ver)\n"
+        "8) Fiyat/Fayda Yorumu ve 'Alınır mı / Alınmaz mı?' şeklinde net bir sonuç\n\n"
         "Premium kullanıcıya hitap eder gibi daha detaylı, ama yine de anlaşılır Türkçe kullan. "
         "Gerektiği yerde uyarıcı ol ama boş yere korkutma. Madde madde ve başlıklarla yaz."
     )
 
     user_content = f"Aşağıdaki ilan metnine göre PREMIUM analiz yap:\n\n{text}"
+    return _call_openai(system_prompt, user_content)
+
+
+def generate_comparison(vehicle1: str, vehicle2: str) -> str:
+    """
+    Araç karşılaştırma için premium formatta detaylı analiz.
+    Şimdilik herkes için açık; ileride haftalık 1 hak / premium sınırsız mantığını
+    uygulama tarafında ve/veya kullanıcı hesabı sisteminde kurgulayacağız.
+    """
+    system_prompt = (
+        "Sen tarafsız ve deneyimli bir oto danışmansın. İKİ ARACI detaylı şekilde "
+        "birbirine göre karşılaştıracaksın.\n\n"
+        "Karşılaştırmada şu başlıklara mutlaka değin:\n"
+        "1) Genel Profil ve Segment Karşılaştırması\n"
+        "2) Performans (motor gücü, tork, hızlanma) ve Sürüş Hissi\n"
+        "3) Konfor, İç Mekan ve Donanım Seviyesi\n"
+        "4) Yakıt Tüketimi ve Güncel Yakıt Fiyatlarına Göre Maliyet Karşılaştırması\n"
+        "5) Kronik Sorunlar, Arıza Riskleri ve Dayanıklılık\n"
+        "6) Bakım Maliyetleri, Parça Fiyatları ve Servis Ağı\n"
+        "7) İkinci El Piyasa Değeri ve Satarken Elde Tutma Gücü\n"
+        "8) Hangi Kullanıcı Profili İçin Hangi Araç Daha Uygun?\n"
+        "9) Artılar / Eksiler Tablosu (Araç 1 ve Araç 2 için madde madde)\n"
+        "10) Sonuç: 'Hangi aracı hangi durumda tercih ederdin?' şeklinde net ve dürüst yorum\n\n"
+        "Tarafsız ol ama kullanıcıya gerçekten yardımcı olacak kadar net öneriler ver. "
+        "Ne çok yuvarlak konuş ne de kesin hüküm veriyormuş gibi davran; artıları ve eksileri göster."
+    )
+
+    user_content = (
+        "Aşağıda iki aracın bilgisi var. Bunları detaylı şekilde birbiriyle karşılaştır:\n\n"
+        f"ARAÇ 1:\n{vehicle1}\n\n"
+        f"ARAÇ 2:\n{vehicle2}\n"
+    )
+
     return _call_openai(system_prompt, user_content)
 
 
@@ -130,7 +172,10 @@ def generate_premium_analysis(text: str) -> str:
 
 @app.get("/")
 async def root():
-    return {"message": "Oto Analiz backend çalışıyor. /analyze ve /premium_analyze endpointlerini kullan."}
+    return {
+        "message": "Oto Analiz backend çalışıyor.",
+        "endpoints": ["/analyze", "/premium_analyze", "/compare", "/health"],
+    }
 
 
 @app.get("/health")
@@ -154,9 +199,23 @@ async def analyze(req: AnalyzeRequest):
 async def premium_analyze(req: AnalyzeRequest):
     """
     PREMIUM analiz endpoint'i.
-    Gövde yine: {"text": "... ilan açıklaması ..."}
+    Gövde: {"text": "... ilan açıklaması ..."}
     """
     if not req.text or not req.text.strip():
         raise HTTPException(status_code=400, detail="Metin boş olamaz.")
     analysis = generate_premium_analysis(req.text)
     return AnalyzeResponse(analysis=analysis)
+
+
+@app.post("/compare", response_model=CompareResponse)
+async def compare(req: CompareRequest):
+    """
+    Araç karşılaştırma endpoint'i.
+    Gövde: {"vehicle1": "...", "vehicle2": "..."}
+    Şimdilik herhangi bir limit yok; ileride haftalık 1 hak / premium sınırsız
+    mantığını buraya veya üst seviyeye ekleyebiliriz.
+    """
+    if not req.vehicle1.strip() or not req.vehicle2.strip():
+        raise HTTPException(status_code=400, detail="İki araç da boş olamaz.")
+    comparison = generate_comparison(req.vehicle1, req.vehicle2)
+    return CompareResponse(comparison=comparison)
