@@ -1,19 +1,23 @@
 import os
-import requests
-from bs4 import BeautifulSoup
-from fastapi import FastAPI
+import json
+from typing import Any, Dict, List, Optional
+
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
-from typing import Optional
-from openai import OpenAI
 from dotenv import load_dotenv
+from openai import OpenAI
 
+# .env içinden anahtarı yükle
 load_dotenv()
+api_key = os.getenv("OPENAI_API_KEY")
+if not api_key:
+    raise RuntimeError("OPENAI_API_KEY bulunamadı. .env dosyasını kontrol et.")
 
-client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
+client = OpenAI(api_key=api_key)
 
 app = FastAPI()
 
+# CORS – Flutter rahatça erişsin
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -23,212 +27,158 @@ app.add_middleware(
 )
 
 
-# ------------------------------
-#  SCRAPER – URL’den otomatik bilgi çekme
-# ------------------------------
+@app.get("/health")
+async def health():
+    return {"status": "ok"}
 
-def scrape_listing(url: str):
-    data = {}
+
+@app.post("/analyze")
+async def analyze(request: Request):
+    """
+    Flutter NormalAnalizScreen'den gelen isteği karşılar.
+    Burada HİÇ Pydantic / Body validation yok -> 422 atacak kimse kalmıyor.
+    """
+
+    # 🔹 Gövdeyi kendimiz parse ediyoruz, hata olursa boş dict'e düşer
+    try:
+      body = await request.json()
+    except Exception:
+      body = {}
+
+    if not isinstance(body, dict):
+      body = {}
+
+    vehicle: Dict[str, Any] = body.get("vehicle") or {}
+    profile: Dict[str, Any] = body.get("profile") or {}
+    ad_description: Optional[str] = body.get("ad_description") or ""
+    screenshot_base64: Optional[str] = body.get("screenshot_base64")
+
+    make = (vehicle.get("make") or "").strip() or "Bilinmiyor"
+    model = (vehicle.get("model") or "").strip() or "Bilinmiyor"
+    year = vehicle.get("year")
+    mileage = vehicle.get("mileage_km")
+    fuel = vehicle.get("fuel")
+
+    yearly_km = profile.get("yearly_km")
+    usage = profile.get("usage")
+    fuel_pref = profile.get("fuel_preference")
+
+    ad_text = ad_description or "İlan açıklaması verilmemiş."
+
+    base_text = f"""
+Kullanıcı Türkiye'de ikinci el araç bakıyor. Araç ve profil bilgileri:
+
+Araç:
+- Marka / Model: {make} {model}
+- Model yılı: {year or 'bilinmiyor'}
+- Kilometre: {mileage or 'bilinmiyor'} km
+- Yakıt türü: {fuel or 'bilinmiyor'}
+
+Kullanıcı profili:
+- Kullanım tipi: {usage or 'belirtilmemiş'} (city/mixed/highway)
+- Yıllık km: {yearly_km or 'bilinmiyor'}
+- Yakıt tercihi: {fuel_pref or 'belirtilmemiş'}
+
+İlan açıklaması:
+\"\"\"{ad_text}\"\"\".
+
+Bu bilgilerle aracı değerlendir; Türkiye şartlarına göre konuş.
+"""
+
+    contents: List[Dict[str, Any]] = [
+        {
+            "type": "input_text",
+            "text": base_text,
+        }
+    ]
+
+    if screenshot_base64:
+        contents.append(
+            {
+                "type": "input_image",
+                "image_url": f"data:image/jpeg;base64,{screenshot_base64}",
+            }
+        )
+
+    response_format = {
+        "type": "json_schema",
+        "json_schema": {
+            "name": "car_analysis",
+            "schema": {
+                "type": "object",
+                "properties": {
+                    "scores": {
+                        "type": "object",
+                        "properties": {
+                            "overall_100": {"type": "integer"},
+                            "reliability_100": {"type": "integer"},
+                            "running_cost_100": {"type": "integer"},
+                            "parts_availability_100": {"type": "integer"},
+                            "suitability_100": {"type": "integer"},
+                        },
+                        "required": ["overall_100"],
+                    },
+                    "summary": {
+                        "type": "object",
+                        "properties": {
+                            "short_text": {"type": "string"},
+                            "pros": {
+                                "type": "array",
+                                "items": {"type": "string"},
+                            },
+                            "cons": {
+                                "type": "array",
+                                "items": {"type": "string"},
+                            },
+                        },
+                        "required": ["short_text", "pros", "cons"],
+                    },
+                },
+                "required": ["scores", "summary"],
+            },
+        },
+    }
 
     try:
-        headers = {
-            "User-Agent": "Mozilla/5.0"
-        }
-        resp = requests.get(url, headers=headers, timeout=10)
-        resp.raise_for_status()
-    except Exception as e:
-        print("Scrape hata:", e)
+        resp = client.responses.create(
+            model="gpt-4.1-mini",
+            input=[
+                {
+                    "role": "system",
+                    "content": [
+                        {
+                            "type": "input_text",
+                            "text": (
+                                "Sen Türkiye'deki ikinci el araç piyasasını iyi bilen, "
+                                "oto ekspertiz + finans uzmanı bir asistansın. "
+                                "Kullanıcının bütçesine ve kullanımına göre yorum yap. "
+                                "Sadece JSON formatında cevap döndür."
+                            ),
+                        }
+                    ],
+                },
+                {
+                    "role": "user",
+                    "content": contents,
+                },
+            ],
+            response_format=response_format,
+        )
+
+        raw = resp.output[0].content[0].text
+
+        try:
+            data = json.loads(raw)
+        except Exception as parse_err:
+            raise HTTPException(
+                status_code=500,
+                detail=f"Model JSON'u parse edilemedi: {parse_err}. Raw: {raw[:200]}",
+            )
+
         return data
 
-    soup = BeautifulSoup(resp.text, "html.parser")
-
-    # Fiyat
-    price = soup.select_one(".classifiedInfo .price") or soup.select_one(".price")
-    if price:
-        raw = price.get_text(strip=True)
-        digits = "".join([c for c in raw if c.isdigit()])
-        if digits:
-            data["price"] = float(digits)
-        data["currency"] = "TRY"
-
-    # Başlık
-    title_el = soup.select_one("h1")
-    if title_el:
-        data["title"] = title_el.get_text(strip=True)
-
-    # Açıklama
-    desc_el = soup.select_one("#classifiedDescription") or soup.select_one(".description")
-    if desc_el:
-        data["description"] = desc_el.get_text(" ", strip=True)
-
-    # KM / YIL / YAKIT / VİTES (sahibinden için tablo parse)
-    table_rows = soup.select(".classifiedInfoList li")
-    for row in table_rows:
-        text = row.get_text(" ", strip=True).lower()
-        if "km" in text:
-            digits = "".join([c for c in text if c.isdigit()])
-            if digits:
-                data["km"] = int(digits)
-        if "model" in text:
-            digits = "".join([c for c in text if c.isdigit()])
-            if digits:
-                data["year"] = int(digits)
-        if "yakıt" in text:
-            if "dizel" in text:
-                data["fuel"] = "Dizel"
-            elif "benzin" in text:
-                data["fuel"] = "Benzin"
-        if "vites" in text:
-            if "otomatik" in text:
-                data["gear"] = "Otomatik"
-            elif "manuel" in text:
-                data["gear"] = "Manuel"
-
-    return data
-
-
-
-# ------------------------------
-#   API REQUEST MODELLERİ
-# ------------------------------
-
-class AnalyzeRequest(BaseModel):
-    url: Optional[str] = None
-    user_budget: Optional[float] = None
-
-    title: Optional[str] = None
-    price: Optional[float] = None
-    currency: Optional[str] = "TRY"
-    year: Optional[int] = None
-    km: Optional[int] = None
-    fuel: Optional[str] = None
-    gear: Optional[str] = None
-    body_type: Optional[str] = None
-    city: Optional[str] = None
-    description: Optional[str] = None
-
-    is_premium: bool = False
-
-
-class AnalyzeResponse(BaseModel):
-    analysis: str
-
-
-
-@app.get("/")
-async def root():
-    return {"message": "Oto Analiz backend çalışıyor."}
-
-
-
-# ------------------------------
-# ANALİZ ENDPOINT
-# ------------------------------
-
-@app.post("/analyze", response_model=AnalyzeResponse)
-async def analyze_car(data: AnalyzeRequest):
-
-    # 🔥 URL geldiyse ve diğer bilgiler boşsa otomatik scrape et
-    if data.url:
-        scraped = scrape_listing(data.url)
-        for key, value in scraped.items():
-            # Eğer kullanıcı manuel girmemişse scrape’den geleni doldur
-            if getattr(data, key, None) in (None, "", 0):
-                setattr(data, key, value)
-
-    # ------------------------------
-    # İLAN METNİ OLUŞTUR
-    # ------------------------------
-    ilan = []
-
-    if data.title: ilan.append(f"Başlık: {data.title}")
-    if data.price: ilan.append(f"Fiyat: {data.price} {data.currency}")
-    if data.year: ilan.append(f"Model Yılı: {data.year}")
-    if data.km: ilan.append(f"Kilometre: {data.km}")
-    if data.fuel: ilan.append(f"Yakıt: {data.fuel}")
-    if data.gear: ilan.append(f"Vites: {data.gear}")
-    if data.body_type: ilan.append(f"Segment: {data.body_type}")
-    if data.city: ilan.append(f"Şehir: {data.city}")
-    if data.description: ilan.append(f"Açıklama: {data.description}")
-
-    ilan_metni = "\n".join(ilan) if ilan else "İlan bilgisi yok."
-
-    # Kullanıcı bütçe bilgisi
-    butce = (
-        f"{data.user_budget} {data.currency}"
-        if data.user_budget else "Belirtilmemiş"
-    )
-
-    premium = "EVET" if data.is_premium else "HAYIR"
-
-
-    # ------------------------------
-    # PROMPT
-    # ------------------------------
-
-    system_prompt = """
-Sen Türkiye'deki 2.el araç piyasasını çok iyi bilen kesin bir ekspertiz uzmanısın.
-FİYAT UYDURMA. Sana gelen fiyatı aynen kullan.
-"""
-
-    if data.is_premium:
-        user_prompt = f"""
-Aşağıdaki ilanı premium detayda analiz et.
-
-Bütçe: {butce}
-Premium: {premium}
-
-İLAN:
-{ilan_metni}
-
-KURALLAR:
-- İLAN FİYATINI ASLA DEĞİŞTİRME.
-- KENDİNCE YENİ FİYAT UYDURMA.
-- MASRAF TAHMİNİ YAPABİLİRSİN AMA İLAN FİYATINI DEĞİŞTİRME.
-
-FORMAT:
-1) Kısa Özet
-2) Olumlu Yönler
-3) Riskler / Masraflar
-4) Kronik Sorunlar
-5) Fiyat & Piyasa Analizi
-6) Pazarlık Payı Tahmini
-7) Ekspertizde Baktırılacak Noktalar
-8) Son Karar (AL / DÜŞÜN / UZAK DUR)
-"""
-    else:
-        user_prompt = f"""
-Aşağıdaki ilanı hızlı analiz et.
-
-Bütçe: {butce}
-
-İLAN:
-{ilan_metni}
-
-FİYATI DEĞİŞTİRME. SANA GELEN FİYAT: {data.price}
-
-FORMAT:
-1) Özet
-2) Olumlu Yönler
-3) Riskler
-4) Bütçe Uygun mu?
-5) Son Karar
-"""
-
-
-    # ------------------------------
-    #   OPENAI ÇAĞRISI
-    # ------------------------------
-
-    response = client.chat.completions.create(
-        model="gpt-4.1-mini",
-        messages=[
-            {"role": "system", "content": system_prompt},
-            {"role": "user", "content": user_prompt}
-        ],
-        temperature=0.4
-    )
-
-    text = response.choices[0].message.content.strip()
-
-    return AnalyzeResponse(analysis=text)
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Analiz sırasında bir hata oluştu: {e}",
+        )
