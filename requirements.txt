@@ -3,3 +3,5 @@ uvicorn
 openai
 python-dotenv
 requests
+python-multipart
+pydantic

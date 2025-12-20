@@ -1,184 +1,145 @@
 import os
-import json
-from typing import Any, Dict, List, Optional
+from typing import Optional, Dict, Any
 
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from dotenv import load_dotenv
+from pydantic import BaseModel
+
 from openai import OpenAI
 
-# .env içinden anahtarı yükle
-load_dotenv()
-api_key = os.getenv("OPENAI_API_KEY")
-if not api_key:
-    raise RuntimeError("OPENAI_API_KEY bulunamadı. .env dosyasını kontrol et.")
 
-client = OpenAI(api_key=api_key)
+# -------------------------
+# FastAPI app
+# -------------------------
+app = FastAPI(title="oto-analiz-backend", version="1.0.0")
 
-app = FastAPI()
-
-# CORS – Flutter rahatça erişsin
+# CORS (Flutter rahat etsin)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["*"],  # prod'da istersen domain bazlı kısıtlarız
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
 
-@app.get("/health")
-async def health():
+# -------------------------
+# Models
+# -------------------------
+class AnalyzeRequest(BaseModel):
+    # Flutter'dan en az birini gönderebilirsin
+    text: Optional[str] = None
+    listing_title: Optional[str] = None
+    description: Optional[str] = None
+
+    # ekstra parametreler (opsiyonel)
+    extras: Optional[Dict[str, Any]] = None
+
+
+class AnalyzeResponse(BaseModel):
+    ok: bool
+    result: str
+
+
+# -------------------------
+# Helpers
+# -------------------------
+def get_openai_client() -> OpenAI:
+    """
+    Render'da .env yok; Environment Variables'dan OPENAI_API_KEY gelmeli.
+    Server crash olmasın diye sadece endpoint çağrılınca kontrol ediyoruz.
+    """
+    api_key = os.getenv("OPENAI_API_KEY")
+    if not api_key:
+        raise HTTPException(
+            status_code=500,
+            detail="OPENAI_API_KEY missing on server. Render -> Environment bölümüne ekle.",
+        )
+    return OpenAI(api_key=api_key)
+
+
+def build_user_input(req: AnalyzeRequest) -> str:
+    parts = []
+    if req.text:
+        parts.append(f"USER_TEXT:\n{req.text}")
+    if req.listing_title:
+        parts.append(f"LISTING_TITLE:\n{req.listing_title}")
+    if req.description:
+        parts.append(f"DESCRIPTION:\n{req.description}")
+    if req.extras:
+        parts.append(f"EXTRAS:\n{req.extras}")
+
+    if not parts:
+        # 422 yerine daha anlaşılır hata
+        raise HTTPException(
+            status_code=400,
+            detail="Boş istek. En azından 'text' veya 'listing_title/description' gönder.",
+        )
+    return "\n\n".join(parts)
+
+
+# -------------------------
+# Routes
+# -------------------------
+@app.get("/")
+def health():
     return {"status": "ok"}
 
 
-@app.post("/analyze")
-async def analyze(request: Request):
+@app.get("/health")
+def health2():
+    return {"ok": True}
+
+
+@app.post("/analyze", response_model=AnalyzeResponse)
+def analyze(req: AnalyzeRequest):
     """
-    Flutter NormalAnalizScreen'den gelen isteği karşılar.
-    Burada HİÇ Pydantic / Body validation yok -> 422 atacak kimse kalmıyor.
-    """
-
-    # 🔹 Gövdeyi kendimiz parse ediyoruz, hata olursa boş dict'e düşer
-    try:
-      body = await request.json()
-    except Exception:
-      body = {}
-
-    if not isinstance(body, dict):
-      body = {}
-
-    vehicle: Dict[str, Any] = body.get("vehicle") or {}
-    profile: Dict[str, Any] = body.get("profile") or {}
-    ad_description: Optional[str] = body.get("ad_description") or ""
-    screenshot_base64: Optional[str] = body.get("screenshot_base64")
-
-    make = (vehicle.get("make") or "").strip() or "Bilinmiyor"
-    model = (vehicle.get("model") or "").strip() or "Bilinmiyor"
-    year = vehicle.get("year")
-    mileage = vehicle.get("mileage_km")
-    fuel = vehicle.get("fuel")
-
-    yearly_km = profile.get("yearly_km")
-    usage = profile.get("usage")
-    fuel_pref = profile.get("fuel_preference")
-
-    ad_text = ad_description or "İlan açıklaması verilmemiş."
-
-    base_text = f"""
-Kullanıcı Türkiye'de ikinci el araç bakıyor. Araç ve profil bilgileri:
-
-Araç:
-- Marka / Model: {make} {model}
-- Model yılı: {year or 'bilinmiyor'}
-- Kilometre: {mileage or 'bilinmiyor'} km
-- Yakıt türü: {fuel or 'bilinmiyor'}
-
-Kullanıcı profili:
-- Kullanım tipi: {usage or 'belirtilmemiş'} (city/mixed/highway)
-- Yıllık km: {yearly_km or 'bilinmiyor'}
-- Yakıt tercihi: {fuel_pref or 'belirtilmemiş'}
-
-İlan açıklaması:
-\"\"\"{ad_text}\"\"\".
-
-Bu bilgilerle aracı değerlendir; Türkiye şartlarına göre konuş.
-"""
-
-    contents: List[Dict[str, Any]] = [
-        {
-            "type": "input_text",
-            "text": base_text,
-        }
-    ]
-
-    if screenshot_base64:
-        contents.append(
-            {
-                "type": "input_image",
-                "image_url": f"data:image/jpeg;base64,{screenshot_base64}",
-            }
-        )
-
-    response_format = {
-        "type": "json_schema",
-        "json_schema": {
-            "name": "car_analysis",
-            "schema": {
-                "type": "object",
-                "properties": {
-                    "scores": {
-                        "type": "object",
-                        "properties": {
-                            "overall_100": {"type": "integer"},
-                            "reliability_100": {"type": "integer"},
-                            "running_cost_100": {"type": "integer"},
-                            "parts_availability_100": {"type": "integer"},
-                            "suitability_100": {"type": "integer"},
-                        },
-                        "required": ["overall_100"],
-                    },
-                    "summary": {
-                        "type": "object",
-                        "properties": {
-                            "short_text": {"type": "string"},
-                            "pros": {
-                                "type": "array",
-                                "items": {"type": "string"},
-                            },
-                            "cons": {
-                                "type": "array",
-                                "items": {"type": "string"},
-                            },
-                        },
-                        "required": ["short_text", "pros", "cons"],
-                    },
-                },
-                "required": ["scores", "summary"],
-            },
-        },
+    Basit analiz endpoint'i.
+    Flutter JSON örneği:
+    {
+      "text": "2016 Passat 1.6 TDI DSG 180.000 km, fiyat 950.000 TL"
     }
+    """
+    user_input = build_user_input(req)
+
+    client = get_openai_client()
+
+    # Model adını burada merkezi yönetiyoruz
+    # Not: Kullandığın SDK ve hesabına göre uygun model adı değişebilir.
+    # Eğer hata alırsan logs'u at, birlikte doğru modele çeviririz.
+    model_name = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
+
+    system_prompt = (
+        "Sen Oto Analiz uygulaması için araç ilanı analizi yapan bir asistansın. "
+        "Kullanıcıya net, kısa, maddeli ve Türkiye piyasasına uygun yorum yap. "
+        "Varsa riskleri ve dikkat edilmesi gerekenleri belirt. "
+        "Tahmini masraf kalemleri ve pazarlık önerisi ekle."
+    )
 
     try:
-        resp = client.responses.create(
-            model="gpt-4.1-mini",
-            input=[
-                {
-                    "role": "system",
-                    "content": [
-                        {
-                            "type": "input_text",
-                            "text": (
-                                "Sen Türkiye'deki ikinci el araç piyasasını iyi bilen, "
-                                "oto ekspertiz + finans uzmanı bir asistansın. "
-                                "Kullanıcının bütçesine ve kullanımına göre yorum yap. "
-                                "Sadece JSON formatında cevap döndür."
-                            ),
-                        }
-                    ],
-                },
-                {
-                    "role": "user",
-                    "content": contents,
-                },
+        # openai python sdk (new)
+        resp = client.chat.completions.create(
+            model=model_name,
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": user_input},
             ],
-            response_format=response_format,
+            temperature=0.4,
         )
 
-        raw = resp.output[0].content[0].text
+        result_text = resp.choices[0].message.content or "Boş çıktı"
 
-        try:
-            data = json.loads(raw)
-        except Exception as parse_err:
-            raise HTTPException(
-                status_code=500,
-                detail=f"Model JSON'u parse edilemedi: {parse_err}. Raw: {raw[:200]}",
-            )
+        return AnalyzeResponse(ok=True, result=result_text)
 
-        return data
-
+    except HTTPException:
+        raise
     except Exception as e:
-        raise HTTPException(
-            status_code=500,
-            detail=f"Analiz sırasında bir hata oluştu: {e}",
-        )
+        # Render logs'ta da görürsün
+        raise HTTPException(status_code=500, detail=f"OpenAI request failed: {str(e)}")
+
+
+# İstersen buraya ileride:
+# - /analyze-from-image (SS analiz)
+# - /compare (karşılaştırma)
+# - /pricing (fiyat tahmini)
+# ekleriz.
