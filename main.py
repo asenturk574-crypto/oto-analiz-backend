@@ -19,27 +19,10 @@ if not api_key:
 
 client = OpenAI(api_key=api_key)
 
-# Varsayılan modeller (istersen .env'den değiştirebilirsin)
+# Varsayılan modeller (.env ile override edebilirsin)
 DEFAULT_MODEL_NORMAL = os.getenv("OPENAI_MODEL_NORMAL", "gpt-4.1-mini")
 DEFAULT_MODEL_PREMIUM = os.getenv("OPENAI_MODEL_PREMIUM", "gpt-4.1")
 DEFAULT_MODEL_OTOBOT = os.getenv("OPENAI_MODEL_OTOBOT", "gpt-4.1-mini")
-
-# -------------------------------------------------------------------
-#  FASTAPI APP
-# -------------------------------------------------------------------
-app = FastAPI(
-    title="Oto Analiz Backend",
-    description="Oto Analiz mobil uygulaması için normal/premium analiz API'si",
-    version="1.0.0",
-)
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],  # İstersek ileride domain ile kısıtlarız
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
 
 # -------------------------------------------------------------------
 #  MODELLER
@@ -70,14 +53,14 @@ class AnalyzeRequest(BaseModel):
     mode: Literal["normal", "premium", "manual", "compare", "otobot"] = "normal"
 
     # Serbest metin alanları
-    text: Optional[str] = None  # genel açıklama
+    text: Optional[str] = None
     listing_title: Optional[str] = None
     listing_description: Optional[str] = None
-    ad_description: Optional[str] = None  # eski frontend ile uyum için
+    ad_description: Optional[str] = None  # eski frontend ile uyum
 
     # SS alanları
-    screenshot_base64: Optional[str] = None  # tek görsel (eski sürüm)
-    screenshots_base64: Optional[List[str]] = None  # birden fazla görsel
+    screenshot_base64: Optional[str] = None            # tek görsel (eski)
+    screenshots_base64: Optional[List[str]] = None     # çoklu görsel
 
     # Yapısal veriler
     profile: Optional[Profile] = None
@@ -89,11 +72,9 @@ class AnalyzeRequest(BaseModel):
 
 # -------------------------------------------------------------------
 #  SABİT VERİ TABLOLARI (bakım, lastik, sigorta, likidite vb.)
-#  Bunlar tamamen backend içinde; dışarı veri sızdırmıyor.
 # -------------------------------------------------------------------
 
 SEGMENT_COSTS = {
-    # Ortalama yıllık bakım maliyeti (TL) + tahmini lastik set fiyatı (TL)
     "B": {"maintenance_yearly": 12000, "tire_set": 9000},
     "C": {"maintenance_yearly": 15000, "tire_set": 11000},
     "D": {"maintenance_yearly": 20000, "tire_set": 14000},
@@ -103,14 +84,12 @@ SEGMENT_COSTS = {
 }
 
 INSURANCE_LOSS_RATIO = {
-    # Sigortacının gözünden: hasar prim oranı yüksekse kasko pahalı olur
     "low": 0.8,
     "medium": 1.0,
     "high": 1.25,
 }
 
 BRAND_RISK_NOTES = {
-    # Çok özet “marka + şanzıman” / “marka + motor” risk notları – sadece örnek
     "vw_dsg": "DSG şanzımanlı VW modellerinde geçmişte kavrama ve mekatronik kaynaklı masraf riskleri görülmüştür.",
     "renault_1.5_dci": "1.5 dCi motorlar genel olarak ekonomik; fakat bakımsız örneklerde turbo/enjektör masrafı çıkabiliyor.",
     "bmw_n47": "Eski N47 dizel BMW motorlarında zamanlama zinciri masraf riski biliniyor, kronik olarak takip edilmeli.",
@@ -118,7 +97,6 @@ BRAND_RISK_NOTES = {
 }
 
 LIQUIDITY_SCORES = {
-    # 1–5: 5 = piyasası çok hızlı, 1 = zor satılır
     "corolla": 5,
     "civic": 5,
     "egea": 4,
@@ -129,7 +107,6 @@ LIQUIDITY_SCORES = {
 }
 
 PARTS_AVAILABILITY = {
-    # 1–5: 5 = her yerde parça / usta var
     "renault": 5,
     "fiat": 5,
     "toyota": 4,
@@ -167,7 +144,6 @@ def _ensure_has_some_text(req: AnalyzeRequest) -> None:
 def _guess_segment(v: Optional[Vehicle]) -> str:
     if not v:
         return "C"
-    # Kullanıcının segment girmesi durumunda onu kullan
     if v.segment:
         return v.segment.upper()
 
@@ -175,14 +151,13 @@ def _guess_segment(v: Optional[Vehicle]) -> str:
     model = (v.model or "").lower()
     body = (v.body_type or "").lower()
 
-    # Çok kaba tahminler – sadece bağlam için
     if any(x in model for x in ["corolla", "civic", "megane", "focus", "astra"]):
         return "C"
     if any(x in model for x in ["passat", "superb", "accord", "camry"]):
         return "D"
     if "egea" in model:
         return "C"
-    if "sportage" in model or "tucson" in model or "qashqai" in model:
+    if any(x in model for x in ["sportage", "tucson", "qashqai"]):
         return "SUV-C"
     if "x5" in model or "gle" in model or "range" in make or "range" in model:
         return "SUV-D"
@@ -196,7 +171,7 @@ def _guess_segment(v: Optional[Vehicle]) -> str:
 
 
 def build_structured_context(req: AnalyzeRequest) -> Dict[str, Any]:
-    """Segment, bakım, yakıt, sigorta vb. için sayısal bağlam üretir."""
+    """Segment, bakım, yakıt, sigorta, likidite vb. için sayısal bağlam üretir."""
     v = req.vehicle
     p = req.profile
 
@@ -219,17 +194,17 @@ def build_structured_context(req: AnalyzeRequest) -> Dict[str, Any]:
     usage_coef = {"city": 1.2, "mixed": 1.0, "highway": 0.85}.get(usage, 1.0)
     est_l_100 = base_l_100 * usage_coef
 
-    # Yıllık yakıt masrafı için kabaca 40 TL / litre varsayalım
+    # Yıllık yakıt masrafı için kabaca 40 TL / litre
     est_fuel_cost_year = yearly_km / 100 * est_l_100 * 40
 
     # Sigorta/kasko kabaca segment + risk notu
     risk_key = "medium"
-    brand = (v.make or "").lower()
-    model = (v.model or "").lower()
+    brand = (v.make or "").lower() if v and v.make else ""
+    model = (v.model or "").lower() if v and v.model else ""
 
-    if "bmw" in brand or "mercedes" in brand or "audi" in brand:
+    if any(b in brand for b in ["bmw", "mercedes", "audi"]):
         risk_key = "high"
-    elif "fiat" in brand or "renault" in brand or "hyundai" in brand:
+    elif any(b in brand for b in ["fiat", "renault", "hyundai"]):
         risk_key = "low"
 
     risk_coef = INSURANCE_LOSS_RATIO.get(risk_key, 1.0)
@@ -284,11 +259,14 @@ def build_structured_context(req: AnalyzeRequest) -> Dict[str, Any]:
 
     # Marka bazlı risk notu
     brand_risks: List[str] = []
-    if "vw" in brand and "dsg" in (req.text or "").lower():
+    text_all = (req.text or "") + " " + (req.listing_description or "") + " " + (req.ad_description or "")
+    text_all = text_all.lower()
+
+    if "vw" in brand and "dsg" in text_all:
         brand_risks.append(BRAND_RISK_NOTES["vw_dsg"])
-    if "dci" in (req.text or "").lower() and "renault" in brand:
+    if "renault" in brand and "dci" in text_all:
         brand_risks.append(BRAND_RISK_NOTES["renault_1.5_dci"])
-    if "n47" in (req.text or "").lower() and "bmw" in brand:
+    if "bmw" in brand and "n47" in text_all:
         brand_risks.append(BRAND_RISK_NOTES["bmw_n47"])
 
     return {
@@ -308,7 +286,10 @@ def build_structured_context(req: AnalyzeRequest) -> Dict[str, Any]:
 
 
 def build_user_content(req: AnalyzeRequest, ctx: Dict[str, Any]) -> List[Dict[str, Any]]:
-    """LLM'e gidecek vision + text content (multi-image dahil)."""
+    """
+    Responses API formatına uygun user content:
+    type: 'input_text' ve 'input_image' olmalı.
+    """
     parts: List[Dict[str, Any]] = []
 
     # 1) Metinler
@@ -318,11 +299,7 @@ def build_user_content(req: AnalyzeRequest, ctx: Dict[str, Any]) -> List[Dict[st
         text_chunks.append(f"İlan başlığı: {req.listing_title.strip()}")
 
     combined_desc = ""
-    for t in [
-        req.text,
-        req.listing_description,
-        req.ad_description,
-    ]:
+    for t in [req.text, req.listing_description, req.ad_description]:
         if t and t.strip():
             combined_desc += t.strip() + "\n"
 
@@ -344,7 +321,12 @@ def build_user_content(req: AnalyzeRequest, ctx: Dict[str, Any]) -> List[Dict[st
         )
 
     if text_chunks:
-        parts.append({"type": "text", "text": "\n\n".join(text_chunks)})
+        parts.append(
+            {
+                "type": "input_text",
+                "text": "\n\n".join(text_chunks),
+            }
+        )
 
     # 2) Görseller (tek + çoklu birlikte)
     images: List[str] = []
@@ -366,7 +348,7 @@ def build_user_content(req: AnalyzeRequest, ctx: Dict[str, Any]) -> List[Dict[st
     if not parts:
         parts.append(
             {
-                "type": "text",
+                "type": "input_text",
                 "text": "Kullanıcı hiçbir metin ya da görsel göndermedi. En azından genel bir ikinci el piyasa bilgisi ver.",
             }
         )
@@ -377,15 +359,25 @@ def build_user_content(req: AnalyzeRequest, ctx: Dict[str, Any]) -> List[Dict[st
 def call_llm(model_name: str, system_prompt: str, req: AnalyzeRequest) -> Dict[str, Any]:
     """
     OpenAI Responses API çağrısı.
-    Dikkat: Burada 'response_format' KULLANMIYORUZ; bu yüzden 500 hatası çözülecek.
-    JSON'u prompt ile istiyoruz ve sonra kendimiz parse ediyoruz.
+    Burada response_format kullanmıyoruz, JSON'u prompt ile istiyoruz.
     """
     ctx = build_structured_context(req)
     user_content = build_user_content(req, ctx)
 
     messages = [
-        {"role": "system", "content": system_prompt},
-        {"role": "user", "content": user_content},
+        {
+            "role": "system",
+            "content": [
+                {
+                    "type": "input_text",
+                    "text": system_prompt,
+                }
+            ],
+        },
+        {
+            "role": "user",
+            "content": user_content,
+        },
     ]
 
     try:
@@ -394,16 +386,17 @@ def call_llm(model_name: str, system_prompt: str, req: AnalyzeRequest) -> Dict[s
             input=messages,
             temperature=0.4,
         )
-        # text parçalarını topla
-        output = resp.output[0].content  # type: ignore[attr-defined]
-        text_chunks = []
-        for c in output:
+
+        # Çıktıdaki text parçalarını topla
+        output_items = resp.output[0].content  # type: ignore[attr-defined]
+        text_chunks: List[str] = []
+        for c in output_items:
             if getattr(c, "type", None) == "output_text":
                 text_chunks.append(c.text)
 
         raw = "".join(text_chunks).strip()
 
-        # Model düzgün JSON vermezse, fallback bir yapı döndürelim
+        # Model JSON döndürmeye çalışıyoruz; bozulursa fallback
         try:
             data = json.loads(raw)
         except json.JSONDecodeError:
@@ -413,7 +406,6 @@ def call_llm(model_name: str, system_prompt: str, req: AnalyzeRequest) -> Dict[s
                 "summary": {"pros": [], "cons": []},
             }
 
-        # Zorunlu alanları garanti altına al
         data.setdefault("scores", {})
         data.setdefault("summary", {})
         data["summary"].setdefault("pros", [])
@@ -429,46 +421,47 @@ def call_llm(model_name: str, system_prompt: str, req: AnalyzeRequest) -> Dict[s
 
 
 def build_system_prompt_for_mode(mode: str) -> str:
-    """
-    Farklı ekranlar için farklı rol talimatı.
-    Şu an çok detaylı yazmak yerine özet veriyoruz, ama sektör,
-    kronik sorun, masraf ve pazarlık odağı hepsinde var.
-    """
     base = (
         "Sen Oto Analiz uygulaması için uzman bir araç ilanı analiz asistanısın. "
         "Kullanıcının ilan metni, araç bilgileri ve varsa ekran görüntülerinden "
         "yararlanarak Türkiye ikinci el piyasasına göre dürüst, tarafsız ve net yorum yap. "
         "Kronik sorun riskleri, muhtemel masraflar, artı/eksi yönler, yıllık maliyet ve "
-        "pazarlık tavsiyesi mutlaka olsun. Cevabını her zaman JSON formatında ver."
+        "pazarlık tavsiyesi mutlaka olsun. Cevabını her zaman JSON formatında ver. "
+        "JSON yapısı kabaca şöyle olsun:\n"
+        "{"
+        '"scores": {"overall_100": sayı, "mechanical_100": sayı, "body_100": sayı}, '
+        '"summary": {"pros": ["..."], "cons": ["..."]}'
+        "}"
     )
 
     if mode == "premium":
         return (
             base
-            + "\nAyrıca premium moddasın: bakım maliyeti, yakıt masrafı, sigorta/kasko, "
-            "likidite (piyasada ne kadar hızlı satılır), parça bulunabilirliği ve marka-risk "
-            "notlarını daha detaylı yorumla. Kullanıcının profilini (yıllık km, kullanım tipi, "
+            + "\nPremium moddasın: bakım maliyeti, yakıt masrafı, sigorta/kasko, "
+            "likidite (piyasa hızı), parça bulunabilirliği ve marka-risk notlarını "
+            "daha detaylı anlat. Kullanıcının profilini (yıllık km, kullanım tipi, "
             "yakıt tercihi) mutlaka dikkate al."
         )
     if mode == "manual":
         return (
             base
-            + "\nBu modda kullanıcı kendi aracını manuel giriyor. Özellikle uzun vadeli sahiplik, "
-            "bakım planı ve olası büyük masraflara odaklan."
+            + "\nKullanıcı kendi aracını giriyor. Uzun vadeli sahiplik, bakım planı "
+            "ve olası büyük masraflara odaklan."
         )
     if mode == "compare":
         return (
             base
-            + "\nBu modda en az iki aracı karşılaştırıyorsun. Hangisi daha mantıklı, hangi profilde "
-            "hangi aracı önerdiğini açıkça yaz ve JSON içinde her araç için ayrı puanlar ver."
+            + "\nBu modda en az iki aracı karşılaştırıyorsun. Hangisi daha mantıklı, "
+            "hangi profilde hangi aracı önerdiğini açıkça yaz ve JSON içinde her araç "
+            "için ayrı puanlar ver (ör: vehicle_1, vehicle_2 anahtarları)."
         )
     if mode == "otobot":
         return (
             base
-            + "\nBu modda 'Hangi aracı almalıyım?' asistanısın. Kullanıcının bütçesine, profil "
-            "bilgilerine göre segment/örnek model öner ve JSON içinde öneri listesi üret."
+            + "\nBu modda 'Hangi aracı almalıyım?' asistanısın. Kullanıcının bütçesine "
+            "ve profil bilgilerine göre 3-5 adet model/segment öner ve bunları "
+            "JSON içinde 'suggestions' listesi olarak ver."
         )
-    # normal
     return base
 
 
@@ -503,10 +496,9 @@ async def analyze(req: AnalyzeRequest) -> Dict[str, Any]:
 
     data = call_llm(model_name, system_prompt, req)
 
-    # Frontend için ortak formatta döndüğümüzden emin olalım
     return {
         "mode": mode,
         "scores": data.get("scores", {}),
         "summary": data.get("summary", {}),
-        "raw": data,  # istersen Flutter tarafında debug için kullanırsın
+        "raw": data,
     }
