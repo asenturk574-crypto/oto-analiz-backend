@@ -66,7 +66,7 @@ class AnalyzeRequest(BaseModel):
 BRAND_COST_CATEGORY: Dict[str, str] = {
     # Ucuz / düşük maliyetli (cheap)
     "fiat": "cheap",
-    "renault": "cheap",
+    "renault": "mid",   # İstersen tekrar cheap yaparsın; şu an Corolla ile aynı segmentte olsun diye mid yaptık
     "dacia": "cheap",
     "peugeot": "cheap",
     "citroen": "cheap",
@@ -650,11 +650,15 @@ def build_user_text(req: AnalyzeRequest) -> str:
 
 @app.post("/analyze")
 async def analyze(req: AnalyzeRequest):
+    # 1) Mode (normal / premium)
+    mode = "normal"
     try:
-        mode = (req.context.mode if req.context and req.context.mode else "normal") if req.context else "normal"
+        if req.context and req.context.mode:
+            mode = (req.context.mode or "normal").lower()
     except Exception:
         mode = "normal"
 
+    # 2) Promtları hazırla
     system_prompt = build_system_prompt(mode)
 
     core_text = build_user_text(req)
@@ -675,27 +679,37 @@ async def analyze(req: AnalyzeRequest):
         + model_insights_text
     )
 
-    # LLM'e gidecek user content (metin + varsa görsel)
+    # 3) User content (görsel + metin)
     user_content: List[Dict[str, Any]] = []
 
-    # Screenshot geldiyse input_image olarak ekle
+    has_image = False
     if req.screenshot_base64:
         try:
+            # base64 geçerli mi diye kontrol
             base64.b64decode(req.screenshot_base64)
             user_content.append({
                 "type": "input_image",
                 "image_base64": req.screenshot_base64,
             })
+            has_image = True
         except Exception:
-            # Görsel bozuksa yok sayıp sadece metinle devam edelim
-            pass
+            # görsel bozuksa ignore et, metinle devam et
+            has_image = False
 
     user_content.append({
         "type": "input_text",
         "text": combined_user_text,
     })
 
-    # JSON şemamız
+    # 4) Kullanılacak modeli seç
+    # - Görsel varsa VEYA premium moddaysa → gpt-4.1 (multimodal, daha güçlü)
+    # - Diğer durumlarda → gpt-4.1-mini (ucuz)
+    if has_image or mode == "premium":
+        model_name = "gpt-4.1"
+    else:
+        model_name = "gpt-4.1-mini"
+
+    # 5) JSON şeması
     analysis_schema = {
         "name": "VehicleAnalysis",
         "schema": {
@@ -741,9 +755,10 @@ async def analyze(req: AnalyzeRequest):
         "strict": False,
     }
 
+    # 6) OpenAI çağrısı
     try:
         response = client.responses.create(
-            model="gpt-4.1-mini",
+            model=model_name,
             input=[
                 {
                     "role": "system",
@@ -762,10 +777,10 @@ async def analyze(req: AnalyzeRequest):
             },
         )
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"LLM isteği başarısız: {e}")
+        raise HTTPException(status_code=500, detail=f"LLM isteği başarısız ({model_name}): {e}")
 
+    # 7) JSON parse
     try:
-        # Responses API'de ilk output'un ilk content'inden text'i alıyoruz
         output = response.output[0].content[0].text  # type: ignore[attr-defined]
         data = json.loads(output)
     except Exception as e:
