@@ -26,29 +26,25 @@ OPENAI_MODEL_COMPARE = os.getenv("OPENAI_MODEL_COMPARE", OPENAI_MODEL_DEFAULT)
 OPENAI_MODEL_OTOBOT = os.getenv("OPENAI_MODEL_OTOBOT", OPENAI_MODEL_DEFAULT)
 
 # ---------------------------------------------------------
-# FastAPI app (Render bunu kullanıyor: uvicorn main:app)
+# FastAPI app
 # ---------------------------------------------------------
 app = FastAPI(title="Oto Analiz Backend")
 
 app.add_middleware(
-    CORSMiddleware,              # ÖNEMLİ: class veriyoruz, instance değil
-    allow_origins=["*"],         # İleride domain ile kısıtlayabiliriz
+    CORSMiddleware,
+    allow_origins=["*"],      # İleride domain ile kısıtlayabiliriz
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
 # ---------------------------------------------------------
-# Pydantic modeller
+# Modeller
 # ---------------------------------------------------------
-
 class Profile(BaseModel):
-    # Default veriyoruz ki eksik gelse bile 422 patlamasın.
     yearly_km: int = Field(15000, ge=0, le=100000)
-    # Serbest string; beklediğimiz: "city", "mixed", "highway"
-    usage: str = "mixed"
-    # Serbest string; beklediğimiz: "gasoline", "diesel", "lpg", "hybrid", "electric"
-    fuel_preference: str = "gasoline"
+    usage: str = "mixed"              # city / mixed / highway
+    fuel_preference: str = "gasoline" # gasoline / diesel / lpg / hybrid / electric
 
 
 class Vehicle(BaseModel):
@@ -56,14 +52,13 @@ class Vehicle(BaseModel):
     model: str = ""
     year: Optional[int] = Field(None, ge=1980, le=2035)
     mileage_km: Optional[int] = Field(None, ge=0)
-    fuel: Optional[str] = None  # "gasoline" | "diesel" | "lpg" | ...
+    fuel: Optional[str] = None       # gasoline / diesel / lpg / hybrid / electric
 
 
 class AnalyzeRequest(BaseModel):
     profile: Profile = Field(default_factory=Profile)
     vehicle: Vehicle = Field(default_factory=Vehicle)
 
-    # Eski sürümle uyum: tek screenshot string'i de kabul et
     screenshot_base64: Optional[str] = None
     screenshots_base64: Optional[List[str]] = None
 
@@ -71,13 +66,11 @@ class AnalyzeRequest(BaseModel):
     context: Dict[str, Any] = Field(default_factory=dict)
 
     class Config:
-        # İleride Flutter'dan ekstra bir şey gönderirsen kırılmasın
         extra = "allow"
 
 
-# Karşılaştırma için basit model – istersek genişletiriz
 class CompareSide(BaseModel):
-    title: Optional[str] = None      # Örn: "Corolla 1.6"
+    title: Optional[str] = None
     vehicle: Vehicle = Field(default_factory=Vehicle)
     ad_description: Optional[str] = None
     screenshots_base64: Optional[List[str]] = None
@@ -95,39 +88,16 @@ class CompareRequest(BaseModel):
         extra = "allow"
 
 
-# OtoBot için basit soru modeli
 class OtoBotRequest(BaseModel):
-    question: Optional[str] = None   # Şu an tek soru yeterli
-    history: Optional[List[Dict[str, str]]] = None  # İleride sohbetli yaparız
+    question: Optional[str] = None
+    history: Optional[List[Dict[str, str]]] = None
 
     class Config:
         extra = "allow"
 
 
 # ---------------------------------------------------------
-# Boş istek kontrolü
-# ---------------------------------------------------------
-def ensure_has_some_content(req: AnalyzeRequest) -> None:
-    has_basic_vehicle = bool((req.vehicle.make or "").strip() or (req.vehicle.model or "").strip())
-    has_desc = bool(req.ad_description and req.ad_description.strip())
-
-    all_ss: List[str] = []
-    if req.screenshot_base64:
-        all_ss.append(req.screenshot_base64)
-    if req.screenshots_base64:
-        all_ss.extend([s for s in req.screenshots_base64 if s])
-
-    has_screenshot = len(all_ss) > 0
-
-    if not (has_basic_vehicle or has_desc or has_screenshot):
-        raise HTTPException(
-            status_code=400,
-            detail="Boş istek. En azından marka/model, ilan açıklaması veya ekran görüntüsü gönder."
-        )
-
-
-# ---------------------------------------------------------
-# Backend tarafı: kabaca maliyet & risk tahmini
+# Backend tarafı: kaba maliyet & risk bilgisi (LLM'e bağlam için)
 # ---------------------------------------------------------
 def guess_segment(vehicle: Vehicle) -> str:
     name = (vehicle.make + " " + vehicle.model).lower()
@@ -159,15 +129,13 @@ def estimate_costs_and_risks(req: AnalyzeRequest) -> Dict[str, Any]:
     segment = guess_segment(v)
     age: Optional[int] = None
     if v.year:
-        age = max(0, 2025 - v.year)  # yılı 2025 varsayıyorum, çok kritik değil
+        age = max(0, 2025 - v.year)
 
     mileage = v.mileage_km or 0
 
-    # Basit bandlar (tam rakamlar önemli değil, GPT'ye yön veriyor)
     base_maintenance = 15000  # TL
     base_fuel = 25000
 
-    # Segment çarpanları
     seg_mult = 1.0
     if "B-segment" in segment:
         seg_mult = 0.7
@@ -178,7 +146,6 @@ def estimate_costs_and_risks(req: AnalyzeRequest) -> Dict[str, Any]:
     elif "premium" in segment or "D-segment" in segment:
         seg_mult = 1.6
 
-    # Yaş ve km etkisi
     age_mult = 1.0
     if age is not None:
         if age > 12:
@@ -196,7 +163,6 @@ def estimate_costs_and_risks(req: AnalyzeRequest) -> Dict[str, Any]:
     elif mileage > 120_000:
         km_mult = 1.2
 
-    # Yakıt tipi
     fuel_mult = 1.0
     fuel_risk = "orta"
     if v.fuel == "diesel":
@@ -213,7 +179,6 @@ def estimate_costs_and_risks(req: AnalyzeRequest) -> Dict[str, Any]:
     yearly_maintenance = int(base_maintenance * seg_mult * age_mult * km_mult)
     yearly_fuel = int(base_fuel * seg_mult * ((p.yearly_km / 15000) or 1) * fuel_mult)
 
-    # Sigorta seviyesi (çok kaba)
     if "premium" in segment:
         insurance_level = "yüksek"
     elif "SUV" in segment or "D-segment" in segment:
@@ -221,7 +186,6 @@ def estimate_costs_and_risks(req: AnalyzeRequest) -> Dict[str, Any]:
     else:
         insurance_level = "orta"
 
-    # Resale hızı
     if "C-segment" in segment or "B-segment" in segment:
         resale_speed = "hızlı"
     elif "SUV" in segment:
@@ -229,7 +193,6 @@ def estimate_costs_and_risks(req: AnalyzeRequest) -> Dict[str, Any]:
     else:
         resale_speed = "orta"
 
-    # Genel risk (bilgi amaçlı; Keşfet preview'ünde direkt 'riskli' demeyeceğiz)
     risk_level = "orta"
     risk_notes: List[str] = []
     if age is not None and age > 12:
@@ -256,10 +219,10 @@ def estimate_costs_and_risks(req: AnalyzeRequest) -> Dict[str, Any]:
 
 
 # ---------------------------------------------------------
-# Kullanıcı mesajını tek string haline getiriyoruz
+# Kullanıcı prompt'u
 # ---------------------------------------------------------
 def build_user_content(req: AnalyzeRequest, mode: str) -> str:
-    v = req.vehicle
+    v = req.vehicle or Vehicle()
     p = req.profile or Profile()
 
     ad_text = (req.ad_description or "").strip()
@@ -281,26 +244,29 @@ def build_user_content(req: AnalyzeRequest, mode: str) -> str:
             "varsayarak genel bir değerlendirme yap."
         )
 
+    # Her şey bomboş gelse bile LLM'e bir şeyler vermek için fallback text
+    if not (v.make.strip() or v.model.strip() or ad_text or all_ss):
+        ad_text = "Kullanıcı çok az bilgi verdi. Türkiye ikinci el piyasasında genel kabul gören kriterlerle, varsayımsal bir aile aracı analizi yap."
+
     base_text = f"""
 Kullanıcı Oto Analiz uygulamasında **{mode}** modunda analiz istiyor.
 
-Araç bilgileri:
-- Marka: {v.make}
-- Model: {v.model}
+Araç bilgileri (boş olan alanlar '-' olabilir):
+- Marka: {v.make or "-"}
+- Model: {v.model or "-"}
 - Yıl: {v.year or "-"}
 - Kilometre: {v.mileage_km or "-"} km
 - Yakıt: {v.fuel or p.fuel_preference}
 
-Kullanım profili:
+Kullanım profili (tahmini değerler olabilir):
 - Yıllık km: {p.yearly_km} km
 - Kullanım tipi: {p.usage}
 - Yakıt tercihi: {p.fuel_preference}
 """
 
     if ad_text:
-        base_text += f"\nİlan açıklaması:\n{ad_text}\n"
+        base_text += f"\nİlan açıklaması veya kullanıcı notu:\n{ad_text}\n"
 
-    # Backend’in kaba tahmini – model bunu kullanarak daha gerçekçi yorum yapsın
     base_text += "\n--- Backend tahmini maliyet & risk bilgileri (kaba hesap) ---\n"
     base_text += json.dumps(backend_context, ensure_ascii=False)
     base_text += "\n-----------------------------------------------------------\n"
@@ -310,7 +276,7 @@ Kullanım profili:
 
 
 # ---------------------------------------------------------
-# LLM çağrısı (JSON mode)
+# LLM JSON çağrısı
 # ---------------------------------------------------------
 def call_llm_json(model_name: str, system_prompt: str, user_content: str) -> Dict[str, Any]:
     try:
@@ -323,6 +289,7 @@ def call_llm_json(model_name: str, system_prompt: str, user_content: str) -> Dic
             ],
         )
     except Exception as e:
+        # OpenAI patlarsa bile 500 dönelim, Flutter düzgün yakalasın
         raise HTTPException(
             status_code=500,
             detail=f"LLM isteği başarısız ({model_name}): {e}",
@@ -345,96 +312,101 @@ def call_llm_json(model_name: str, system_prompt: str, user_content: str) -> Dic
 # ---------------------------------------------------------
 SYSTEM_PROMPT_NORMAL = """
 Sen 'Oto Analiz' uygulaması için çalışan bir ARAÇ İLANI ANALİZ ASİSTANI'sın.
-Görevin: Kullanıcının verdiği araç bilgilerine, ilan açıklamasına ve backend'in
-sağladığı tahmini maliyet/risk bilgilerine göre NET ve ORTA DETAYLI bir analiz yapmak.
 
-ÇIKTIYI SADECE GEÇERLİ BİR JSON OLARAK DÖN:
+ÇIKTIYI SADECE GEÇERLİ BİR JSON OLARAK DÖN. ŞABLON:
 
 {
   "scores": {
-    "overall_100": sayı,
-    "mechanical_100": sayı,
-    "body_100": sayı,
-    "economy_100": sayı
+    "overall_100": 0,
+    "mechanical_100": 0,
+    "body_100": 0,
+    "economy_100": 0
   },
   "summary": {
-    "short_comment": "1-2 cümlelik genel yorum",
-    "pros": ["madde madde artılar"],
-    "cons": ["madde madde eksiler"],
-    "estimated_risk_level": "düşük" | "orta" | "yüksek"
+    "short_comment": "",
+    "pros": [],
+    "cons": [],
+    "estimated_risk_level": "orta"
   },
   "preview": {
-    "title": "Araç başlığı (marka + model + yıl)",
-    "price_tag": "Uygun" | "Normal" | "Yüksek" | null,
-    "spoiler": "Keşfet için 1-2 cümlelik kısa ve NÖTR özet. Burada 'alınır, alınmaz, sakın, riskli' gibi kelimeler kullanma.",
-    "bullets": [
-      "En fazla 3 madde. 'Ekspertiz önerilir', 'tramer kontrolü yapılmalı' gibi nötr, bilgilendirici cümleler yaz."
-    ]
+    "title": "",
+    "price_tag": null,
+    "spoiler": "",
+    "bullets": []
   }
 }
 
 Kurallar:
-- Kullanıcıyı korkutma, kesin hükümler verme. Özellikle PREVIEW alanında:
+- Tüm alanlar JSON içinde mutlaka olsun (boş bile kalsa).
+- PREVIEW kısmı Keşfet için kullanılacak:
   - 'alınır', 'alınmaz', 'sakın', 'riskli', 'tehlikeli' gibi kelimeleri KULLANMA.
-  - Fiyat ile ilgili sadece genel etiket ver ('Uygun/Normal/Yüksek'), rakam yazma.
-- SADECE JSON DÖN, JSON dışında metin yazma.
+  - Fiyatla ilgili sadece 'Uygun/Normal/Yüksek' etiketi ver, rakam yazma.
 - Dil: Türkçe.
 """
 
 SYSTEM_PROMPT_PREMIUM = """
 Sen 'Oto Analiz' uygulamasının PREMIUM analiz asistanısın.
-Normal analizdeki her şeyi yap, ama daha detaylı ve piyasa odaklı anlat.
 
-Türkiye koşullarını varsay:
-- Parça bulunabilirliği, servis ağı, kronik sorun riskini değerlendir.
-- Yakıt türüne göre tahmini yakıt maliyetini yorumla (backend tahminini de kullan).
-- Segmentine göre bakım, kasko ve ikinci el piyasasını anlat (hızlı mı satılır?).
-
-ÇIKTIYI SADECE GEÇERLİ BİR JSON OLARAK DÖN:
+ÇIKTIYI SADECE GEÇERLİ BİR JSON OLARAK DÖN. ŞABLON:
 
 {
   "scores": {
-    "overall_100": sayı,
-    "mechanical_100": sayı,
-    "body_100": sayı,
-    "economy_100": sayı,
-    "comfort_100": sayı,
-    "family_use_100": sayı,
-    "resale_100": sayı
+    "overall_100": 0,
+    "mechanical_100": 0,
+    "body_100": 0,
+    "economy_100": 0,
+    "comfort_100": 0,
+    "family_use_100": 0,
+    "resale_100": 0
   },
   "cost_estimates": {
-    "yearly_maintenance_tr": sayı,
-    "yearly_fuel_tr": sayı,
-    "insurance_level": "düşük" | "orta" | "orta-yüksek" | "yüksek",
-    "notes": "kısa maliyet özeti"
+    "yearly_maintenance_tr": 0,
+    "yearly_fuel_tr": 0,
+    "insurance_level": "orta",
+    "notes": ""
   },
   "risk_analysis": {
-    "chronic_issues": ["olası kronik sorunlar"],
-    "risk_level": "düşük" | "orta" | "yüksek",
-    "warnings": ["dikkat edilmesi gereken noktalar"]
+    "chronic_issues": [],
+    "risk_level": "orta",
+    "warnings": []
   },
   "summary": {
-    "short_comment": "1-2 cümlelik genel yorum",
-    "pros": ["madde madde artılar"],
-    "cons": ["madde madde eksiler"],
-    "who_should_buy": "Bu araç kimler için mantıklı?"
+    "short_comment": "",
+    "pros": [],
+    "cons": [],
+    "who_should_buy": ""
   },
   "preview": {
-    "title": "Araç başlığı (marka + model + yıl)",
-    "price_tag": "Uygun" | "Normal" | "Yüksek" | null,
-    "spoiler": "Keşfet için 1-2 cümlelik kısa ve NÖTR özet. Burada 'alınır, alınmaz, sakın, riskli' gibi kelimeler kullanma.",
-    "bullets": [
-      "En fazla 3 madde. 'Ekspertiz önerilir', 'tramer kontrolü yapılmalı' gibi nötr, bilgilendirici cümleler yaz."
-    ]
+    "title": "",
+    "price_tag": null,
+    "spoiler": "",
+    "bullets": []
   }
 }
 
 Kurallar:
-- Kullanıcıyı korkutmadan ama dürüst ol.
-- PREVIEW kısmı Keşfet için kullanılacak, bu yüzden:
-  - Kesin karar cümleleri veya ağır ifadeler kullanma.
-  - Fiyat rakamı yazma, sadece 'Uygun/Normal/Yüksek' etiketi ver.
-- SADECE JSON DÖN, JSON dışında metin yazma.
+- Tüm alanlar JSON içinde mutlaka olsun (boş bile kalsa).
+- PREVIEW kısmı Keşfet için kullanılacak:
+  - 'alınır', 'alınmaz', 'sakın', 'riskli', 'tehlikeli' gibi kelimeleri KULLANMA.
+  - Fiyat rakamı verme, sadece 'Uygun/Normal/Yüksek' etiketi kullan veya null bırak.
+- Dil: Türkçe.
+"""
+
+SYSTEM_PROMPT_MANUAL = """
+Sen 'Oto Analiz' uygulamasında KULLANICININ KENDİ ARACI için manuel analiz yapan asistansın.
+Kullanıcı bazen çok az bilgi verebilir; bu durumda bile genel, bilgilendirici bir analiz üret.
+
+Çıktı formatın NORMAL analizle aynıdır, yani:
+
+{
+  "scores": {...},
+  "summary": {...},
+  "preview": {...}
+}
+
+Kurallar:
+- PREVIEW kısmı nötr olsun, 'alınır/alınmaz' gibi ifadeler kullanma.
+- Bilgiler çok azsa bile 'ekspertiz, tramer, bakım kaydı' gibi genel tavsiyelere odaklan.
 - Dil: Türkçe.
 """
 
@@ -487,9 +459,7 @@ async def root() -> Dict[str, Any]:
 # ---------------------------------------------------------
 @app.post("/analyze")
 async def analyze(req: AnalyzeRequest) -> Dict[str, Any]:
-    ensure_has_some_content(req)
     user_content = build_user_content(req, mode="normal")
-
     data = call_llm_json(
         model_name=OPENAI_MODEL_NORMAL,
         system_prompt=SYSTEM_PROMPT_NORMAL,
@@ -503,12 +473,25 @@ async def analyze(req: AnalyzeRequest) -> Dict[str, Any]:
 # ---------------------------------------------------------
 @app.post("/premium_analyze")
 async def premium_analyze(req: AnalyzeRequest) -> Dict[str, Any]:
-    ensure_has_some_content(req)
     user_content = build_user_content(req, mode="premium")
-
     data = call_llm_json(
         model_name=OPENAI_MODEL_PREMIUM,
         system_prompt=SYSTEM_PROMPT_PREMIUM,
+        user_content=user_content,
+    )
+    return data
+
+
+# ---------------------------------------------------------
+# MANUEL / KENDİ ARAÇ ANALİZİ (2 endpoint birden)
+# ---------------------------------------------------------
+@app.post("/manual_analyze")
+@app.post("/manual")
+async def manual_analyze(req: AnalyzeRequest) -> Dict[str, Any]:
+    user_content = build_user_content(req, mode="manual")
+    data = call_llm_json(
+        model_name=OPENAI_MODEL_NORMAL,
+        system_prompt=SYSTEM_PROMPT_MANUAL,
         user_content=user_content,
     )
     return data
@@ -561,6 +544,7 @@ Kullanıcı profili:
 async def otobot(req: OtoBotRequest) -> Dict[str, Any]:
     question = (req.question or "").strip()
     if not question:
+        # Tamamen boş gelirse bile 400; ama Flutter tarafı message gösterir
         raise HTTPException(
             status_code=400,
             detail="Soru boş olamaz. 'question' alanına bir metin gönder.",
@@ -571,7 +555,6 @@ async def otobot(req: OtoBotRequest) -> Dict[str, Any]:
         {"role": "user", "content": question},
     ]
 
-    # İleride history gelirse ekle
     if req.history:
         for h in req.history:
             role = h.get("role", "user")
