@@ -31,12 +31,11 @@ OPENAI_MODEL_OTOBOT = os.getenv("OPENAI_MODEL_OTOBOT", OPENAI_MODEL_DEFAULT)
 app = FastAPI(title="Oto Analiz Backend")
 
 app.add_middleware(
-    CORSMiddleware(
-        allow_origins=["*"],      # İleride domain ile kısıtlayabiliriz
-        allow_credentials=True,
-        allow_methods=["*"],
-        allow_headers=["*"],
-    )
+    CORSMiddleware,              # ÖNEMLİ: class veriyoruz, instance değil
+    allow_origins=["*"],         # İleride domain ile kısıtlayabiliriz
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 # ---------------------------------------------------------
@@ -129,7 +128,6 @@ def ensure_has_some_content(req: AnalyzeRequest) -> None:
 
 # ---------------------------------------------------------
 # Backend tarafı: kabaca maliyet & risk tahmini
-# (Segment, yaş, km, yakıt vb. ile oynayıp GPT'ye bilgi veriyoruz)
 # ---------------------------------------------------------
 def guess_segment(vehicle: Vehicle) -> str:
     name = (vehicle.make + " " + vehicle.model).lower()
