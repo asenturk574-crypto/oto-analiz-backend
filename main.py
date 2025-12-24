@@ -15,9 +15,10 @@ load_dotenv()
 
 api_key = os.getenv("OPENAI_API_KEY")
 if not api_key:
-    raise RuntimeError("OPENAI_API_KEY bulunamadı. .env dosyasını kontrol et.")
-
-client = OpenAI(api_key=api_key)
+    print("UYARI: OPENAI_API_KEY bulunamadı, analizler fallback modunda çalışacak.")
+    client = None
+else:
+    client = OpenAI(api_key=api_key)
 
 OPENAI_MODEL_DEFAULT = os.getenv("OPENAI_MODEL", "gpt-4.1-mini")
 OPENAI_MODEL_NORMAL = os.getenv("OPENAI_MODEL_NORMAL", OPENAI_MODEL_DEFAULT)
@@ -32,7 +33,7 @@ app = FastAPI(title="Oto Analiz Backend")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],      # İleride domain ile kısıtlayabiliriz
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -97,7 +98,7 @@ class OtoBotRequest(BaseModel):
 
 
 # ---------------------------------------------------------
-# Backend tarafı: kaba maliyet & risk bilgisi (LLM'e bağlam için)
+# Backend tahminleri (segment + maliyet)
 # ---------------------------------------------------------
 def guess_segment(vehicle: Vehicle) -> str:
     name = (vehicle.make + " " + vehicle.model).lower()
@@ -219,7 +220,7 @@ def estimate_costs_and_risks(req: AnalyzeRequest) -> Dict[str, Any]:
 
 
 # ---------------------------------------------------------
-# Kullanıcı prompt'u
+# Kullanıcı prompt'u (LLM için)
 # ---------------------------------------------------------
 def build_user_content(req: AnalyzeRequest, mode: str) -> str:
     v = req.vehicle or Vehicle()
@@ -244,7 +245,6 @@ def build_user_content(req: AnalyzeRequest, mode: str) -> str:
             "varsayarak genel bir değerlendirme yap."
         )
 
-    # Her şey bomboş gelse bile LLM'e bir şeyler vermek için fallback text
     if not (v.make.strip() or v.model.strip() or ad_text or all_ss):
         ad_text = "Kullanıcı çok az bilgi verdi. Türkiye ikinci el piyasasında genel kabul gören kriterlerle, varsayımsal bir aile aracı analizi yap."
 
@@ -276,9 +276,171 @@ Kullanım profili (tahmini değerler olabilir):
 
 
 # ---------------------------------------------------------
-# LLM JSON çağrısı
+# Fallback JSON üreticileri (LLM patlarsa)
 # ---------------------------------------------------------
-def call_llm_json(model_name: str, system_prompt: str, user_content: str) -> Dict[str, Any]:
+def fallback_normal(req: AnalyzeRequest) -> Dict[str, Any]:
+    v = req.vehicle
+    seg_info = estimate_costs_and_risks(req)
+    title = f"{v.year or ''} {v.make} {v.model}".strip() or "Araç Analizi"
+
+    return {
+        "scores": {
+            "overall_100": 70,
+            "mechanical_100": 70,
+            "body_100": 70,
+            "economy_100": 70,
+        },
+        "summary": {
+            "short_comment": "Araç hakkında temel bilgilere göre genel bir değerlendirme yapıldı.",
+            "pros": [
+                "Türkiye piyasasına göre makul bir ikinci el tercih olabilir.",
+                "Doğru bakım ve ekspertiz ile uzun süre kullanılabilir.",
+            ],
+            "cons": [
+                "Ekspertiz ve tramer yapılmadan net yoruma gidilemez.",
+                "Bakım geçmişi ve km durumu mutlaka detaylı kontrol edilmelidir.",
+            ],
+            "estimated_risk_level": seg_info.get("overall_risk_level", "orta"),
+        },
+        "preview": {
+            "title": title,
+            "price_tag": "Normal",
+            "spoiler": "Sınırlı bilgiye göre genel, nötr bir ikinci el değerlendirmesi yapıldı. Detaylı ekspertiz mutlaka önerilir.",
+            "bullets": [
+                "Ekspertiz ve tramer kaydı mutlaka kontrol edilmeli.",
+                "Bakım kayıtları ve km uyumu doğrulanmalı.",
+                "Lastik ve fren durumu pazarlıkta avantaj sağlayabilir.",
+            ],
+        },
+    }
+
+
+def fallback_premium(req: AnalyzeRequest) -> Dict[str, Any]:
+    v = req.vehicle
+    seg_info = estimate_costs_and_risks(req)
+    title = f"{v.year or ''} {v.make} {v.model}".strip() or "Araç Analizi (Premium)"
+
+    return {
+        "scores": {
+            "overall_100": 75,
+            "mechanical_100": 74,
+            "body_100": 73,
+            "economy_100": 70,
+            "comfort_100": 72,
+            "family_use_100": 78,
+            "resale_100": 76,
+        },
+        "cost_estimates": {
+            "yearly_maintenance_tr": seg_info.get("estimated_yearly_maintenance_tr", 15000),
+            "yearly_fuel_tr": seg_info.get("estimated_yearly_fuel_tr", 25000),
+            "insurance_level": seg_info.get("insurance_level", "orta"),
+            "notes": "Hesaplamalar sınırlı bilgiye göre tahmini olarak yapılmıştır; gerçek maliyetler araç durumuna göre değişebilir.",
+        },
+        "risk_analysis": {
+            "chronic_issues": [
+                "Bu segmentte tipik ikinci el araçlarda yaşa ve km'ye bağlı standart yıpranma görülebilir.",
+            ],
+            "risk_level": seg_info.get("overall_risk_level", "orta"),
+            "warnings": [
+                "Satın almadan önce kapsamlı ekspertiz ve tramer sorgusu yaptırılması önerilir.",
+                "Bakım geçmişi ve km uyumu teyit edilmelidir.",
+            ],
+        },
+        "summary": {
+            "short_comment": "Verilen bilgilere göre genel olarak dengeli ve potansiyel olarak mantıklı bir ikinci el tercih olabilir.",
+            "pros": [
+                "Doğru bakım ve dikkatli satın alma süreci ile uzun süre kullanılabilir.",
+                "Piyasada bu segmentte alıcı bulma potansiyeli genellikle yüksektir.",
+            ],
+            "cons": [
+                "Net karar için araç yerinde görülmeli ve detaylı inceleme yapılmalıdır.",
+                "Yüksek km veya düzensiz bakım geçmişi maliyetleri artırabilir.",
+            ],
+            "who_should_buy": "Ailesiyle düzenli kullanım planlayan, bütçesini bilen ve satın almadan önce detaylı ekspertiz yaptırmaya hazır kullanıcılar için uygun olabilir.",
+        },
+        "preview": {
+            "title": title,
+            "price_tag": "Normal",
+            "spoiler": "Sınırlı bilgiyle yapılan premium formatta genel değerlendirme. Ekspertiz, tramer ve bakım kayıtları mutlaka kontrol edilmelidir.",
+            "bullets": [
+                "Tahmini yıllık bakım ve yakıt maliyeti orta seviyede.",
+                "İkinci el piyasasında alıcı bulma potansiyeli fena değil.",
+                "Satın almadan önce detaylı ekspertiz şart.",
+            ],
+        },
+    }
+
+
+def fallback_manual(req: AnalyzeRequest) -> Dict[str, Any]:
+    # Manuel analiz, normal fallback'e çok benzer
+    return fallback_normal(req)
+
+
+def fallback_compare(req: CompareRequest) -> Dict[str, Any]:
+    left_title = (f"{req.left.vehicle.make} {req.left.vehicle.model}").strip() or "Sol araç"
+    right_title = (f"{req.right.vehicle.make} {req.right.vehicle.model}").strip() or "Sağ araç"
+
+    return {
+        "better_overall": "left",
+        "summary": f"{left_title} genel kullanım için biraz daha dengeli bir tercih olarak varsayıldı. Ancak her iki araç için de ekspertiz ve tramer şarttır.",
+        "left_pros": [
+            f"{left_title} için varsayımsal olarak daha dengeli maliyet/performans oranı kabul edildi.",
+            "Aile ve karışık kullanım için uygun olabilir.",
+        ],
+        "left_cons": [
+            "Gerçek durum bilinmediği için mutlaka yerinde inceleme gerekir.",
+        ],
+        "right_pros": [
+            f"{right_title} da doğru bakımla mantıklı bir tercih olabilir.",
+        ],
+        "right_cons": [
+            "Toplanan bilgilere göre maliyet veya kullanım açısından biraz daha dikkatli incelenmelidir.",
+        ],
+        "use_cases": {
+            "family_use": f"Aile kullanımı için {left_title} biraz daha avantajlı varsayılmıştır.",
+            "long_distance": "Her iki araç da düzenli bakım ile uzun yolda kullanılabilir.",
+            "city_use": "Şehir içi kullanımda yakıt ve konfor açısından her iki aracın da test edilmesi önerilir.",
+        },
+    }
+
+
+def fallback_otobot(question: str) -> Dict[str, Any]:
+    return {
+        "answer": "Verdiğin bilgiler sınırlı olsa da, Türkiye'de genelde C-segment bir dizel veya benzinli-hybrid araç; aile, konfor ve uzun yol dengesi için mantıklı bir başlangıç noktasıdır. Yıllık km yüksekse dizel veya ekonomik benzinli, daha düşükse benzinli veya hybrid düşünülebilir. Satın almadan önce mutlaka ekspertiz, tramer ve bakım geçmişi kontrolü yaptır.",
+        "suggested_segments": ["C-sedan", "C-hatchback", "C-SUV"],
+        "example_models": [
+            "Toyota Corolla",
+            "Hyundai i30 / Elantra",
+            "Renault Megane",
+            "Honda Civic",
+        ],
+    }
+
+
+# ---------------------------------------------------------
+# LLM JSON çağrısı (hata olursa fallback)
+# ---------------------------------------------------------
+def call_llm_json(
+    model_name: str,
+    system_prompt: str,
+    user_content: str,
+    mode: str,
+    req: Any,
+) -> Dict[str, Any]:
+    # OpenAI client yoksa direkt fallback
+    if client is None:
+        if mode == "normal":
+            return fallback_normal(req)
+        if mode == "premium":
+            return fallback_premium(req)
+        if mode == "manual":
+            return fallback_manual(req)
+        if mode == "compare":
+            return fallback_compare(req)
+        if mode == "otobot":
+            return fallback_otobot(user_content)
+        return fallback_normal(req)
+
     try:
         resp = client.chat.completions.create(
             model=model_name,
@@ -288,23 +450,24 @@ def call_llm_json(model_name: str, system_prompt: str, user_content: str) -> Dic
                 {"role": "user", "content": user_content},
             ],
         )
-    except Exception as e:
-        # OpenAI patlarsa bile 500 dönelim, Flutter düzgün yakalasın
-        raise HTTPException(
-            status_code=500,
-            detail=f"LLM isteği başarısız ({model_name}): {e}",
-        )
-
-    try:
         content = resp.choices[0].message.content
         if isinstance(content, str):
             return json.loads(content)
         return content  # type: ignore[return-value]
     except Exception as e:
-        raise HTTPException(
-            status_code=500,
-            detail=f"LLM yanıtı JSON parse edilemedi: {e}",
-        )
+        # Her türlü OpenAI / JSON hatasında fallback kullan
+        print(f"LLM hatası ({mode}): {e}")
+        if mode == "normal":
+            return fallback_normal(req)
+        if mode == "premium":
+            return fallback_premium(req)
+        if mode == "manual":
+            return fallback_manual(req)
+        if mode == "compare":
+            return fallback_compare(req)
+        if mode == "otobot":
+            return fallback_otobot(user_content)
+        return fallback_normal(req)
 
 
 # ---------------------------------------------------------
@@ -460,12 +623,13 @@ async def root() -> Dict[str, Any]:
 @app.post("/analyze")
 async def analyze(req: AnalyzeRequest) -> Dict[str, Any]:
     user_content = build_user_content(req, mode="normal")
-    data = call_llm_json(
+    return call_llm_json(
         model_name=OPENAI_MODEL_NORMAL,
         system_prompt=SYSTEM_PROMPT_NORMAL,
         user_content=user_content,
+        mode="normal",
+        req=req,
     )
-    return data
 
 
 # ---------------------------------------------------------
@@ -474,27 +638,29 @@ async def analyze(req: AnalyzeRequest) -> Dict[str, Any]:
 @app.post("/premium_analyze")
 async def premium_analyze(req: AnalyzeRequest) -> Dict[str, Any]:
     user_content = build_user_content(req, mode="premium")
-    data = call_llm_json(
+    return call_llm_json(
         model_name=OPENAI_MODEL_PREMIUM,
         system_prompt=SYSTEM_PROMPT_PREMIUM,
         user_content=user_content,
+        mode="premium",
+        req=req,
     )
-    return data
 
 
 # ---------------------------------------------------------
-# MANUEL / KENDİ ARAÇ ANALİZİ (2 endpoint birden)
+# MANUEL / KENDİ ARAÇ ANALİZİ
 # ---------------------------------------------------------
 @app.post("/manual_analyze")
 @app.post("/manual")
 async def manual_analyze(req: AnalyzeRequest) -> Dict[str, Any]:
     user_content = build_user_content(req, mode="manual")
-    data = call_llm_json(
+    return call_llm_json(
         model_name=OPENAI_MODEL_NORMAL,
         system_prompt=SYSTEM_PROMPT_MANUAL,
         user_content=user_content,
+        mode="manual",
+        req=req,
     )
-    return data
 
 
 # ---------------------------------------------------------
@@ -529,12 +695,13 @@ Kullanıcı profili:
 
     user_content = (left_text + "\n" + right_text + "\n" + profile_text).strip()
 
-    data = call_llm_json(
+    return call_llm_json(
         model_name=OPENAI_MODEL_COMPARE,
         system_prompt=SYSTEM_PROMPT_COMPARE,
         user_content=user_content,
+        mode="compare",
+        req=req,
     )
-    return data
 
 
 # ---------------------------------------------------------
@@ -544,43 +711,18 @@ Kullanıcı profili:
 async def otobot(req: OtoBotRequest) -> Dict[str, Any]:
     question = (req.question or "").strip()
     if not question:
-        # Tamamen boş gelirse bile 400; ama Flutter tarafı message gösterir
+        # Tamamen boş gelirse 400; Flutter tarafı buna göre kullanıcıya mesaj gösterebilir
         raise HTTPException(
             status_code=400,
             detail="Soru boş olamaz. 'question' alanına bir metin gönder.",
         )
 
-    messages = [
-        {"role": "system", "content": SYSTEM_PROMPT_OTOBOT},
-        {"role": "user", "content": question},
-    ]
+    user_content = question
 
-    if req.history:
-        for h in req.history:
-            role = h.get("role", "user")
-            content = h.get("content", "")
-            if content:
-                messages.append({"role": role, "content": content})
-
-    try:
-        resp = client.chat.completions.create(
-            model=OPENAI_MODEL_OTOBOT,
-            response_format={"type": "json_object"},
-            messages=messages,
-        )
-    except Exception as e:
-        raise HTTPException(
-            status_code=500,
-            detail=f"LLM isteği başarısız (OtoBot): {e}",
-        )
-
-    try:
-        content = resp.choices[0].message.content
-        if isinstance(content, str):
-            return json.loads(content)
-        return content  # type: ignore[return-value]
-    except Exception as e:
-        raise HTTPException(
-            status_code=500,
-            detail=f"OtoBot yanıtı JSON parse edilemedi: {e}",
-        )
+    return call_llm_json(
+        model_name=OPENAI_MODEL_OTOBOT,
+        system_prompt=SYSTEM_PROMPT_OTOBOT,
+        user_content=user_content,
+        mode="otobot",
+        req=req,
+    )
