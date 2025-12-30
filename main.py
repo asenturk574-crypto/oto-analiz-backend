@@ -26,6 +26,7 @@ OPENAI_MODEL_PREMIUM = os.getenv("OPENAI_MODEL_PREMIUM", OPENAI_MODEL_DEFAULT)
 OPENAI_MODEL_COMPARE = os.getenv("OPENAI_MODEL_COMPARE", OPENAI_MODEL_DEFAULT)
 OPENAI_MODEL_OTOBOT = os.getenv("OPENAI_MODEL_OTOBOT", OPENAI_MODEL_DEFAULT)
 
+
 # ---------------------------------------------------------
 # FastAPI app
 # ---------------------------------------------------------
@@ -39,13 +40,14 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 # ---------------------------------------------------------
 # Modeller
 # ---------------------------------------------------------
 class Profile(BaseModel):
     yearly_km: int = Field(15000, ge=0, le=100000)
-    usage: str = "mixed"              # city / mixed / highway
-    fuel_preference: str = "gasoline" # gasoline / diesel / lpg / hybrid / electric
+    usage: str = "mixed"  # city / mixed / highway
+    fuel_preference: str = "gasoline"  # gasoline / diesel / lpg / hybrid / electric
 
 
 class Vehicle(BaseModel):
@@ -53,7 +55,7 @@ class Vehicle(BaseModel):
     model: str = ""
     year: Optional[int] = Field(None, ge=1980, le=2035)
     mileage_km: Optional[int] = Field(None, ge=0)
-    fuel: Optional[str] = None       # gasoline / diesel / lpg / hybrid / electric
+    fuel: Optional[str] = None  # gasoline / diesel / lpg / hybrid / electric
 
 
 class AnalyzeRequest(BaseModel):
@@ -67,7 +69,7 @@ class AnalyzeRequest(BaseModel):
     context: Dict[str, Any] = Field(default_factory=dict)
 
     class Config:
-        extra = "allow"
+        extra = "allow"  # "text" gibi ek alanları da kabul et
 
 
 class CompareSide(BaseModel):
@@ -180,6 +182,10 @@ def estimate_costs_and_risks(req: AnalyzeRequest) -> Dict[str, Any]:
     yearly_maintenance = int(base_maintenance * seg_mult * age_mult * km_mult)
     yearly_fuel = int(base_fuel * seg_mult * ((p.yearly_km / 15000) or 1) * fuel_mult)
 
+    # Mantıksız uç değerleri sınırla
+    yearly_maintenance = max(5000, min(yearly_maintenance, 60000))
+    yearly_fuel = max(8000, min(yearly_fuel, 80000))
+
     if "premium" in segment:
         insurance_level = "yüksek"
     elif "SUV" in segment or "D-segment" in segment:
@@ -228,30 +234,30 @@ def build_user_content(req: AnalyzeRequest, mode: str) -> str:
 
     ad_text = (req.ad_description or "").strip()
 
-    all_ss: List[str] = []
-    if req.screenshot_base64:
-        all_ss.append(req.screenshot_base64)
-    if req.screenshots_base64:
-        all_ss.extend([s for s in req.screenshots_base64 if s])
+    # Flutter tarafında gönderilen serbest metin (araçtan beklentiler + özet)
+    extra_text = ""
+    try:
+        raw_extra = getattr(req, "text", None)
+    except Exception:
+        raw_extra = None
+    if isinstance(raw_extra, str) and raw_extra.strip():
+        extra_text = raw_extra.strip()
+
+    # Kullanıcı şehri (context içinden gelebilir)
+    user_city = None
+    if isinstance(req.context, dict):
+        user_city = req.context.get("user_city")
 
     backend_context = estimate_costs_and_risks(req)
 
-    ss_info = ""
-    if all_ss:
-        ss_info = (
-            f"\nKullanıcı {len(all_ss)} adet ilan ekran görüntüsü ekledi. "
-            "Bu görüntülerdeki fiyat, donanım, paket ve hasar bilgilerini de analizinde kullan. "
-            "Eğer görüntülere doğrudan erişemiyorsan bile, bu bilgilerin mevcut olduğunu "
-            "varsayarak genel bir değerlendirme yap."
+    # Eğer hiçbir bilgi yoksa, tamamen genel bir senaryo
+    if not (v.make.strip() or v.model.strip() or ad_text or extra_text):
+        extra_text = (
+            "Kullanıcı kendisi için ilk aracı almayı planlayan, Türkiye'de yaşayan, günlük şehir içi kullanım ve "
+            "ara sıra uzun yol yapan ortalama bir sürücü olsun. Bütçesi kısıtlı ve bakım maliyetlerini de önemsiyor."
         )
 
-    if not (v.make.strip() or v.model.strip() or ad_text or all_ss):
-        ad_text = (
-            "Kullanıcı çok az bilgi verdi. Türkiye ikinci el piyasasında genel kabul gören "
-            "kriterlerle, varsayımsal bir aile aracı analizi yap."
-        )
-
-    base_text = f"""
+    base_text = f'''
 Kullanıcı Oto Analiz uygulamasında **{mode}** modunda analiz istiyor.
 
 Araç bilgileri (boş olan alanlar '-' olabilir):
@@ -260,22 +266,40 @@ Araç bilgileri (boş olan alanlar '-' olabilir):
 - Yıl: {v.year or "-"}
 - Kilometre: {v.mileage_km or "-"} km
 - Yakıt: {v.fuel or p.fuel_preference}
+- Şehir (varsa): {user_city or "-"}
 
-Kullanım profili (tahmini değerler olabilir):
+Kullanım profili:
 - Yıllık km: {p.yearly_km} km
 - Kullanım tipi: {p.usage}
 - Yakıt tercihi: {p.fuel_preference}
-"""
+'''.strip()
+
+    if extra_text:
+        base_text += (
+            "\n\nKullanıcının formda yazdığı ek bilgiler ve beklentiler "
+            "(örneğin 'öğrenciyim', 'ilk aracım', 'şehir içi kullanım', 'uzun yol ağırlıklı', "
+            "'aile için güvenli olsun' vb.):\n"
+            f"{extra_text}\n"
+        )
 
     if ad_text:
-        base_text += f"\nİlan açıklaması veya kullanıcı notu:\n{ad_text}\n"
+        base_text += "\nİlan açıklaması veya satıcının yazdığı metin:\n" + ad_text + "\n"
 
     base_text += "\n--- Backend tahmini maliyet & risk bilgileri (kaba hesap) ---\n"
     base_text += json.dumps(backend_context, ensure_ascii=False)
     base_text += "\n-----------------------------------------------------------\n"
-    base_text += ss_info
 
-    return base_text.strip()
+    base_text += (
+        "\nAnaliz yaparken kullanıcı PROFİLİNİ mutlaka hesaba kat:\n"
+        "- Eğer kullanıcı öğrenciyse veya 'ilk araç' diyorsa, bütçe, sigorta/kasko maliyeti, park kolaylığı "
+        "ve düşük masraf konularını özellikle vurgula.\n"
+        "- Aile kullanımından bahsediyorsa, arka sıra ve bagaj genişliği, çocukla kullanım, uzun yoldaki konfor ve güvenliği öne çıkar.\n"
+        "- Kullanım tipi şehir içi ise park kolaylığı, manevra kabiliyeti ve yakıt tüketimine; uzun yol ise konfor, "
+        "kasa yapısı ve yüksek hız stabilitesine odaklan.\n"
+        "- İkinci el piyasası, yedek parça bulunurluğu ve ustaya gösterme kolaylığı hakkında da maddeler ekle."
+    )
+
+    return base_text
 
 
 # ---------------------------------------------------------
@@ -285,18 +309,6 @@ def fallback_normal(req: AnalyzeRequest) -> Dict[str, Any]:
     v = req.vehicle
     seg_info = estimate_costs_and_risks(req)
     title = f"{v.year or ''} {v.make} {v.model}".strip() or "Araç Analizi"
-
-    result_text = (
-        f"{title} için temel bilgilere göre genel bir değerlendirme:\n"
-        f"- Segment tahmini: {seg_info.get('segment_guess', 'bilinmiyor')}.\n"
-        f"- Tahmini yıllık bakım maliyeti: yaklaşık "
-        f"{seg_info.get('estimated_yearly_maintenance_tr', 15000)} TL civarı.\n"
-        f"- Tahmini yıllık yakıt maliyeti: yaklaşık "
-        f"{seg_info.get('estimated_yearly_fuel_tr', 25000)} TL civarı.\n"
-        f"- Genel risk seviyesi: {seg_info.get('overall_risk_level', 'orta')}.\n\n"
-        "Satın almadan önce mutlaka ekspertiz, tramer ve bakım geçmişi kontrolü yaptırılmalı; "
-        "özellikle km ve yaş ileriyse motor, şanzıman ve yürür aksam detaylı incelenmelidir."
-    )
 
     return {
         "scores": {
@@ -310,29 +322,23 @@ def fallback_normal(req: AnalyzeRequest) -> Dict[str, Any]:
             "pros": [
                 "Türkiye piyasasına göre makul bir ikinci el tercih olabilir.",
                 "Doğru bakım ve ekspertiz ile uzun süre kullanılabilir.",
-                "C/D segmenti bir araç için konfor ve kullanım dengesi potansiyeli var.",
             ],
             "cons": [
                 "Ekspertiz ve tramer yapılmadan net yoruma gidilemez.",
                 "Bakım geçmişi ve km durumu mutlaka detaylı kontrol edilmelidir.",
-                "Lastik, fren ve yürür aksam masraf çıkarma ihtimali vardır.",
             ],
             "estimated_risk_level": seg_info.get("overall_risk_level", "orta"),
         },
         "preview": {
             "title": title,
             "price_tag": "Normal",
-            "spoiler": (
-                "Sınırlı bilgiye göre genel, nötr bir ikinci el değerlendirmesi yapıldı. "
-                "Detaylı ekspertiz mutlaka önerilir."
-            ),
+            "spoiler": "Sınırlı bilgiye göre genel, nötr bir ikinci el değerlendirmesi yapıldı. Detaylı ekspertiz mutlaka önerilir.",
             "bullets": [
                 "Ekspertiz ve tramer kaydı mutlaka kontrol edilmeli.",
                 "Bakım kayıtları ve km uyumu doğrulanmalı.",
                 "Lastik ve fren durumu pazarlıkta avantaj sağlayabilir.",
             ],
         },
-        "result": result_text,
     }
 
 
@@ -341,27 +347,8 @@ def fallback_premium(req: AnalyzeRequest) -> Dict[str, Any]:
     seg_info = estimate_costs_and_risks(req)
     title = f"{v.year or ''} {v.make} {v.model}".strip() or "Araç Analizi (Premium)"
 
-    result_text = (
-        f"Özet:\n"
-        f"{title} için verilen yıl, km ve yakıt bilgilerine göre araç genel olarak "
-        f"{seg_info.get('segment_guess', 'C/D-segment')} sınıfında, günlük kullanım "
-        "ve uzun yol dengesini sunabilecek bir ikinci el aday gibi görünüyor.\n\n"
-        "Yıllık Maliyet Tahmini:\n"
-        f"- Tahmini yıllık bakım maliyeti: yaklaşık "
-        f"{seg_info.get('estimated_yearly_maintenance_tr', 18000)} TL.\n"
-        f"- Tahmini yıllık yakıt maliyeti: yaklaşık "
-        f"{seg_info.get('estimated_yearly_fuel_tr', 28000)} TL.\n"
-        f"- Sigorta/kasko seviyesi: {seg_info.get('insurance_level', 'orta')} seviyede; "
-        "bütçe planlanırken bu kalem de hesaba katılmalı.\n\n"
-        "Riskler & Dikkat Edilmesi Gerekenler:\n"
-        f"- Genel risk seviyesi: {seg_info.get('overall_risk_level', 'orta')}.\n"
-        "- Km ve yaş arttıkça motor, şanzıman ve yürür aksam masrafları belirginleşebilir.\n"
-        "- Tramer ve ekspertiz raporu olmadan sadece ilan metnine güvenmek yeterli değildir.\n\n"
-        "Piyasa Yorumu ve Alternatifler:\n"
-        "Bu araç, aynı segmentteki muadilleriyle kıyaslandığında mantıklı bir seçenek olabilir; "
-        "ancak fiyat, donanım ve hasar geçmişi benzer ilanlarla mutlaka karşılaştırılmalıdır. "
-        "Bütçene yakın alternatif modelleri de inceleyerek pazarlık payını arttırman faydalı olur."
-    )
+    yearly_maintenance = seg_info.get("estimated_yearly_maintenance_tr", 15000)
+    yearly_fuel = seg_info.get("estimated_yearly_fuel_tr", 25000)
 
     return {
         "scores": {
@@ -374,125 +361,65 @@ def fallback_premium(req: AnalyzeRequest) -> Dict[str, Any]:
             "resale_100": 76,
         },
         "cost_estimates": {
-            "yearly_maintenance_tr": seg_info.get(
-                "estimated_yearly_maintenance_tr", 18000
-            ),
-            "yearly_fuel_tr": seg_info.get("estimated_yearly_fuel_tr", 28000),
+            "yearly_maintenance_tr": yearly_maintenance,
+            "yearly_fuel_tr": yearly_fuel,
             "insurance_level": seg_info.get("insurance_level", "orta"),
-            "notes": (
-                "Hesaplamalar sınırlı bilgiye göre tahmini olarak yapılmıştır; gerçek maliyetler "
-                "araç durumuna ve kullanım şekline göre değişebilir."
-            ),
+            "notes": "Hesaplamalar sınırlı bilgiye göre tahmini olarak yapılmıştır; gerçek maliyetler araç durumuna göre değişebilir.",
         },
         "risk_analysis": {
             "chronic_issues": [
                 "Bu segmentte tipik ikinci el araçlarda yaşa ve km'ye bağlı standart yıpranma görülebilir.",
-                "Özellikle yüksek km’de süspansiyon, şanzıman ve ön takım masraf çıkarabilir.",
             ],
             "risk_level": seg_info.get("overall_risk_level", "orta"),
             "warnings": [
                 "Satın almadan önce kapsamlı ekspertiz ve tramer sorgusu yaptırılması önerilir.",
-                "Bakım geçmişi ve km uyumu mutlaka servis kayıtları ile teyit edilmelidir.",
-                "Lastik, fren ve sarf malzeme durumuna göre ek bütçe ayırmak gerekebilir.",
+                "Bakım geçmişi ve km uyumu teyit edilmelidir.",
             ],
         },
         "summary": {
-            "short_comment": (
-                "Verilen bilgilere göre araç, doğru kontrol ve pazarlıkla mantıklı bir ikinci el tercih "
-                "olabilir; ancak km, yaş ve bakım geçmişi mutlaka detaylı incelenmelidir."
-            ),
+            "short_comment": "Verilen bilgilere göre genel olarak dengeli ve potansiyel olarak mantıklı bir ikinci el tercih olabilir.",
             "pros": [
-                "Segmentine göre konfor ve donanım seviyesi tatmin edici olabilir.",
-                "Doğru bakım yapıldığında uzun süre kullanılma potansiyeli var.",
-                "Piyasada benzer ilanlarla kıyaslandığında alıcı bulma potansiyeli yüksek.",
-                "Uzun yol ve aile kullanımı için dengeli bir profil sunabilir.",
-                "LPG / dizel / hybrid gibi ekonomik seçenekler maliyetleri aşağı çekebilir (varsa).",
+                "Doğru bakım ve dikkatli satın alma süreci ile uzun süre kullanılabilir.",
+                "Piyasada bu segmentte alıcı bulma potansiyeli genellikle yüksektir.",
             ],
             "cons": [
-                "Yüksek km veya düzensiz bakım geçmişi ciddi masraflar doğurabilir.",
-                "Hasar geçmişi ve tramer raporu bilinmeden net karar vermek risklidir.",
-                "Pahalı parça ve işçilik gerektiren markalarda yıllık maliyet yukarı çıkabilir.",
-                "Kasko ve sigorta maliyetleri, ekonomik modellerden daha yüksek olabilir.",
+                "Net karar için araç yerinde görülmeli ve detaylı inceleme yapılmalıdır.",
+                "Yüksek km veya düzensiz bakım geçmişi maliyetleri artırabilir.",
             ],
-            "who_should_buy": (
-                "Ailesiyle düzenli kullanım planlayan, bütçesini bilen ve satın almadan önce detaylı "
-                "ekspertiz yaptırmaya hazır kullanıcılar için uygun olabilir."
-            ),
+            "who_should_buy": "Ailesiyle düzenli kullanım planlayan, bütçesini bilen ve satın almadan önce detaylı ekspertiz yaptırmaya hazır kullanıcılar için uygun olabilir.",
         },
         "preview": {
             "title": title,
             "price_tag": "Normal",
-            "spoiler": (
-                "Tahmini bakım ve yakıt maliyetleri orta seviyede. Ekspertiz ve tramer sonrasında, "
-                "piyasa ile karşılaştırarak değerlendirilmesi gereken bir ikinci el seçenek."
-            ),
+            "spoiler": "Sınırlı bilgiyle yapılan premium formatta genel değerlendirme. Ekspertiz, tramer ve bakım kayıtları mutlaka kontrol edilmelidir.",
             "bullets": [
-                "Yıllık tahmini bakım ve yakıt maliyeti orta seviyede.",
-                "Piyasada benzer ilanlarla mutlaka kıyaslanmalı.",
-                "Ekspertiz ve tramer raporu olmadan karar verilmemeli.",
+                "Tahmini yıllık bakım ve yakıt maliyeti orta seviyede.",
+                "İkinci el piyasasında alıcı bulma potansiyeli fena değil.",
+                "Satın almadan önce detaylı ekspertiz şart.",
             ],
         },
-        "result": result_text,
+        "result": (
+            "Genel Değerlendirme: Araç verilen sınırlı bilgilerle bakıldığında, doğru ekspertiz ve bakım geçmişi teyidi "
+            "yapıldığı sürece dengeli bir ikinci el alternatifi olabilir.\n\n"
+            "Maliyet & Bütçe:\n"
+            f"- Tahmini yıllık bakım maliyeti: {yearly_maintenance} TL civarında, segmentine göre orta seviyede.\n"
+            f"- Tahmini yıllık yakıt maliyeti: {yearly_fuel} TL bandında, kullanım yoğunluğuna göre değişebilir.\n"
+            "- Sigorta ve kasko seviyesinin segment nedeniyle orta–yüksek olması beklenebilir.\n"
+            "- Düzenli bakım yapılmazsa beklenmedik masraflar artabilir.\n\n"
+            "Risk & Dikkat Edilmesi Gerekenler:\n"
+            "- Km ve yaş durumuna göre motor, şanzıman ve yürüyen aksam mutlaka detaylı kontrol edilmelidir.\n"
+            "- Tramer ve ekspertiz raporu olmadan net karar verilmemelidir.\n"
+            "- Kronik sorunları bilinen bir motor veya şanzıman tipi varsa, bu konular özellikle sorulmalıdır.\n\n"
+            "Kime Uygun?:\n"
+            "- Ailesiyle zaman zaman uzun yol yapan, bütçesine dikkat eden ama biraz konfor da isteyen kullanıcılar.\n"
+            "- Aracını düzenli bakımda tutmayı sorun etmeyen ve ikinci el sürecini bilinçli yönetmek isteyenler."
+        ),
     }
 
 
 def fallback_manual(req: AnalyzeRequest) -> Dict[str, Any]:
-    v = req.vehicle
-    seg_info = estimate_costs_and_risks(req)
-    title = f"{v.year or ''} {v.make} {v.model}".strip() or "Kendi Aracın Analizi"
-
-    result_text = (
-        f"Kendi aracın olan {title} için temel bilgilere göre genel bir değerlendirme:\n"
-        f"- Segment tahmini: {seg_info.get('segment_guess', 'bilinmiyor')}.\n"
-        f"- Tahmini yıllık bakım maliyeti: "
-        f"{seg_info.get('estimated_yearly_maintenance_tr', 15000)} TL civarı.\n"
-        f"- Tahmini yıllık yakıt maliyeti: "
-        f"{seg_info.get('estimated_yearly_fuel_tr', 25000)} TL civarı.\n"
-        f"- Genel risk seviyesi: {seg_info.get('overall_risk_level', 'orta')}.\n\n"
-        "Aracını uzun süre kullanmayı düşünüyorsan; periyodik bakımları aksatmamak, "
-        "tramer ve hasar geçmişini takip etmek ve özellikle yürür aksam seslerini ciddiye "
-        "almak uzun vadede seni yüksek masraflardan koruyabilir."
-    )
-
-    return {
-        "scores": {
-            "overall_100": 72,
-            "mechanical_100": 72,
-            "body_100": 71,
-            "economy_100": 70,
-        },
-        "summary": {
-            "short_comment": (
-                "Verilen sınırlı bilgilere göre aracın genel durumu ortalama seviyede kabul edilmiştir; "
-                "bakımlar düzenli yapılırsa uzun süre kullanılabilir."
-            ),
-            "pros": [
-                "Bakımları düzenli yapıldığında uzun süre sorunsuz kullanılabilir.",
-                "Segmentine göre konfor ve kullanım dengesini sağlayabilir.",
-                "Aracını tanıdığın için geçmişini bilmek ikinci el araçlara göre avantajlıdır.",
-            ],
-            "cons": [
-                "Yüksek km ve yaş ilerledikçe kronik masraflar artabilir.",
-                "Bazı büyük bakım kalemleri (triger, debriyaj, yürür aksam) birikerek yük getirebilir.",
-                "Bakım ve onarım geciktirilirse daha büyük masraflara yol açabilir.",
-            ],
-            "estimated_risk_level": seg_info.get("overall_risk_level", "orta"),
-        },
-        "preview": {
-            "title": title,
-            "price_tag": None,
-            "spoiler": (
-                "Kendi aracın için genel bir durum analizi ve bakım/maliyet tavsiyesi sunuluyor. "
-                "Düzenli bakım ve takip ile uzun süre keyifle kullanılabilir."
-            ),
-            "bullets": [
-                "Periyodik bakımları zamanında yaptır.",
-                "Tramer ve hasar geçmişini takipte tut.",
-                "Şüpheli ses ve titreşimleri önemseyip kontrol ettir.",
-            ],
-        },
-        "result": result_text,
-    }
+    # Manuel analiz, normal fallback'e çok benzer
+    return fallback_normal(req)
 
 
 def fallback_compare(req: CompareRequest) -> Dict[str, Any]:
@@ -501,11 +428,7 @@ def fallback_compare(req: CompareRequest) -> Dict[str, Any]:
 
     return {
         "better_overall": "left",
-        "summary": (
-            f"{left_title}, varsayımsal olarak genel kullanım ve maliyet dengesi açısından "
-            f"{right_title} modeline göre biraz daha avantajlı kabul edilmiştir. "
-            "Ancak her iki araç için de ekspertiz ve tramer sonuçları görülmeden net karar verilmemelidir."
-        ),
+        "summary": f"{left_title} genel kullanım için biraz daha dengeli bir tercih olarak varsayıldı. Ancak her iki araç için de ekspertiz ve tramer şarttır.",
         "left_pros": [
             f"{left_title} için varsayımsal olarak daha dengeli maliyet/performans oranı kabul edildi.",
             "Aile ve karışık kullanım için uygun olabilir.",
@@ -529,13 +452,7 @@ def fallback_compare(req: CompareRequest) -> Dict[str, Any]:
 
 def fallback_otobot(question: str) -> Dict[str, Any]:
     return {
-        "answer": (
-            "Verdiğin bilgiler sınırlı olsa da, Türkiye'de genelde C-segment bir dizel veya "
-            "benzinli-hybrid araç; aile, konfor ve uzun yol dengesi için mantıklı bir başlangıç "
-            "noktasıdır. Yıllık km yüksekse dizel veya ekonomik benzinli, daha düşükse benzinli "
-            "veya hybrid düşünülebilir. Satın almadan önce mutlaka ekspertiz, tramer ve bakım "
-            "geçmişi kontrolü yaptır."
-        ),
+        "answer": "Verdiğin bilgiler sınırlı olsa da, Türkiye'de genelde C-segment bir dizel veya benzinli-hybrid araç; aile, konfor ve uzun yol dengesi için mantıklı bir başlangıç noktasıdır. Yıllık km yüksekse dizel veya ekonomik benzinli, daha düşükse benzinli veya hybrid düşünülebilir. Satın almadan önce mutlaka ekspertiz, tramer ve bakım geçmişi kontrolü yaptır.",
         "suggested_segments": ["C-sedan", "C-hatchback", "C-SUV"],
         "example_models": [
             "Toyota Corolla",
@@ -625,23 +542,17 @@ Sen 'Oto Analiz' uygulaması için çalışan bir ARAÇ İLANI ANALİZ ASİSTANI
     "price_tag": null,
     "spoiler": "",
     "bullets": []
-  },
-  "result": ""
+  }
 }
 
 Kurallar:
 - Tüm alanlar JSON içinde mutlaka olsun (boş bile kalsa).
-- "pros" ve "cons" içinde tercihen en az 4'er madde yaz.
-- "result" alanında 3–4 paragraflık detaylı bir açıklama yap:
-  - Özet
-  - Tahmini maliyet ve riskler
-  - Kullanım senaryoları (şehir içi, uzun yol, aile kullanımı)
 - PREVIEW kısmı Keşfet için kullanılacak:
   - 'alınır', 'alınmaz', 'sakın', 'riskli', 'tehlikeli' gibi kelimeleri KULLANMA.
   - Fiyatla ilgili sadece 'Uygun/Normal/Yüksek' etiketi ver, rakam yazma.
-- Türkiye ikinci el piyasasına göre yorum yap, ama emin olmadığın yerde net rakam üretme.
 - Dil: Türkçe.
 """
+
 
 SYSTEM_PROMPT_PREMIUM = """
 Sen 'Oto Analiz' uygulamasının PREMIUM analiz asistanısın.
@@ -685,21 +596,33 @@ Sen 'Oto Analiz' uygulamasının PREMIUM analiz asistanısın.
 }
 
 Kurallar:
-- Tüm alanlar JSON içinde mutlaka olsun (boş bile kalsa).
-- "pros" ve "cons" içinde mümkünse 5–7 detaylı madde yaz.
-- "cost_estimates" alanındaki değerleri, sistem mesajında verilen backend tahminiyle uyumlu kullan.
-- "result" alanında en az 4–6 paragraflık detaylı bir premium analiz yaz:
-  - Özet
-  - Yıllık tahmini bakım ve yakıt maliyetleri (aralık olarak bahset, kesin rakam verme)
-  - Kronik sorunlar ve olası masraf riskleri
-  - Piyasa yorumu (sıfır km fiyatına göre genel olarak pahalı / normal / uygun gibi nitel kıyas)
-  - Hangi tip kullanıcı için mantıklı olur
-- Kesin fiyat rakamları uydurma; fiyatı sadece nitelik olarak değerlendir (Uygun/Normal/Yüksek, sıfırına yakın, üstünde, altında gibi).
+- Tüm alanlar JSON içinde mutlaka olsun.
+- Kullanıcının formda yazdığı ek bilgiler ve 'Araçtan beklentiler' kısmını dikkatlice incele;
+  'öğrenciyim', 'ilk aracım', 'aile için', 'şehir içi ağırlıklı', 'uzun yol önemli' gibi bilgiler varsa
+  pros/cons ve result bölümünü mutlaka buna göre kişiselleştir.
+- "pros" ve "cons" listelerinde mümkünse 5–7 madde olsun; her madde tek cümle, kısa ve net olsun.
+  Örneğin: sigorta maliyeti, yedek parça bulunurluğu, park kolaylığı, şehir içi/uzun yol performansı,
+  ikinci el piyasasının hızı, kronik arıza bilinirliği gibi konulara değin.
+- cost_estimates.yearly_maintenance_tr ve yearly_fuel_tr:
+  - 'Backend tahmini maliyet & risk' JSON'unda verilen 'estimated_yearly_maintenance_tr' ve
+    'estimated_yearly_fuel_tr' değerlerini temel al.
+  - Bu tahminler üzerinde en fazla ±%30 sapma yap.
+  - ASLA bu tahminlerin 2 katından fazla ya da yarısından az değer yazma.
+- "result" çıktısı uzun bir makale olmasın; yaklaşık 150–250 kelime olsun ve yapısı şöyle olsun:
+  1) "Genel Değerlendirme" başlığı altında 2–3 cümlelik kısa bir özet.
+  2) "Maliyet & Bütçe" başlığı altında 3–5 madde (yıllık bakım, yakıt, sigorta/kasko seviyesi, beklenmedik masraf riski).
+  3) "Risk & Dikkat Edilmesi Gerekenler" başlığı altında 3–5 madde
+     (km, yaş, kronik sorun ihtimali, ekspertiz/tramer ihtiyacı, premium parça maliyeti vb.).
+  4) "Kime Uygun?" başlığı altında 2–4 madde
+     (örneğin: 'şehir içi kısa mesafe kullanan öğrenciler', 'ailesiyle uzun yol yapanlar' gibi).
+- "result" içinde mümkün olduğunca TL rakamı yazma; bakım ve yakıt için
+  "düşük / orta / yüksek" gibi nitel ifadeler kullan.
 - PREVIEW kısmı Keşfet için kullanılacak:
   - 'alınır', 'alınmaz', 'sakın', 'riskli', 'tehlikeli' gibi kelimeleri KULLANMA.
   - Fiyat rakamı verme, sadece 'Uygun/Normal/Yüksek' etiketi kullan veya null bırak.
 - Dil: Türkçe.
 """
+
 
 SYSTEM_PROMPT_MANUAL = """
 Sen 'Oto Analiz' uygulamasında KULLANICININ KENDİ ARACI için manuel analiz yapan asistansın.
@@ -708,37 +631,17 @@ Kullanıcı bazen çok az bilgi verebilir; bu durumda bile genel, bilgilendirici
 Çıktı formatın NORMAL analizle aynıdır, yani:
 
 {
-  "scores": {
-    "overall_100": 0,
-    "mechanical_100": 0,
-    "body_100": 0,
-    "economy_100": 0
-  },
-  "summary": {
-    "short_comment": "",
-    "pros": [],
-    "cons": [],
-    "estimated_risk_level": "orta"
-  },
-  "preview": {
-    "title": "",
-    "price_tag": null,
-    "spoiler": "",
-    "bullets": []
-  },
-  "result": ""
+  "scores": {...},
+  "summary": {...},
+  "preview": {...}
 }
 
 Kurallar:
-- "result" alanında aracın sahibi için 3–5 paragraflık detaylı bir rehber yaz:
-  - Mevcut durum
-  - Bakım öncelikleri
-  - Kısa / orta vadeli masraf beklentileri
-  - Uzun vadede araçla ilgili tavsiyeler
 - PREVIEW kısmı nötr olsun, 'alınır/alınmaz' gibi ifadeler kullanma.
 - Bilgiler çok azsa bile 'ekspertiz, tramer, bakım kaydı' gibi genel tavsiyelere odaklan.
 - Dil: Türkçe.
 """
+
 
 SYSTEM_PROMPT_COMPARE = """
 Sen 'Oto Analiz' uygulaması için ARAÇ KARŞILAŞTIRMA asistanısın.
@@ -761,6 +664,7 @@ Kullanıcıya iki aracı teknik, maliyet ve kullanım açısından karşılaşt�
 Dil: Türkçe, sadece JSON.
 """
 
+
 SYSTEM_PROMPT_OTOBOT = """
 Sen 'Oto Analiz' uygulamasının OTOBOT isimli araç alma rehberisin.
 Kullanıcı bütçesini, kullanım şeklini ve beklentisini anlatıyor olabilir.
@@ -770,7 +674,7 @@ Görevin: Ona Türkiye piyasasına göre mantıklı segment ve model önerileri 
 {
   "answer": "kullanıcıya verilen detaylı tavsiye yanıtı (Türkçe)",
   "suggested_segments": ["B-SUV", "C-sedan", ...],
-  "example_models": ["Örnek model 1", "Örnek model 2", "...]
+  "example_models": ["Örnek model 1", "Örnek model 2", "..."]
 }
 Dil: Türkçe, dışarıda metin yok.
 """
@@ -785,36 +689,10 @@ async def root() -> Dict[str, Any]:
 
 
 # ---------------------------------------------------------
-# NORMAL / PREMIUM / MANUEL ANALİZ – tek endpoint üzerinden
+# NORMAL ANALİZ
 # ---------------------------------------------------------
 @app.post("/analyze")
 async def analyze(req: AnalyzeRequest) -> Dict[str, Any]:
-    ctx = req.context or {}
-    mode = str(ctx.get("mode", "normal")).lower()
-
-    # Premium
-    if mode == "premium":
-        user_content = build_user_content(req, mode="premium")
-        return call_llm_json(
-            model_name=OPENAI_MODEL_PREMIUM,
-            system_prompt=SYSTEM_PROMPT_PREMIUM,
-            user_content=user_content,
-            mode="premium",
-            req=req,
-        )
-
-    # Manuel / kendi araç analizi
-    if mode == "manual":
-        user_content = build_user_content(req, mode="manual")
-        return call_llm_json(
-            model_name=OPENAI_MODEL_NORMAL,
-            system_prompt=SYSTEM_PROMPT_MANUAL,
-            user_content=user_content,
-            mode="manual",
-            req=req,
-        )
-
-    # Default: normal analiz
     user_content = build_user_content(req, mode="normal")
     return call_llm_json(
         model_name=OPENAI_MODEL_NORMAL,
@@ -826,17 +704,23 @@ async def analyze(req: AnalyzeRequest) -> Dict[str, Any]:
 
 
 # ---------------------------------------------------------
-# Ayrı endpointler (eski client’ler için de çalışsın)
+# PREMIUM ANALİZ
 # ---------------------------------------------------------
 @app.post("/premium_analyze")
 async def premium_analyze(req: AnalyzeRequest) -> Dict[str, Any]:
-    # Context yoksa premium olarak işaretle
-    ctx = req.context or {}
-    ctx["mode"] = "premium"
-    req.context = ctx
-    return await analyze(req)
+    user_content = build_user_content(req, mode="premium")
+    return call_llm_json(
+        model_name=OPENAI_MODEL_PREMIUM,
+        system_prompt=SYSTEM_PROMPT_PREMIUM,
+        user_content=user_content,
+        mode="premium",
+        req=req,
+    )
 
 
+# ---------------------------------------------------------
+# MANUEL / KENDİ ARACI ANALİZİ
+# ---------------------------------------------------------
 @app.post("/manual_analyze")
 @app.post("/manual")
 async def manual_analyze(req: AnalyzeRequest) -> Dict[str, Any]:
@@ -898,7 +782,6 @@ Kullanıcı profili:
 async def otobot(req: OtoBotRequest) -> Dict[str, Any]:
     question = (req.question or "").strip()
     if not question:
-        # Tamamen boş gelirse 400; Flutter tarafı buna göre kullanıcıya mesaj gösterebilir
         raise HTTPException(
             status_code=400,
             detail="Soru boş olamaz. 'question' alanına bir metin gönder.",
