@@ -733,22 +733,45 @@ async def root() -> Dict[str, Any]:
 
 
 # ---------------------------------------------------------
-# NORMAL ANALİZ
+# NORMAL + PREMIUM ANALİZ (TEK ENDPOINT)
 # ---------------------------------------------------------
 @app.post("/analyze")
 async def analyze(req: AnalyzeRequest) -> Dict[str, Any]:
-    user_content = build_user_content(req, mode="normal")
-    return call_llm_json(
-        model_name=OPENAI_MODEL_NORMAL,
-        system_prompt=SYSTEM_PROMPT_NORMAL,
-        user_content=user_content,
-        mode="normal",
-        req=req,
-    )
+    """
+    Flutter tarafında context.mode = "premium" gelirse PREMIUM,
+    aksi halde NORMAL analiz yapar.
+    """
+    requested_mode = "normal"
+    try:
+        if req.context:
+            ctx_mode = str(req.context.get("mode", "normal")).lower()
+            if ctx_mode in ("normal", "premium"):
+                requested_mode = ctx_mode
+    except Exception:
+        requested_mode = "normal"
+
+    if requested_mode == "premium":
+        user_content = build_user_content(req, mode="premium")
+        return call_llm_json(
+            model_name=OPENAI_MODEL_PREMIUM,
+            system_prompt=SYSTEM_PROMPT_PREMIUM,
+            user_content=user_content,
+            mode="premium",
+            req=req,
+        )
+    else:
+        user_content = build_user_content(req, mode="normal")
+        return call_llm_json(
+            model_name=OPENAI_MODEL_NORMAL,
+            system_prompt=SYSTEM_PROMPT_NORMAL,
+            user_content=user_content,
+            mode="normal",
+            req=req,
+        )
 
 
 # ---------------------------------------------------------
-# PREMIUM ANALİZ
+# (İstersen ayrı endpoint de dursun) PREMIUM ANALİZ
 # ---------------------------------------------------------
 @app.post("/premium_analyze")
 async def premium_analyze(req: AnalyzeRequest) -> Dict[str, Any]:
