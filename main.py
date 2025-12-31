@@ -100,7 +100,6 @@ class OtoBotRequest(BaseModel):
 # ---------------------------------------------------------
 # Basit model / segment bilgi tabanı (statik)
 # ---------------------------------------------------------
-
 MODEL_KNOWLEDGE_TABLE: List[Dict[str, Any]] = [
     {
         "match": ["renault", "clio"],
@@ -187,12 +186,9 @@ MODEL_KNOWLEDGE_TABLE: List[Dict[str, Any]] = [
 
 
 def get_model_knowledge(vehicle: Vehicle) -> Dict[str, Any]:
-    """
-    Araç marka + model ismine göre statik bilgi tabanından eşleşme yap.
-    Hiçbir şey bulunamazsa boş dict dön.
-    """
+    """Araç marka + model ismine göre statik bilgi tabanından eşleşme yap."""
     name = (vehicle.make + " " + vehicle.model).lower()
-    name = " ".join(name.split())  # normalize spaces
+    name = " ".join(name.split())  # gereksiz boşlukları temizle
     for item in MODEL_KNOWLEDGE_TABLE:
         if all(word in name for word in item["match"]):
             return item
@@ -381,9 +377,25 @@ Kullanım profili (tahmini değerler olabilir):
     base_text += "\n-----------------------------------------------------------\n"
 
     if model_knowledge:
-        base_text += "\n--- Model / segment bilgi tabanı (statik) ---\n"
-        base_text += json.dumps(model_knowledge, ensure_ascii=False)
-        base_text += "\n---------------------------------------------------\n"
+        # Model bilgisini LLM'in rahat kullanacağı metne çevir
+        mk = model_knowledge
+        chronic = mk.get("known_chronic_issues") or []
+        chronic_text = "; ".join(chronic) if chronic else "Belirgin kronik sorun bilgisi yok."
+        base_text += "\nModel hakkında statik, genel bilgiler (bunları analizinde mutlaka kullan):\n"
+        base_text += f"- Segment: {mk.get('segment', '-')}\n"
+        base_text += f"- Marka ailesi: {mk.get('brand_family', '-')}\n"
+        base_text += (
+            f"- Tipik şehir içi tüketim: yaklaşık {mk.get('typical_fuel_city_l_100km', 'N/A')} L/100 km\n"
+        )
+        base_text += (
+            f"- Tipik uzun yol tüketimi: yaklaşık {mk.get('typical_fuel_highway_l_100km', 'N/A')} L/100 km\n"
+        )
+        base_text += f"- Tipik sigorta seviyesi: {mk.get('typical_insurance_level', '-')}\n"
+        base_text += f"- İkinci el piyasasında bulunabilirlik / satış hızı: {mk.get('typical_resale_speed', '-')}\n"
+        base_text += f"- Bu modele dair bilinen kronik sorunlar: {chronic_text}\n"
+        base_text += f"- Ek not: {mk.get('notes', '-')}\n"
+        base_text += "Bu bilgiler bakım maliyeti, sigorta seviyesi, yedek parça ve ikinci el piyasası yorumlarında kullanılmalıdır.\n"
+        base_text += "-----------------------------------------------------------\n"
 
     base_text += ss_info
 
@@ -501,7 +513,6 @@ def fallback_premium(req: AnalyzeRequest) -> Dict[str, Any]:
 
 
 def fallback_manual(req: AnalyzeRequest) -> Dict[str, Any]:
-    # Manuel analiz, normal fallback'e çok benzer
     return fallback_normal(req)
 
 
@@ -556,7 +567,6 @@ def call_llm_json(
     mode: str,
     req: Any,
 ) -> Dict[str, Any]:
-    # OpenAI client yoksa direkt fallback
     if client is None:
         if mode == "normal":
             return fallback_normal(req)
@@ -584,7 +594,6 @@ def call_llm_json(
             return json.loads(content)
         return content  # type: ignore[return-value]
     except Exception as e:
-        # Her türlü OpenAI / JSON hatasında fallback kullan
         print(f"LLM hatası ({mode}): {e}")
         if mode == "normal":
             return fallback_normal(req)
@@ -631,7 +640,7 @@ Sen 'Oto Analiz' uygulaması için çalışan bir ARAÇ İLANI ANALİZ ASİSTANI
 
 Kurallar:
 - Tüm alanlar JSON içinde mutlaka olsun (boş bile kalsa).
-- 'result' alanında 3-4 paragraf uzunluğunda kısa bir açıklama yaz; ancak PREMIUM kadar uzun olmasına gerek yok.
+- 'result' alanında 2-3 paragraf uzunluğunda kısa bir açıklama yaz; ancak PREMIUM kadar uzun olmasına gerek yok.
 - PREVIEW kısmı Keşfet için kullanılacak:
   - 'alınır', 'alınmaz', 'sakın', 'riskli', 'tehlikeli' gibi kelimeleri KULLANMA.
   - Fiyatla ilgili sadece 'Uygun/Normal/Yüksek' etiketi ver, rakam yazma.
@@ -644,7 +653,7 @@ Sen 'Oto Analiz' uygulamasının PREMIUM analiz asistanısın.
 Sana:
 - Kullanıcının ARAÇ ve KULLANIM PROFİLİ,
 - Backend'in tahmini yıllık bakım / yakıt / sigorta / risk hesapları,
-- (Varsa) belirli marka-model için statik 'model_knowledge' bilgisi
+- (Varsa) belirli marka-model için statik 'model hakkında bilgiler'
 gönderilecek.
 
 Görevin: Bunları kullanarak detaylı, KİŞİSELLEŞTİRİLMİŞ ve TAMAMEN JSON formatında bir premium analiz üretmek.
@@ -689,23 +698,20 @@ Görevin: Bunları kullanarak detaylı, KİŞİSELLEŞTİRİLMİŞ ve TAMAMEN JS
 
 ÖNEMLİ KURALLAR:
 - Tüm alanlar JSON içinde mutlaka olsun (boş bile kalsa).
-- 'result' alanı en az 180 KELİME olsun; 3-4 paragraf halinde yaz:
-  1) Araç ve ilan özeti (segment, yaş, km, donanım ve genel durum).
-  2) Backend'ten gelen 'estimated_yearly_maintenance_tr' ve 'estimated_yearly_fuel_tr' değerlerini kullanarak yıllık bakım ve yakıt maliyetini açıkla (örn. "yaklaşık 24.000 TL civarı").
-  3) Backend'teki 'insurance_level', 'overall_risk_level' ve 'risk_notes' ile risk ve sigorta tarafını açıkla.
-  4) Kullanıcının PROFiLiNE göre kişisel yorum yap: yıllık km, kullanım tipi (şehir içi / karışık / uzun yol), bütçesi, ilk araç / öğrenci / aile kullanımı gibi sinyalleri mutlaka değerlendir.
-- Eğer 'model_knowledge' doluysa:
-  - 'segment', 'typical_fuel_*', 'typical_insurance_level', 'typical_resale_speed' ve 'known_chronic_issues' alanlarını hem 'result' kısmında hem de 'risk_analysis.chronic_issues' ve 'summary.pros/cons' içinde kullan.
-- Yeni sayısal maliyet uydurma:
-  - YILLIK bakım ve yakıt tutarlarını backend JSON'undaki değerlerden al.
-  - Gerekirse bunları yuvarlayarak ifade et (ör. "yaklaşık 25-30 bin TL bandı").
+- 'result' alanı en az 180 kelime olsun ve AŞAĞIDAKİ DÖRT BAŞLIK MANTIĞINDA YAZ:
+  1) "Araç Özeti ve Genel Durum": Model, segment, yaş, kilometre, donanım ve mekanik durumun genel değerlendirmesi.
+  2) "Bakım, Yakıt ve İşletme Maliyetleri": Backend'teki 'estimated_yearly_maintenance_tr' ve 'estimated_yearly_fuel_tr' değerlerini KULLANARAK yıllık bakım + yakıt için yaklaşık maliyet aralığını açıkla (ör: "yaklaşık 20–25 bin TL bandı").
+  3) "Sigorta, Yedek Parça ve İkinci El Piyasası": Backend'teki 'insurance_level' ve 'resale_speed' ile, model hakkında verilen statik bilgilerden (tipik sigorta seviyesi, tipik ikinci el hızı, kronik sorunlar, parça bulunabilirliği) yola çıkarak sigorta tutarı seviyesi, kaza / kronik arıza riski ve ikinci el likiditesi hakkında net yorum yap.
+  4) "Kullanıcı Profiline Göre Uygunluk ve Son Yorum": Kullanıcının yıllık km'si, kullanım tipi (şehir içi / karışık / uzun yol), ilan açıklamasında veya bağlamda geçen 'öğrenci', 'ilk araç', 'aile aracı', 'bütçem sınırlı', 'şehir içi yoğun kullanım' gibi sinyalleri mutlaka değerlendir ve kişisel tavsiye ver.
+- YILLIK bakım ve yakıt tutarlarını UYDURMA; backend JSON'undaki değerlerden hareket et. Gerekirse bunları yuvarla ve aralık olarak ifade et.
 - 'cost_estimates.yearly_maintenance_tr' ve 'yearly_fuel_tr' alanlarında da backend değerlerini kullan.
 - 'risk_analysis.risk_level' backend'teki 'overall_risk_level' ile uyumlu olsun.
-- 'summary.pros' ve 'summary.cons' en az 5'er madde olsun.
-- 'who_should_buy' 2-3 cümlelik net bir profil tanımı olsun (örn. "İstanbul'da yaşayan, yıllık 20.000 km yapan ve bütçesi sınırlı genç kullanıcılar için ...").
+- 'risk_analysis.chronic_issues' listesinde, backend'ten veya model bilgisinden gelen kronik sorunları mutlaka kullan.
+- 'summary.pros' ve 'summary.cons' en az 5'er madde olsun; bakım maliyeti, sigorta seviyesi, parça bulunabilirliği ve ikinci el piyasası gibi başlıkları da bu maddelere dağıt.
+- 'who_should_buy' 2–3 cümlelik net bir profil tanımı olsun (örn. "İstanbul gibi büyük şehirde yaşayan, yıllık 15–20 bin km yapan ve dolu donanımlı dizel otomatik bir aile aracı arayan kullanıcılar için uygun bir seçenektir.").
 - PREVIEW kısmı Keşfet için kullanılacak:
   - 'alınır', 'alınmaz', 'sakın', 'çöplük', 'riskli', 'tehlikeli' gibi kelimeleri KULLANMA.
-  - Fiyat rakamı verme, sadece 'Uygun/Normal/Yüksek' etiketi kullan veya null bırak.
+  - Fiyat rakamı verme; sadece 'Uygun/Normal/Yüksek' etiketi kullan veya null bırak.
 - Dil: Türkçe.
 """
 
