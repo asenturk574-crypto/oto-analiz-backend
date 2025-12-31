@@ -1,0 +1,1121 @@
+{
+  "meta": {
+    "base_year": 2025,
+    "target_year": 2026,
+    "increase_rate_target_year": 0.1895,
+    "increase_multiplier_target_year": 1.1895,
+    "notes": [
+      "2026 değerler 2025 resmi tarifelerinin %18,95 artırılmasıyla (kesirler atılarak) hesaplanmış tahmini değerlerdir.",
+      "Kesin hesap için Dijital Vergi Dairesi MTV hesaplama ekranı veya Resmî Gazete'de yayımlanan ilgili tarife/tebliğ esas alınmalıdır."
+    ],
+    "generated_at": "2025-12-31 00:00:00"
+  },
+  "mtv_2025": {
+    "tariff_I_automobile_value_based": [
+      {
+        "vehicle_type": "automobile",
+        "cc_min": 0,
+        "cc_max": 1300,
+        "value_min": 0,
+        "value_max": 259900,
+        "tax": {
+          "1_3": 4834,
+          "4_6": 3372,
+          "7_11": 1882,
+          "12_15": 1420,
+          "16_plus": 499
+        }
+      },
+      {
+        "vehicle_type": "automobile",
+        "cc_min": 0,
+        "cc_max": 1300,
+        "value_min": 259900,
+        "value_max": 455300,
+        "tax": {
+          "1_3": 5313,
+          "4_6": 3707,
+          "7_11": 2068,
+          "12_15": 1565,
+          "16_plus": 551
+        },
+        "value_min_exclusive": true
+      },
+      {
+        "vehicle_type": "automobile",
+        "cc_min": 0,
+        "cc_max": 1300,
+        "value_min": 455300,
+        "value_max": null,
+        "tax": {
+          "1_3": 5803,
+          "4_6": 4042,
+          "7_11": 2264,
+          "12_15": 1709,
+          "16_plus": 594
+        },
+        "value_min_exclusive": true
+      },
+      {
+        "vehicle_type": "automobile",
+        "cc_min": 1301,
+        "cc_max": 1600,
+        "value_min": 0,
+        "value_max": 259900,
+        "tax": {
+          "1_3": 8421,
+          "4_6": 6314,
+          "7_11": 3661,
+          "12_15": 2587,
+          "16_plus": 993
+        }
+      },
+      {
+        "vehicle_type": "automobile",
+        "cc_min": 1301,
+        "cc_max": 1600,
+        "value_min": 259900,
+        "value_max": 455300,
+        "tax": {
+          "1_3": 9267,
+          "4_6": 6948,
+          "7_11": 4031,
+          "12_15": 2838,
+          "16_plus": 1085
+        },
+        "value_min_exclusive": true
+      },
+      {
+        "vehicle_type": "automobile",
+        "cc_min": 1301,
+        "cc_max": 1600,
+        "value_min": 455300,
+        "value_max": null,
+        "tax": {
+          "1_3": 10112,
+          "4_6": 7577,
+          "7_11": 4389,
+          "12_15": 3098,
+          "16_plus": 1184
+        },
+        "value_min_exclusive": true
+      },
+      {
+        "vehicle_type": "automobile",
+        "cc_min": 1601,
+        "cc_max": 1800,
+        "value_min": 0,
+        "value_max": 651700,
+        "tax": {
+          "1_3": 16370,
+          "4_6": 12801,
+          "7_11": 7523,
+          "12_15": 4589,
+          "16_plus": 1777
+        }
+      },
+      {
+        "vehicle_type": "automobile",
+        "cc_min": 1601,
+        "cc_max": 1800,
+        "value_min": 651700,
+        "value_max": null,
+        "tax": {
+          "1_3": 17866,
+          "4_6": 13956,
+          "7_11": 8218,
+          "12_15": 5014,
+          "16_plus": 1940
+        },
+        "value_min_exclusive": true
+      },
+      {
+        "vehicle_type": "automobile",
+        "cc_min": 1801,
+        "cc_max": 2000,
+        "value_min": 0,
+        "value_max": 651700,
+        "tax": {
+          "1_3": 25792,
+          "4_6": 19862,
+          "7_11": 11674,
+          "12_15": 6948,
+          "16_plus": 2731
+        }
+      },
+      {
+        "vehicle_type": "automobile",
+        "cc_min": 1801,
+        "cc_max": 2000,
+        "value_min": 651700,
+        "value_max": null,
+        "tax": {
+          "1_3": 28142,
+          "4_6": 21677,
+          "7_11": 12734,
+          "12_15": 7577,
+          "16_plus": 2982
+        },
+        "value_min_exclusive": true
+      },
+      {
+        "vehicle_type": "automobile",
+        "cc_min": 2001,
+        "cc_max": 2500,
+        "value_min": 0,
+        "value_max": 813900,
+        "tax": {
+          "1_3": 38695,
+          "4_6": 28090,
+          "7_11": 17549,
+          "12_15": 10480,
+          "16_plus": 4145
+        }
+      },
+      {
+        "vehicle_type": "automobile",
+        "cc_min": 2001,
+        "cc_max": 2500,
+        "value_min": 813900,
+        "value_max": null,
+        "tax": {
+          "1_3": 42217,
+          "4_6": 30642,
+          "7_11": 19141,
+          "12_15": 11439,
+          "16_plus": 4522
+        },
+        "value_min_exclusive": true
+      },
+      {
+        "vehicle_type": "automobile",
+        "cc_min": 2501,
+        "cc_max": 3000,
+        "value_min": 0,
+        "value_max": 1628900,
+        "tax": {
+          "1_3": 53952,
+          "4_6": 46942,
+          "7_11": 29322,
+          "12_15": 15770,
+          "16_plus": 5780
+        }
+      },
+      {
+        "vehicle_type": "automobile",
+        "cc_min": 2501,
+        "cc_max": 3000,
+        "value_min": 1628900,
+        "value_max": null,
+        "tax": {
+          "1_3": 58864,
+          "4_6": 51203,
+          "7_11": 31991,
+          "12_15": 17206,
+          "16_plus": 6308
+        },
+        "value_min_exclusive": true
+      },
+      {
+        "vehicle_type": "automobile",
+        "cc_min": 3001,
+        "cc_max": 3500,
+        "value_min": 0,
+        "value_max": 1628900,
+        "tax": {
+          "1_3": 82173,
+          "4_6": 73942,
+          "7_11": 44537,
+          "12_15": 22231,
+          "16_plus": 8142
+        }
+      },
+      {
+        "vehicle_type": "automobile",
+        "cc_min": 3001,
+        "cc_max": 3500,
+        "value_min": 1628900,
+        "value_max": null,
+        "tax": {
+          "1_3": 89652,
+          "4_6": 80656,
+          "7_11": 48585,
+          "12_15": 24245,
+          "16_plus": 8893
+        },
+        "value_min_exclusive": true
+      },
+      {
+        "vehicle_type": "automobile",
+        "cc_min": 3501,
+        "cc_max": 4000,
+        "value_min": 0,
+        "value_max": 2607700,
+        "tax": {
+          "1_3": 129201,
+          "4_6": 111570,
+          "7_11": 65702,
+          "12_15": 29322,
+          "16_plus": 11674
+        }
+      },
+      {
+        "vehicle_type": "automobile",
+        "cc_min": 3501,
+        "cc_max": 4000,
+        "value_min": 2607700,
+        "value_max": null,
+        "tax": {
+          "1_3": 140960,
+          "4_6": 121707,
+          "7_11": 71687,
+          "12_15": 31991,
+          "16_plus": 12734
+        },
+        "value_min_exclusive": true
+      },
+      {
+        "vehicle_type": "automobile",
+        "cc_min": 4001,
+        "cc_max": 99999,
+        "value_min": 0,
+        "value_max": 3096500,
+        "tax": {
+          "1_3": 211479,
+          "4_6": 158577,
+          "7_11": 93917,
+          "12_15": 42208,
+          "16_plus": 16370
+        }
+      },
+      {
+        "vehicle_type": "automobile",
+        "cc_min": 4001,
+        "cc_max": 99999,
+        "value_min": 3096500,
+        "value_max": null,
+        "tax": {
+          "1_3": 230698,
+          "4_6": 172998,
+          "7_11": 102458,
+          "12_15": 46044,
+          "16_plus": 17866
+        },
+        "value_min_exclusive": true
+      }
+    ],
+    "tariff_I_motorcycle": [
+      {
+        "vehicle_type": "motorcycle",
+        "cc_min": 100,
+        "cc_max": 250,
+        "tax": {
+          "1_3": 899,
+          "4_6": 672,
+          "7_11": 496,
+          "12_15": 305,
+          "16_plus": 115
+        }
+      },
+      {
+        "vehicle_type": "motorcycle",
+        "cc_min": 251,
+        "cc_max": 650,
+        "tax": {
+          "1_3": 1862,
+          "4_6": 1409,
+          "7_11": 899,
+          "12_15": 496,
+          "16_plus": 305
+        }
+      },
+      {
+        "vehicle_type": "motorcycle",
+        "cc_min": 651,
+        "cc_max": 1200,
+        "tax": {
+          "1_3": 4808,
+          "4_6": 2857,
+          "7_11": 1409,
+          "12_15": 899,
+          "16_plus": 496
+        }
+      },
+      {
+        "vehicle_type": "motorcycle",
+        "cc_min": 1201,
+        "cc_max": 99999,
+        "tax": {
+          "1_3": 11666,
+          "4_6": 7707,
+          "7_11": 4808,
+          "12_15": 3817,
+          "16_plus": 1862
+        }
+      }
+    ],
+    "tariff_II_other_vehicles": {
+      "minibus": {
+        "age_groups": {
+          "1_6": 5780,
+          "7_15": 3817,
+          "16_plus": 1862
+        }
+      },
+      "panelvan": {
+        "cc_le_1900": {
+          "age_groups": {
+            "1_6": 7707,
+            "7_15": 4808,
+            "16_plus": 2857
+          }
+        },
+        "cc_ge_1901": {
+          "age_groups": {
+            "1_6": 11666,
+            "7_15": 7707,
+            "16_plus": 4808
+          }
+        }
+      },
+      "bus": {
+        "seats_le_25": {
+          "age_groups": {
+            "1_6": 14603,
+            "7_15": 8720,
+            "16_plus": 3817
+          }
+        },
+        "seats_26_35": {
+          "age_groups": {
+            "1_6": 17513,
+            "7_15": 14603,
+            "16_plus": 5780
+          }
+        },
+        "seats_36_45": {
+          "age_groups": {
+            "1_6": 19489,
+            "7_15": 16530,
+            "16_plus": 7707
+          }
+        },
+        "seats_ge_46": {
+          "age_groups": {
+            "1_6": 23381,
+            "7_15": 19489,
+            "16_plus": 11666
+          }
+        }
+      },
+      "truck": {
+        "kg_le_1500": {
+          "age_groups": {
+            "1_6": 5182,
+            "7_15": 3442,
+            "16_plus": 1685
+          }
+        },
+        "kg_1501_3500": {
+          "age_groups": {
+            "1_6": 10499,
+            "7_15": 6082,
+            "16_plus": 3442
+          }
+        },
+        "kg_3501_5000": {
+          "age_groups": {
+            "1_6": 15774,
+            "7_15": 13129,
+            "16_plus": 5182
+          }
+        },
+        "kg_5001_10000": {
+          "age_groups": {
+            "1_6": 17513,
+            "7_15": 14872,
+            "16_plus": 6971
+          }
+        },
+        "kg_10001_20000": {
+          "age_groups": {
+            "1_6": 21048,
+            "7_15": 17513,
+            "16_plus": 10499
+          }
+        },
+        "kg_ge_20001": {
+          "age_groups": {
+            "1_6": 26327,
+            "7_15": 21048,
+            "16_plus": 12231
+          }
+        }
+      }
+    },
+    "tariff_IA_pre2018_automobile": [
+      {
+        "vehicle_type": "automobile",
+        "cc_min": 0,
+        "cc_max": 1300,
+        "tax": {
+          "1_3": 4834,
+          "4_6": 3372,
+          "7_11": 1882,
+          "12_15": 1420,
+          "16_plus": 499
+        }
+      },
+      {
+        "vehicle_type": "automobile",
+        "cc_min": 1301,
+        "cc_max": 1600,
+        "tax": {
+          "1_3": 8421,
+          "4_6": 6314,
+          "7_11": 3661,
+          "12_15": 2587,
+          "16_plus": 993
+        }
+      },
+      {
+        "vehicle_type": "automobile",
+        "cc_min": 1601,
+        "cc_max": 1800,
+        "tax": {
+          "1_3": 14885,
+          "4_6": 11626,
+          "7_11": 6848,
+          "12_15": 4168,
+          "16_plus": 1612
+        }
+      },
+      {
+        "vehicle_type": "automobile",
+        "cc_min": 1801,
+        "cc_max": 2000,
+        "tax": {
+          "1_3": 23454,
+          "4_6": 18057,
+          "7_11": 10613,
+          "12_15": 6314,
+          "16_plus": 2487
+        }
+      },
+      {
+        "vehicle_type": "automobile",
+        "cc_min": 2001,
+        "cc_max": 2500,
+        "tax": {
+          "1_3": 35175,
+          "4_6": 25534,
+          "7_11": 15954,
+          "12_15": 9528,
+          "16_plus": 3766
+        }
+      },
+      {
+        "vehicle_type": "automobile",
+        "cc_min": 2501,
+        "cc_max": 3000,
+        "tax": {
+          "1_3": 49052,
+          "4_6": 42669,
+          "7_11": 26654,
+          "12_15": 14329,
+          "16_plus": 5259
+        }
+      },
+      {
+        "vehicle_type": "automobile",
+        "cc_min": 3001,
+        "cc_max": 3500,
+        "tax": {
+          "1_3": 74703,
+          "4_6": 67218,
+          "7_11": 40486,
+          "12_15": 20203,
+          "16_plus": 7409
+        }
+      },
+      {
+        "vehicle_type": "automobile",
+        "cc_min": 3501,
+        "cc_max": 4000,
+        "tax": {
+          "1_3": 117462,
+          "4_6": 101427,
+          "7_11": 59730,
+          "12_15": 26654,
+          "16_plus": 10613
+        }
+      },
+      {
+        "vehicle_type": "automobile",
+        "cc_min": 4001,
+        "cc_max": 99999,
+        "tax": {
+          "1_3": 192250,
+          "4_6": 144166,
+          "7_11": 85377,
+          "12_15": 38363,
+          "16_plus": 14885
+        }
+      }
+    ]
+  },
+  "mtv_2026_estimated": {
+    "tariff_I_automobile_value_based": [
+      {
+        "vehicle_type": "automobile",
+        "cc_min": 0,
+        "cc_max": 1300,
+        "value_min": 0,
+        "value_max": 309100,
+        "tax": {
+          "1_3": 5750,
+          "4_6": 4010,
+          "7_11": 2238,
+          "12_15": 1689,
+          "16_plus": 593
+        }
+      },
+      {
+        "vehicle_type": "automobile",
+        "cc_min": 0,
+        "cc_max": 1300,
+        "value_min": 309100,
+        "value_max": 541500,
+        "tax": {
+          "1_3": 6319,
+          "4_6": 4409,
+          "7_11": 2459,
+          "12_15": 1861,
+          "16_plus": 655
+        },
+        "value_min_exclusive": true
+      },
+      {
+        "vehicle_type": "automobile",
+        "cc_min": 0,
+        "cc_max": 1300,
+        "value_min": 541500,
+        "value_max": null,
+        "tax": {
+          "1_3": 6902,
+          "4_6": 4807,
+          "7_11": 2693,
+          "12_15": 2032,
+          "16_plus": 706
+        },
+        "value_min_exclusive": true
+      },
+      {
+        "vehicle_type": "automobile",
+        "cc_min": 1301,
+        "cc_max": 1600,
+        "value_min": 0,
+        "value_max": 309100,
+        "tax": {
+          "1_3": 10016,
+          "4_6": 7510,
+          "7_11": 4354,
+          "12_15": 3077,
+          "16_plus": 1181
+        }
+      },
+      {
+        "vehicle_type": "automobile",
+        "cc_min": 1301,
+        "cc_max": 1600,
+        "value_min": 309100,
+        "value_max": 541500,
+        "tax": {
+          "1_3": 11023,
+          "4_6": 8264,
+          "7_11": 4794,
+          "12_15": 3375,
+          "16_plus": 1290
+        },
+        "value_min_exclusive": true
+      },
+      {
+        "vehicle_type": "automobile",
+        "cc_min": 1301,
+        "cc_max": 1600,
+        "value_min": 541500,
+        "value_max": null,
+        "tax": {
+          "1_3": 12028,
+          "4_6": 9012,
+          "7_11": 5220,
+          "12_15": 3685,
+          "16_plus": 1408
+        },
+        "value_min_exclusive": true
+      },
+      {
+        "vehicle_type": "automobile",
+        "cc_min": 1601,
+        "cc_max": 1800,
+        "value_min": 0,
+        "value_max": 775100,
+        "tax": {
+          "1_3": 19472,
+          "4_6": 15226,
+          "7_11": 8948,
+          "12_15": 5458,
+          "16_plus": 2113
+        }
+      },
+      {
+        "vehicle_type": "automobile",
+        "cc_min": 1601,
+        "cc_max": 1800,
+        "value_min": 775100,
+        "value_max": null,
+        "tax": {
+          "1_3": 21251,
+          "4_6": 16600,
+          "7_11": 9775,
+          "12_15": 5964,
+          "16_plus": 2307
+        },
+        "value_min_exclusive": true
+      },
+      {
+        "vehicle_type": "automobile",
+        "cc_min": 1801,
+        "cc_max": 2000,
+        "value_min": 0,
+        "value_max": 775100,
+        "tax": {
+          "1_3": 30679,
+          "4_6": 23625,
+          "7_11": 13886,
+          "12_15": 8264,
+          "16_plus": 3248
+        }
+      },
+      {
+        "vehicle_type": "automobile",
+        "cc_min": 1801,
+        "cc_max": 2000,
+        "value_min": 775100,
+        "value_max": null,
+        "tax": {
+          "1_3": 33474,
+          "4_6": 25784,
+          "7_11": 15147,
+          "12_15": 9012,
+          "16_plus": 3547
+        },
+        "value_min_exclusive": true
+      },
+      {
+        "vehicle_type": "automobile",
+        "cc_min": 2001,
+        "cc_max": 2500,
+        "value_min": 0,
+        "value_max": 968100,
+        "tax": {
+          "1_3": 46027,
+          "4_6": 33413,
+          "7_11": 20874,
+          "12_15": 12465,
+          "16_plus": 4930
+        }
+      },
+      {
+        "vehicle_type": "automobile",
+        "cc_min": 2001,
+        "cc_max": 2500,
+        "value_min": 968100,
+        "value_max": null,
+        "tax": {
+          "1_3": 50217,
+          "4_6": 36448,
+          "7_11": 22768,
+          "12_15": 13606,
+          "16_plus": 5378
+        },
+        "value_min_exclusive": true
+      },
+      {
+        "vehicle_type": "automobile",
+        "cc_min": 2501,
+        "cc_max": 3000,
+        "value_min": 0,
+        "value_max": 1937500,
+        "tax": {
+          "1_3": 64175,
+          "4_6": 55837,
+          "7_11": 34878,
+          "12_15": 18758,
+          "16_plus": 6875
+        }
+      },
+      {
+        "vehicle_type": "automobile",
+        "cc_min": 2501,
+        "cc_max": 3000,
+        "value_min": 1937500,
+        "value_max": null,
+        "tax": {
+          "1_3": 70018,
+          "4_6": 60905,
+          "7_11": 38053,
+          "12_15": 20466,
+          "16_plus": 7503
+        },
+        "value_min_exclusive": true
+      },
+      {
+        "vehicle_type": "automobile",
+        "cc_min": 3001,
+        "cc_max": 3500,
+        "value_min": 0,
+        "value_max": 1937500,
+        "tax": {
+          "1_3": 97744,
+          "4_6": 87954,
+          "7_11": 52976,
+          "12_15": 26443,
+          "16_plus": 9684
+        }
+      },
+      {
+        "vehicle_type": "automobile",
+        "cc_min": 3001,
+        "cc_max": 3500,
+        "value_min": 1937500,
+        "value_max": null,
+        "tax": {
+          "1_3": 106641,
+          "4_6": 95940,
+          "7_11": 57791,
+          "12_15": 28839,
+          "16_plus": 10578
+        },
+        "value_min_exclusive": true
+      },
+      {
+        "vehicle_type": "automobile",
+        "cc_min": 3501,
+        "cc_max": 4000,
+        "value_min": 0,
+        "value_max": 3101800,
+        "tax": {
+          "1_3": 153684,
+          "4_6": 132712,
+          "7_11": 78152,
+          "12_15": 34878,
+          "16_plus": 13886
+        }
+      },
+      {
+        "vehicle_type": "automobile",
+        "cc_min": 3501,
+        "cc_max": 4000,
+        "value_min": 3101800,
+        "value_max": null,
+        "tax": {
+          "1_3": 167671,
+          "4_6": 144770,
+          "7_11": 85271,
+          "12_15": 38053,
+          "16_plus": 15147
+        },
+        "value_min_exclusive": true
+      },
+      {
+        "vehicle_type": "automobile",
+        "cc_min": 4001,
+        "cc_max": 99999,
+        "value_min": 0,
+        "value_max": 3683200,
+        "tax": {
+          "1_3": 251554,
+          "4_6": 188627,
+          "7_11": 111714,
+          "12_15": 50206,
+          "16_plus": 19472
+        }
+      },
+      {
+        "vehicle_type": "automobile",
+        "cc_min": 4001,
+        "cc_max": 99999,
+        "value_min": 3683200,
+        "value_max": null,
+        "tax": {
+          "1_3": 274415,
+          "4_6": 205781,
+          "7_11": 121873,
+          "12_15": 54769,
+          "16_plus": 21251
+        },
+        "value_min_exclusive": true
+      }
+    ],
+    "tariff_I_motorcycle": [
+      {
+        "vehicle_type": "motorcycle",
+        "cc_min": 100,
+        "cc_max": 250,
+        "tax": {
+          "1_3": 1069,
+          "4_6": 799,
+          "7_11": 589,
+          "12_15": 362,
+          "16_plus": 136
+        }
+      },
+      {
+        "vehicle_type": "motorcycle",
+        "cc_min": 251,
+        "cc_max": 650,
+        "tax": {
+          "1_3": 2214,
+          "4_6": 1676,
+          "7_11": 1069,
+          "12_15": 589,
+          "16_plus": 362
+        }
+      },
+      {
+        "vehicle_type": "motorcycle",
+        "cc_min": 651,
+        "cc_max": 1200,
+        "tax": {
+          "1_3": 5719,
+          "4_6": 3398,
+          "7_11": 1676,
+          "12_15": 1069,
+          "16_plus": 589
+        }
+      },
+      {
+        "vehicle_type": "motorcycle",
+        "cc_min": 1201,
+        "cc_max": 99999,
+        "tax": {
+          "1_3": 13876,
+          "4_6": 9167,
+          "7_11": 5719,
+          "12_15": 4540,
+          "16_plus": 2214
+        }
+      }
+    ],
+    "tariff_II_other_vehicles": {
+      "minibus": {
+        "age_groups": {
+          "1_6": 6875,
+          "7_15": 4540,
+          "16_plus": 2214
+        }
+      },
+      "panelvan": {
+        "cc_le_1900": {
+          "age_groups": {
+            "1_6": 9167,
+            "7_15": 5719,
+            "16_plus": 3398
+          }
+        },
+        "cc_ge_1901": {
+          "age_groups": {
+            "1_6": 13876,
+            "7_15": 9167,
+            "16_plus": 5719
+          }
+        }
+      },
+      "bus": {
+        "seats_le_25": {
+          "age_groups": {
+            "1_6": 17370,
+            "7_15": 10372,
+            "16_plus": 4540
+          }
+        },
+        "seats_26_35": {
+          "age_groups": {
+            "1_6": 20831,
+            "7_15": 17370,
+            "16_plus": 6875
+          }
+        },
+        "seats_36_45": {
+          "age_groups": {
+            "1_6": 23182,
+            "7_15": 19662,
+            "16_plus": 9167
+          }
+        },
+        "seats_ge_46": {
+          "age_groups": {
+            "1_6": 27811,
+            "7_15": 23182,
+            "16_plus": 13876
+          }
+        }
+      },
+      "truck": {
+        "kg_le_1500": {
+          "age_groups": {
+            "1_6": 6163,
+            "7_15": 4094,
+            "16_plus": 2004
+          }
+        },
+        "kg_1501_3500": {
+          "age_groups": {
+            "1_6": 12488,
+            "7_15": 7234,
+            "16_plus": 4094
+          }
+        },
+        "kg_3501_5000": {
+          "age_groups": {
+            "1_6": 18763,
+            "7_15": 15616,
+            "16_plus": 6163
+          }
+        },
+        "kg_5001_10000": {
+          "age_groups": {
+            "1_6": 20831,
+            "7_15": 17690,
+            "16_plus": 8292
+          }
+        },
+        "kg_10001_20000": {
+          "age_groups": {
+            "1_6": 25036,
+            "7_15": 20831,
+            "16_plus": 12488
+          }
+        },
+        "kg_ge_20001": {
+          "age_groups": {
+            "1_6": 31315,
+            "7_15": 25036,
+            "16_plus": 14548
+          }
+        }
+      }
+    },
+    "tariff_IA_pre2018_automobile": [
+      {
+        "vehicle_type": "automobile",
+        "cc_min": 0,
+        "cc_max": 1300,
+        "tax": {
+          "1_3": 5750,
+          "4_6": 4010,
+          "7_11": 2238,
+          "12_15": 1689,
+          "16_plus": 593
+        }
+      },
+      {
+        "vehicle_type": "automobile",
+        "cc_min": 1301,
+        "cc_max": 1600,
+        "tax": {
+          "1_3": 10016,
+          "4_6": 7510,
+          "7_11": 4354,
+          "12_15": 3077,
+          "16_plus": 1181
+        }
+      },
+      {
+        "vehicle_type": "automobile",
+        "cc_min": 1601,
+        "cc_max": 1800,
+        "tax": {
+          "1_3": 17705,
+          "4_6": 13829,
+          "7_11": 8145,
+          "12_15": 4957,
+          "16_plus": 1917
+        }
+      },
+      {
+        "vehicle_type": "automobile",
+        "cc_min": 1801,
+        "cc_max": 2000,
+        "tax": {
+          "1_3": 27898,
+          "4_6": 21478,
+          "7_11": 12624,
+          "12_15": 7510,
+          "16_plus": 2958
+        }
+      },
+      {
+        "vehicle_type": "automobile",
+        "cc_min": 2001,
+        "cc_max": 2500,
+        "tax": {
+          "1_3": 41840,
+          "4_6": 30372,
+          "7_11": 18977,
+          "12_15": 11333,
+          "16_plus": 4479
+        }
+      },
+      {
+        "vehicle_type": "automobile",
+        "cc_min": 2501,
+        "cc_max": 3000,
+        "tax": {
+          "1_3": 58347,
+          "4_6": 50754,
+          "7_11": 31704,
+          "12_15": 17044,
+          "16_plus": 6255
+        }
+      },
+      {
+        "vehicle_type": "automobile",
+        "cc_min": 3001,
+        "cc_max": 3500,
+        "tax": {
+          "1_3": 88859,
+          "4_6": 79955,
+          "7_11": 48158,
+          "12_15": 24031,
+          "16_plus": 8813
+        }
+      },
+      {
+        "vehicle_type": "automobile",
+        "cc_min": 3501,
+        "cc_max": 4000,
+        "tax": {
+          "1_3": 139721,
+          "4_6": 120647,
+          "7_11": 71048,
+          "12_15": 31704,
+          "16_plus": 12624
+        }
+      },
+      {
+        "vehicle_type": "automobile",
+        "cc_min": 4001,
+        "cc_max": 99999,
+        "tax": {
+          "1_3": 228681,
+          "4_6": 171485,
+          "7_11": 101555,
+          "12_15": 45632,
+          "16_plus": 17705
+        }
+      }
+    ]
+  }
+}

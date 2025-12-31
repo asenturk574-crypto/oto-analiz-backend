@@ -1,0 +1,106 @@
+{
+  "diesel": [
+    {
+      "topic": "DPF/EGR kurumlanma",
+      "severity": "orta",
+      "trigger": "şehir içi ağırlıklı kullanım + yüksek km",
+      "check": "rejenerasyon, çekiş düşüşü, arıza lambası, OBD hata kodu",
+      "cost_band": "orta-yüksek"
+    },
+    {
+      "topic": "Enjektör hassasiyeti",
+      "severity": "orta",
+      "trigger": "yakıt kalitesi + yüksek km",
+      "check": "tekleme, zor çalışma, duman",
+      "cost_band": "orta"
+    }
+  ],
+  "dsg": [
+    {
+      "topic": "DSG/DCT mekatronik-kavrama",
+      "severity": "orta-yüksek",
+      "trigger": "bakım/yağ geçmişi belirsiz + şehir içi",
+      "check": "kalkış titreme, vites geçiş vuruntu, ısınınca davranış",
+      "cost_band": "yüksek"
+    }
+  ],
+  "dct_optional": [
+    {
+      "topic": "DCT otomatik bakım hassasiyeti",
+      "severity": "orta",
+      "trigger": "bakım geçmişi belirsiz",
+      "check": "kalkış titreme, geri kaçırma, geçiş gecikmesi",
+      "cost_band": "orta-yüksek"
+    }
+  ],
+  "cvt": [
+    {
+      "topic": "CVT yağ/bakım hassasiyeti",
+      "severity": "orta",
+      "trigger": "yüksek tork + kötü bakım",
+      "check": "hızlanmada kaydırma hissi, uğultu, vuruntu",
+      "cost_band": "orta-yüksek"
+    }
+  ],
+  "turbo_small": [
+    {
+      "topic": "Turbo/yağ bakımı hassasiyeti",
+      "severity": "orta",
+      "trigger": "uzun yağ değişim aralığı, soğuk kullanım",
+      "check": "yağ tüketimi, turbo ıslık/ses, çekiş",
+      "cost_band": "orta"
+    }
+  ],
+  "lpg_common": [
+    {
+      "topic": "Subap ayarı/uyumu (LPG)",
+      "severity": "orta",
+      "trigger": "uzun süre yanlış ayar",
+      "check": "çekiş düşüşü, kompresyon, rölanti",
+      "cost_band": "orta"
+    }
+  ],
+  "hybrid": [
+    {
+      "topic": "Batarya/soğutma + 12V akü",
+      "severity": "düşük-orta",
+      "trigger": "yaş + bakım ihmal",
+      "check": "enerji akışı, uyarı ışıkları, fan/soğutma",
+      "cost_band": "orta"
+    }
+  ],
+  "ev": [
+    {
+      "topic": "Batarya sağlık/menzil",
+      "severity": "orta",
+      "trigger": "hızlı şarj geçmişi + yaş",
+      "check": "SOH raporu, menzil sapması, şarj hızı",
+      "cost_band": "yüksek"
+    },
+    {
+      "topic": "12V akü",
+      "severity": "düşük-orta",
+      "trigger": "yaş",
+      "check": "marş/uyarı",
+      "cost_band": "düşük"
+    }
+  ],
+  "awd_optional": [
+    {
+      "topic": "4x4 aktarma bakımı",
+      "severity": "orta",
+      "trigger": "yağ değişimleri ihmal",
+      "check": "dönüşte ses, titreşim, kaçak",
+      "cost_band": "orta"
+    }
+  ],
+  "premium": [
+    {
+      "topic": "Elektronik/konfor donanımı yaşlanması",
+      "severity": "orta",
+      "trigger": "10+ yaş",
+      "check": "ekran, sensör, klima, cam tavan, modüller",
+      "cost_band": "orta-yüksek"
+    }
+  ]
+}

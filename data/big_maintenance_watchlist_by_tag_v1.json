@@ -1,0 +1,56 @@
+{
+  "diesel": [
+    {
+      "item": "DPF/EGR kontrol/temizlik ihtimali",
+      "when": "şehir içi + 120.000 km+",
+      "note": "rejenerasyon geçmişi, OBD hata kodları"
+    },
+    {
+      "item": "Enjektör test/geri dönüş",
+      "when": "150.000 km+",
+      "note": "yakıt sistemi sağlığı"
+    }
+  ],
+  "dsg": [
+    {
+      "item": "Şanzıman yağı ve filtre bakımı",
+      "when": "bakım geçmişi belirsizse hemen",
+      "note": "üretici aralığına göre (genelde 60-80 bin km)"
+    }
+  ],
+  "cvt": [
+    {
+      "item": "CVT yağı bakımı",
+      "when": "bakım geçmişi belirsizse hemen",
+      "note": "ısı/yağ sağlığı kritik"
+    }
+  ],
+  "turbo_small": [
+    {
+      "item": "PCV/yağ tüketimi takibi",
+      "when": "100.000 km+",
+      "note": "yağ seviyesi, duman, buji durumu"
+    }
+  ],
+  "lpg_common": [
+    {
+      "item": "Subap ayarı/kompresyon kontrolü",
+      "when": "80.000-120.000 km arası ve sonrası",
+      "note": "montaj/ayar kalitesine bağlı"
+    }
+  ],
+  "hybrid": [
+    {
+      "item": "Hibrit batarya sağlık kontrolü",
+      "when": "8+ yıl / yüksek km",
+      "note": "servis test raporu"
+    }
+  ],
+  "ev": [
+    {
+      "item": "Batarya SOH raporu + şarj geçmişi",
+      "when": "alım öncesi",
+      "note": "hızlı şarj oranı ve kapasite kaybı"
+    }
+  ]
+}

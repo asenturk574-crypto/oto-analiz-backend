@@ -1,0 +1,94 @@
+{
+  "fiat": {
+    "network": 5,
+    "cost": 2
+  },
+  "renault": {
+    "network": 5,
+    "cost": 2
+  },
+  "toyota": {
+    "network": 5,
+    "cost": 2
+  },
+  "hyundai": {
+    "network": 4,
+    "cost": 2
+  },
+  "kia": {
+    "network": 4,
+    "cost": 2
+  },
+  "ford": {
+    "network": 4,
+    "cost": 3
+  },
+  "honda": {
+    "network": 4,
+    "cost": 2
+  },
+  "volkswagen": {
+    "network": 4,
+    "cost": 3
+  },
+  "skoda": {
+    "network": 3,
+    "cost": 3
+  },
+  "seat": {
+    "network": 3,
+    "cost": 3
+  },
+  "opel": {
+    "network": 4,
+    "cost": 3
+  },
+  "peugeot": {
+    "network": 4,
+    "cost": 3
+  },
+  "citroen": {
+    "network": 3,
+    "cost": 3
+  },
+  "dacia": {
+    "network": 5,
+    "cost": 2
+  },
+  "nissan": {
+    "network": 3,
+    "cost": 3
+  },
+  "mitsubishi": {
+    "network": 2,
+    "cost": 3
+  },
+  "bmw": {
+    "network": 3,
+    "cost": 5
+  },
+  "mercedes": {
+    "network": 3,
+    "cost": 5
+  },
+  "audi": {
+    "network": 3,
+    "cost": 5
+  },
+  "volvo": {
+    "network": 2,
+    "cost": 5
+  },
+  "lexus": {
+    "network": 2,
+    "cost": 5
+  },
+  "range": {
+    "network": 1,
+    "cost": 5
+  },
+  "land": {
+    "network": 1,
+    "cost": 5
+  }
+}

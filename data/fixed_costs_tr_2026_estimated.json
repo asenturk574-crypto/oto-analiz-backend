@@ -1,0 +1,62 @@
+{
+  "meta": {
+    "country": "TR",
+    "currency": "TRY",
+    "base_year": 2025,
+    "target_year": 2026,
+    "increase_rate": 0.2549,
+    "generated_at_local": "2025-12-31T11:22:07",
+    "notes": [
+      "Araç muayene ücretleri her yıl yeniden değerleme oranına paralel güncellenir; 2026 için %25,49 oranı esas alınarak 2025 TÜVTÜRK resmi ücretlerinden türetilmiş tahmini değerlerdir.",
+      "Kesin tutarlar için TÜVTÜRK'ün güncel 'Araç Muayene Fiyatları' sayfası esas alınmalıdır."
+    ]
+  },
+  "vehicle_inspection": {
+    "delay_fee_rule": "Gecikilen her ay için muayene ücretinin %5'i (2918 sayılı Kanun md.35 uygulaması).",
+    "fees_2025": {
+      "moto_tractor": {
+        "label": "Traktör (römorklu/römorksuz), motosiklet, motorlu bisiklet",
+        "fee": 1334.4
+      },
+      "car_light": {
+        "label": "Otomobil, minibüs, kamyonet, arazi taşıtı, römork/yarı römork, özel amaçlı taşıt",
+        "fee": 2620.8
+      },
+      "heavy": {
+        "label": "Otobüs, kamyon, çekici, tanker",
+        "fee": 3543.6
+      }
+    },
+    "fees_2026_estimated": {
+      "moto_tractor": {
+        "label": "Traktör (römorklu/römorksuz), motosiklet, motorlu bisiklet",
+        "fee": 1674.54
+      },
+      "car_light": {
+        "label": "Otomobil, minibüs, kamyonet, arazi taşıtı, römork/yarı römork, özel amaçlı taşıt",
+        "fee": 3288.84
+      },
+      "heavy": {
+        "label": "Otobüs, kamyon, çekici, tanker",
+        "fee": 4446.86
+      }
+    },
+    "periodicity_notes": [
+      "Binek otomobiller için ilk 3 yıl muayene yok, sonra 2 yılda bir (genel kural).",
+      "Hafif ticari ve diğer sınıflarda periyot farklı olabilir."
+    ],
+    "annualized_hint": {
+      "car_light": {
+        "how": "Binek otomobil için 2 yılda bir varsayımıyla yıllık ortalama",
+        "annual_equivalent_fee_2026_estimated": 1644.42
+      }
+    }
+  },
+  "emissions_test": {
+    "fee_try": null,
+    "notes": [
+      "Egzoz emisyon ölçüm bedeli ayrı alınır ve dönemsel güncellenebilir; bu pakete kesin rakam eklenmedi.",
+      "Uygulamada 'fee_try' alanı boşsa kullanıcıdan veya resmi kaynaktan güncel değer alın."
+    ]
+  }
+}

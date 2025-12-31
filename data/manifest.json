@@ -1,0 +1,56 @@
+{
+  "name": "Oto Analiz Premium Data Pack",
+  "version": "v3",
+  "generated_at_local": "2025-12-31T11:22:07",
+  "contents": [
+    {
+      "file": "anchors_tr_popular_96.json",
+      "desc": "Popüler 96 araç için anchor/emsal kayıtları + kronik başlıkları (model bazlı)."
+    },
+    {
+      "file": "vehicle_profiles_96_v1.json",
+      "desc": "96 araç için: segment, alias, etiketler, indeksler, risk pattern'ler, kontrol listeleri."
+    },
+    {
+      "file": "inspection_checklists_by_segment_v1.json",
+      "desc": "Segment bazlı ekspertiz kontrol listeleri."
+    },
+    {
+      "file": "risk_patterns_by_tag_v1.json",
+      "desc": "Etiket bazlı kronik/risk şablonları (örn. dsg, dpf, cvt, turbo_small)."
+    },
+    {
+      "file": "big_maintenance_watchlist_by_tag_v1.json",
+      "desc": "Etiket bazlı büyük bakım kalemleri (triger/zincir/volan vs)."
+    },
+    {
+      "file": "brand_service_cost_indices_v1.json",
+      "desc": "Marka/segment bazlı servis-parça maliyet indeksleri."
+    },
+    {
+      "file": "traffic_caps_tr_2025_12_seed.json",
+      "desc": "Zorunlu trafik sigortası tavan primleri (İst/Ank/İzmir, basamak 0-8) - 2025-12 seed."
+    },
+    {
+      "file": "oem_service_sources_tr_seed_2025_12.json",
+      "desc": "OEM bakım fiyatı/hesaplama sayfaları kaynak listesi (marka bazlı)."
+    },
+    {
+      "file": "hyundai_oem_service_seed_2025_01.json",
+      "desc": "Hyundai için OEM bakım seed (örnek)."
+    },
+    {
+      "file": "mtv_tr_2025_2026_estimated_1895.json",
+      "desc": "MTV 2025 resmi tarifeler + 2026 için %18,95 artırımlı tahmini tablo."
+    },
+    {
+      "file": "fixed_costs_tr_2026_estimated.json",
+      "desc": "Muayene vb. sabit yıllık maliyetler için TR tahmini dataset (2026)."
+    }
+  ],
+  "integration_notes": [
+    "Bu pack, premium analiz çıktısında 'piyasa/masraf/risk' çeşitliliğini artırmak için tasarlanmıştır.",
+    "Sigorta/kasko için bu pack tavan prim (trafik) + indeks yaklaşımı sağlar; kesin teklif için API/entegrasyon gerekir.",
+    "Piyasa fiyatı için: ilan fiyatını emsal bandıyla karşılaştırmak isterseniz ayrıca 'market_price_anchors' dataseti eklemek gerekir (ilan/emsal veri kaynağı veya manuel güncelleme)."
+  ]
+}

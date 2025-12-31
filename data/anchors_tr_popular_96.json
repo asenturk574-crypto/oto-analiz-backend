@@ -1,0 +1,1320 @@
+[
+  {
+    "key": "renault clio",
+    "segment": "B_HATCH",
+    "aliases": [
+      "clio",
+      "clio 4",
+      "clio 5"
+    ],
+    "tags": [
+      "turbo_small",
+      "dct_optional"
+    ],
+    "parts": "çok kolay",
+    "resale": "hızlı"
+  },
+  {
+    "key": "hyundai i20",
+    "segment": "B_HATCH",
+    "aliases": [
+      "i20"
+    ],
+    "tags": [
+      "turbo_small",
+      "dct_optional"
+    ],
+    "parts": "kolay",
+    "resale": "hızlı-orta"
+  },
+  {
+    "key": "hyundai i10",
+    "segment": "A_B_HATCH",
+    "aliases": [
+      "i10"
+    ],
+    "tags": [
+      "auto_optional"
+    ],
+    "parts": "kolay",
+    "resale": "orta"
+  },
+  {
+    "key": "fiat egea hatchback",
+    "segment": "C_SEDAN",
+    "aliases": [
+      "egea hb",
+      "egea hatchback",
+      "egea hatch"
+    ],
+    "tags": [
+      "diesel_common",
+      "dct_optional"
+    ],
+    "parts": "çok kolay",
+    "resale": "hızlı"
+  },
+  {
+    "key": "fiat egea sedan",
+    "segment": "C_SEDAN",
+    "aliases": [
+      "egea",
+      "egea sedan",
+      "tipo sedan"
+    ],
+    "tags": [
+      "diesel_common",
+      "dct_optional",
+      "lpg_common"
+    ],
+    "parts": "çok kolay",
+    "resale": "hızlı"
+  },
+  {
+    "key": "opel corsa",
+    "segment": "B_HATCH",
+    "aliases": [
+      "corsa"
+    ],
+    "tags": [
+      "turbo_small",
+      "auto_optional"
+    ],
+    "parts": "kolay",
+    "resale": "orta"
+  },
+  {
+    "key": "peugeot 208",
+    "segment": "B_HATCH",
+    "aliases": [
+      "208"
+    ],
+    "tags": [
+      "turbo_small",
+      "auto_optional"
+    ],
+    "parts": "orta-kolay",
+    "resale": "orta"
+  },
+  {
+    "key": "vw polo",
+    "segment": "B_HATCH",
+    "aliases": [
+      "polo"
+    ],
+    "tags": [
+      "turbo_small",
+      "dsg_or_dct_optional"
+    ],
+    "parts": "kolay",
+    "resale": "hızlı-orta"
+  },
+  {
+    "key": "skoda fabia",
+    "segment": "B_HATCH",
+    "aliases": [
+      "fabia"
+    ],
+    "tags": [
+      "turbo_small",
+      "dsg_or_dct_optional"
+    ],
+    "parts": "kolay",
+    "resale": "orta"
+  },
+  {
+    "key": "seat ibiza",
+    "segment": "B_HATCH",
+    "aliases": [
+      "ibiza"
+    ],
+    "tags": [
+      "turbo_small",
+      "dsg_or_dct_optional"
+    ],
+    "parts": "kolay",
+    "resale": "orta"
+  },
+  {
+    "key": "toyota yaris",
+    "segment": "B_HATCH",
+    "aliases": [
+      "yaris"
+    ],
+    "tags": [
+      "hybrid_common",
+      "auto_optional"
+    ],
+    "parts": "kolay",
+    "resale": "hızlı-orta"
+  },
+  {
+    "key": "kia rio",
+    "segment": "B_HATCH",
+    "aliases": [
+      "rio"
+    ],
+    "tags": [
+      "auto_optional"
+    ],
+    "parts": "orta-kolay",
+    "resale": "orta"
+  },
+  {
+    "key": "suzuki swift",
+    "segment": "B_HATCH",
+    "aliases": [
+      "swift"
+    ],
+    "tags": [
+      "hybrid_common",
+      "auto_optional"
+    ],
+    "parts": "orta",
+    "resale": "orta"
+  },
+  {
+    "key": "dacia sandero",
+    "segment": "B_HATCH",
+    "aliases": [
+      "sandero",
+      "sandero stepway"
+    ],
+    "tags": [
+      "turbo_small"
+    ],
+    "parts": "çok kolay",
+    "resale": "orta"
+  },
+  {
+    "key": "citroen c3",
+    "segment": "B_HATCH",
+    "aliases": [
+      "c3"
+    ],
+    "tags": [
+      "turbo_small",
+      "auto_optional"
+    ],
+    "parts": "orta-kolay",
+    "resale": "orta"
+  },
+  {
+    "key": "hyundai accent blue",
+    "segment": "B_SEDAN",
+    "aliases": [
+      "accent",
+      "accent blue"
+    ],
+    "tags": [
+      "lpg_common"
+    ],
+    "parts": "çok kolay",
+    "resale": "hızlı-orta"
+  },
+  {
+    "key": "renault symbol",
+    "segment": "B_SEDAN",
+    "aliases": [
+      "symbol"
+    ],
+    "tags": [
+      "lpg_common",
+      "diesel_common"
+    ],
+    "parts": "çok kolay",
+    "resale": "orta"
+  },
+  {
+    "key": "fiat linea",
+    "segment": "B_SEDAN",
+    "aliases": [
+      "linea"
+    ],
+    "tags": [
+      "diesel_common",
+      "lpg_common"
+    ],
+    "parts": "çok kolay",
+    "resale": "orta"
+  },
+  {
+    "key": "toyota corolla",
+    "segment": "C_SEDAN",
+    "aliases": [
+      "corolla"
+    ],
+    "tags": [
+      "hybrid_common",
+      "lpg_common"
+    ],
+    "parts": "kolay",
+    "resale": "hızlı"
+  },
+  {
+    "key": "honda civic",
+    "segment": "C_SEDAN",
+    "aliases": [
+      "civic"
+    ],
+    "tags": [
+      "lpg_common",
+      "turbo_small"
+    ],
+    "parts": "kolay",
+    "resale": "hızlı"
+  },
+  {
+    "key": "renault megane",
+    "segment": "C_SEDAN",
+    "aliases": [
+      "megane"
+    ],
+    "tags": [
+      "diesel_common",
+      "dct_optional",
+      "turbo_small"
+    ],
+    "parts": "kolay",
+    "resale": "hızlı-orta"
+  },
+  {
+    "key": "opel astra",
+    "segment": "C_SEDAN",
+    "aliases": [
+      "astra"
+    ],
+    "tags": [
+      "diesel_common",
+      "turbo_small",
+      "auto_optional"
+    ],
+    "parts": "orta-kolay",
+    "resale": "orta"
+  },
+  {
+    "key": "ford focus",
+    "segment": "C_SEDAN",
+    "aliases": [
+      "focus"
+    ],
+    "tags": [
+      "diesel_common",
+      "turbo_small",
+      "auto_optional"
+    ],
+    "parts": "orta-kolay",
+    "resale": "orta"
+  },
+  {
+    "key": "vw golf",
+    "segment": "C_HATCH",
+    "aliases": [
+      "golf"
+    ],
+    "tags": [
+      "turbo_small",
+      "dsg_or_dct_optional",
+      "diesel_common"
+    ],
+    "parts": "kolay",
+    "resale": "hızlı-orta"
+  },
+  {
+    "key": "seat leon",
+    "segment": "C_HATCH",
+    "aliases": [
+      "leon"
+    ],
+    "tags": [
+      "turbo_small",
+      "dsg_or_dct_optional"
+    ],
+    "parts": "kolay",
+    "resale": "orta"
+  },
+  {
+    "key": "skoda octavia",
+    "segment": "C_SEDAN",
+    "aliases": [
+      "octavia"
+    ],
+    "tags": [
+      "turbo_small",
+      "dsg_or_dct_optional",
+      "diesel_common"
+    ],
+    "parts": "kolay",
+    "resale": "orta"
+  },
+  {
+    "key": "peugeot 308",
+    "segment": "C_HATCH",
+    "aliases": [
+      "308"
+    ],
+    "tags": [
+      "turbo_small",
+      "auto_optional",
+      "diesel_common"
+    ],
+    "parts": "orta-kolay",
+    "resale": "orta"
+  },
+  {
+    "key": "hyundai elantra",
+    "segment": "C_SEDAN",
+    "aliases": [
+      "elantra"
+    ],
+    "tags": [
+      "auto_optional"
+    ],
+    "parts": "kolay",
+    "resale": "orta"
+  },
+  {
+    "key": "hyundai i30",
+    "segment": "C_HATCH",
+    "aliases": [
+      "i30"
+    ],
+    "tags": [
+      "turbo_small",
+      "dct_optional"
+    ],
+    "parts": "kolay",
+    "resale": "orta"
+  },
+  {
+    "key": "kia ceed",
+    "segment": "C_HATCH",
+    "aliases": [
+      "ceed",
+      "cee'd"
+    ],
+    "tags": [
+      "turbo_small",
+      "dct_optional"
+    ],
+    "parts": "orta-kolay",
+    "resale": "orta"
+  },
+  {
+    "key": "mazda 3",
+    "segment": "C_HATCH",
+    "aliases": [
+      "mazda3",
+      "mazda 3"
+    ],
+    "tags": [
+      "auto_optional"
+    ],
+    "parts": "orta",
+    "resale": "orta"
+  },
+  {
+    "key": "citroen c4x",
+    "segment": "C_SEDAN",
+    "aliases": [
+      "c4x",
+      "c4 x"
+    ],
+    "tags": [
+      "turbo_small",
+      "auto_optional"
+    ],
+    "parts": "orta-kolay",
+    "resale": "orta"
+  },
+  {
+    "key": "citroen c4",
+    "segment": "C_HATCH",
+    "aliases": [
+      "c4"
+    ],
+    "tags": [
+      "turbo_small",
+      "auto_optional"
+    ],
+    "parts": "orta-kolay",
+    "resale": "orta"
+  },
+  {
+    "key": "toyota auris",
+    "segment": "C_HATCH",
+    "aliases": [
+      "auris"
+    ],
+    "tags": [
+      "hybrid_common"
+    ],
+    "parts": "kolay",
+    "resale": "hızlı-orta"
+  },
+  {
+    "key": "renault captur",
+    "segment": "B_SUV",
+    "aliases": [
+      "captur"
+    ],
+    "tags": [
+      "turbo_small",
+      "auto_optional"
+    ],
+    "parts": "kolay",
+    "resale": "orta"
+  },
+  {
+    "key": "ford puma",
+    "segment": "B_SUV",
+    "aliases": [
+      "puma"
+    ],
+    "tags": [
+      "turbo_small",
+      "auto_optional"
+    ],
+    "parts": "orta-kolay",
+    "resale": "orta"
+  },
+  {
+    "key": "peugeot 2008",
+    "segment": "B_SUV",
+    "aliases": [
+      "2008"
+    ],
+    "tags": [
+      "turbo_small",
+      "auto_optional"
+    ],
+    "parts": "orta-kolay",
+    "resale": "orta"
+  },
+  {
+    "key": "vw t-cross",
+    "segment": "B_SUV",
+    "aliases": [
+      "t-cross",
+      "tcross"
+    ],
+    "tags": [
+      "turbo_small",
+      "dsg_or_dct_optional"
+    ],
+    "parts": "kolay",
+    "resale": "orta"
+  },
+  {
+    "key": "vw taigo",
+    "segment": "B_SUV",
+    "aliases": [
+      "taigo"
+    ],
+    "tags": [
+      "turbo_small",
+      "dsg_or_dct_optional"
+    ],
+    "parts": "kolay",
+    "resale": "hızlı-orta"
+  },
+  {
+    "key": "hyundai bayon",
+    "segment": "B_SUV",
+    "aliases": [
+      "bayon"
+    ],
+    "tags": [
+      "turbo_small",
+      "auto_optional"
+    ],
+    "parts": "kolay",
+    "resale": "orta"
+  },
+  {
+    "key": "skoda kamiq",
+    "segment": "B_SUV",
+    "aliases": [
+      "kamiq"
+    ],
+    "tags": [
+      "turbo_small",
+      "dsg_or_dct_optional"
+    ],
+    "parts": "kolay",
+    "resale": "orta"
+  },
+  {
+    "key": "seat arona",
+    "segment": "B_SUV",
+    "aliases": [
+      "arona"
+    ],
+    "tags": [
+      "turbo_small",
+      "dsg_or_dct_optional"
+    ],
+    "parts": "kolay",
+    "resale": "orta"
+  },
+  {
+    "key": "nissan juke",
+    "segment": "B_SUV",
+    "aliases": [
+      "juke"
+    ],
+    "tags": [
+      "turbo_small",
+      "cvt_optional"
+    ],
+    "parts": "orta",
+    "resale": "orta"
+  },
+  {
+    "key": "dacia duster",
+    "segment": "C_SUV",
+    "aliases": [
+      "duster"
+    ],
+    "tags": [
+      "diesel_common",
+      "awd_optional"
+    ],
+    "parts": "çok kolay",
+    "resale": "hızlı-orta"
+  },
+  {
+    "key": "nissan qashqai",
+    "segment": "C_SUV",
+    "aliases": [
+      "qashqai",
+      "kaşkay"
+    ],
+    "tags": [
+      "cvt_optional",
+      "diesel_common",
+      "hybrid_common"
+    ],
+    "parts": "orta",
+    "resale": "orta-hızlı"
+  },
+  {
+    "key": "hyundai tucson",
+    "segment": "C_SUV",
+    "aliases": [
+      "tucson"
+    ],
+    "tags": [
+      "diesel_common",
+      "hybrid_common",
+      "auto_optional"
+    ],
+    "parts": "orta-kolay",
+    "resale": "orta"
+  },
+  {
+    "key": "kia sportage",
+    "segment": "C_SUV",
+    "aliases": [
+      "sportage"
+    ],
+    "tags": [
+      "diesel_common",
+      "hybrid_common",
+      "auto_optional"
+    ],
+    "parts": "orta",
+    "resale": "orta"
+  },
+  {
+    "key": "peugeot 3008",
+    "segment": "C_SUV",
+    "aliases": [
+      "3008"
+    ],
+    "tags": [
+      "diesel_common",
+      "auto_optional",
+      "turbo_small"
+    ],
+    "parts": "orta",
+    "resale": "orta"
+  },
+  {
+    "key": "peugeot 5008",
+    "segment": "D_SUV",
+    "aliases": [
+      "5008"
+    ],
+    "tags": [
+      "diesel_common",
+      "auto_optional"
+    ],
+    "parts": "orta",
+    "resale": "orta"
+  },
+  {
+    "key": "vw t-roc",
+    "segment": "C_SUV",
+    "aliases": [
+      "t-roc",
+      "troc"
+    ],
+    "tags": [
+      "turbo_small",
+      "dsg_or_dct_optional"
+    ],
+    "parts": "kolay",
+    "resale": "hızlı-orta"
+  },
+  {
+    "key": "vw tiguan",
+    "segment": "D_SUV",
+    "aliases": [
+      "tiguan"
+    ],
+    "tags": [
+      "turbo_small",
+      "dsg_or_dct_optional",
+      "diesel_common",
+      "awd_optional"
+    ],
+    "parts": "orta-kolay",
+    "resale": "orta"
+  },
+  {
+    "key": "ford kuga",
+    "segment": "C_SUV",
+    "aliases": [
+      "kuga"
+    ],
+    "tags": [
+      "diesel_common",
+      "hybrid_common",
+      "auto_optional"
+    ],
+    "parts": "orta-kolay",
+    "resale": "orta"
+  },
+  {
+    "key": "opel mokka",
+    "segment": "B_SUV",
+    "aliases": [
+      "mokka"
+    ],
+    "tags": [
+      "turbo_small",
+      "auto_optional",
+      "electric_optional"
+    ],
+    "parts": "orta",
+    "resale": "orta"
+  },
+  {
+    "key": "opel grandland",
+    "segment": "C_SUV",
+    "aliases": [
+      "grandland",
+      "grandland x"
+    ],
+    "tags": [
+      "diesel_common",
+      "auto_optional"
+    ],
+    "parts": "orta",
+    "resale": "orta"
+  },
+  {
+    "key": "citroen c5 aircross",
+    "segment": "C_SUV",
+    "aliases": [
+      "c5 aircross"
+    ],
+    "tags": [
+      "diesel_common",
+      "auto_optional"
+    ],
+    "parts": "orta",
+    "resale": "orta"
+  },
+  {
+    "key": "toyota c-hr",
+    "segment": "C_SUV",
+    "aliases": [
+      "c-hr",
+      "chr"
+    ],
+    "tags": [
+      "hybrid_common"
+    ],
+    "parts": "kolay",
+    "resale": "hızlı-orta"
+  },
+  {
+    "key": "toyota corolla cross",
+    "segment": "C_SUV",
+    "aliases": [
+      "corolla cross"
+    ],
+    "tags": [
+      "hybrid_common"
+    ],
+    "parts": "kolay",
+    "resale": "hızlı-orta"
+  },
+  {
+    "key": "toyota rav4",
+    "segment": "D_SUV",
+    "aliases": [
+      "rav4",
+      "rav 4"
+    ],
+    "tags": [
+      "hybrid_common",
+      "awd_optional"
+    ],
+    "parts": "orta-kolay",
+    "resale": "orta"
+  },
+  {
+    "key": "honda hrv",
+    "segment": "C_SUV",
+    "aliases": [
+      "hr-v",
+      "hrv"
+    ],
+    "tags": [
+      "hybrid_common",
+      "cvt_optional"
+    ],
+    "parts": "orta-kolay",
+    "resale": "orta"
+  },
+  {
+    "key": "honda crv",
+    "segment": "D_SUV",
+    "aliases": [
+      "cr-v",
+      "crv"
+    ],
+    "tags": [
+      "hybrid_common",
+      "cvt_optional",
+      "awd_optional"
+    ],
+    "parts": "orta",
+    "resale": "orta"
+  },
+  {
+    "key": "mazda cx-5",
+    "segment": "D_SUV",
+    "aliases": [
+      "cx-5",
+      "cx5"
+    ],
+    "tags": [
+      "awd_optional"
+    ],
+    "parts": "orta",
+    "resale": "orta"
+  },
+  {
+    "key": "renault arkana",
+    "segment": "C_SUV",
+    "aliases": [
+      "arkana"
+    ],
+    "tags": [
+      "turbo_small",
+      "auto_optional"
+    ],
+    "parts": "kolay",
+    "resale": "orta"
+  },
+  {
+    "key": "renault austral",
+    "segment": "C_SUV",
+    "aliases": [
+      "austral"
+    ],
+    "tags": [
+      "hybrid_common",
+      "auto_optional"
+    ],
+    "parts": "orta-kolay",
+    "resale": "orta"
+  },
+  {
+    "key": "nissan x-trail",
+    "segment": "D_SUV",
+    "aliases": [
+      "x-trail",
+      "xtrail"
+    ],
+    "tags": [
+      "cvt_optional",
+      "awd_optional",
+      "hybrid_common"
+    ],
+    "parts": "orta",
+    "resale": "orta"
+  },
+  {
+    "key": "vw passat",
+    "segment": "D_SEDAN",
+    "aliases": [
+      "passat"
+    ],
+    "tags": [
+      "dsg_or_dct_optional",
+      "diesel_common"
+    ],
+    "parts": "orta",
+    "resale": "orta-hızlı"
+  },
+  {
+    "key": "skoda superb",
+    "segment": "D_SEDAN",
+    "aliases": [
+      "superb"
+    ],
+    "tags": [
+      "dsg_or_dct_optional",
+      "diesel_common"
+    ],
+    "parts": "orta",
+    "resale": "orta"
+  },
+  {
+    "key": "peugeot 508",
+    "segment": "D_SEDAN",
+    "aliases": [
+      "508"
+    ],
+    "tags": [
+      "diesel_common",
+      "auto_optional"
+    ],
+    "parts": "orta",
+    "resale": "orta"
+  },
+  {
+    "key": "opel insignia",
+    "segment": "D_SEDAN",
+    "aliases": [
+      "insignia"
+    ],
+    "tags": [
+      "diesel_common",
+      "auto_optional"
+    ],
+    "parts": "orta",
+    "resale": "orta"
+  },
+  {
+    "key": "toyota camry",
+    "segment": "D_SEDAN",
+    "aliases": [
+      "camry"
+    ],
+    "tags": [
+      "hybrid_common"
+    ],
+    "parts": "orta-kolay",
+    "resale": "orta"
+  },
+  {
+    "key": "bmw 3 serisi",
+    "segment": "PREMIUM_D",
+    "aliases": [
+      "bmw 320",
+      "320i",
+      "320d",
+      "3.20",
+      "3 serisi",
+      "3 series"
+    ],
+    "tags": [
+      "premium_electronics",
+      "turbo_medium",
+      "diesel_common",
+      "awd_optional"
+    ],
+    "parts": "orta-zor",
+    "resale": "orta"
+  },
+  {
+    "key": "bmw 5 serisi",
+    "segment": "E_SEGMENT",
+    "aliases": [
+      "bmw 520",
+      "520i",
+      "520d",
+      "5 serisi",
+      "5 series"
+    ],
+    "tags": [
+      "premium_electronics",
+      "turbo_medium",
+      "diesel_common",
+      "awd_optional"
+    ],
+    "parts": "zor",
+    "resale": "orta"
+  },
+  {
+    "key": "mercedes c serisi",
+    "segment": "PREMIUM_D",
+    "aliases": [
+      "c180",
+      "c200",
+      "c220",
+      "c serisi",
+      "c class"
+    ],
+    "tags": [
+      "premium_electronics",
+      "turbo_medium",
+      "diesel_common"
+    ],
+    "parts": "orta-zor",
+    "resale": "orta"
+  },
+  {
+    "key": "mercedes e serisi",
+    "segment": "E_SEGMENT",
+    "aliases": [
+      "e200",
+      "e220",
+      "e serisi",
+      "e class"
+    ],
+    "tags": [
+      "premium_electronics",
+      "turbo_medium",
+      "diesel_common"
+    ],
+    "parts": "zor",
+    "resale": "orta"
+  },
+  {
+    "key": "audi a3",
+    "segment": "PREMIUM_D",
+    "aliases": [
+      "a3"
+    ],
+    "tags": [
+      "premium_electronics",
+      "turbo_small",
+      "dsg_or_dct_optional"
+    ],
+    "parts": "orta-zor",
+    "resale": "orta"
+  },
+  {
+    "key": "audi a4",
+    "segment": "PREMIUM_D",
+    "aliases": [
+      "a4"
+    ],
+    "tags": [
+      "premium_electronics",
+      "turbo_medium",
+      "dsg_or_dct_optional",
+      "diesel_common"
+    ],
+    "parts": "orta-zor",
+    "resale": "orta"
+  },
+  {
+    "key": "audi a6",
+    "segment": "E_SEGMENT",
+    "aliases": [
+      "a6"
+    ],
+    "tags": [
+      "premium_electronics",
+      "turbo_medium",
+      "dsg_or_dct_optional",
+      "diesel_common"
+    ],
+    "parts": "zor",
+    "resale": "orta"
+  },
+  {
+    "key": "volvo s60",
+    "segment": "PREMIUM_D",
+    "aliases": [
+      "s60"
+    ],
+    "tags": [
+      "premium_electronics",
+      "turbo_medium"
+    ],
+    "parts": "zor",
+    "resale": "orta-yavaş"
+  },
+  {
+    "key": "volvo xc60",
+    "segment": "PREMIUM_SUV",
+    "aliases": [
+      "xc60"
+    ],
+    "tags": [
+      "premium_electronics",
+      "turbo_medium",
+      "awd_optional",
+      "hybrid_common"
+    ],
+    "parts": "zor",
+    "resale": "orta"
+  },
+  {
+    "key": "mercedes glc",
+    "segment": "PREMIUM_SUV",
+    "aliases": [
+      "glc",
+      "glc 200",
+      "glc 220"
+    ],
+    "tags": [
+      "premium_electronics",
+      "turbo_medium",
+      "diesel_common",
+      "awd_optional"
+    ],
+    "parts": "zor",
+    "resale": "orta"
+  },
+  {
+    "key": "bmw x1",
+    "segment": "PREMIUM_SUV",
+    "aliases": [
+      "x1"
+    ],
+    "tags": [
+      "premium_electronics",
+      "turbo_small",
+      "dsg_or_dct_optional",
+      "awd_optional"
+    ],
+    "parts": "zor",
+    "resale": "orta"
+  },
+  {
+    "key": "bmw x3",
+    "segment": "PREMIUM_SUV",
+    "aliases": [
+      "x3"
+    ],
+    "tags": [
+      "premium_electronics",
+      "turbo_medium",
+      "diesel_common",
+      "awd_optional"
+    ],
+    "parts": "zor",
+    "resale": "orta"
+  },
+  {
+    "key": "audi q3",
+    "segment": "PREMIUM_SUV",
+    "aliases": [
+      "q3"
+    ],
+    "tags": [
+      "premium_electronics",
+      "turbo_small",
+      "dsg_or_dct_optional",
+      "awd_optional"
+    ],
+    "parts": "zor",
+    "resale": "orta"
+  },
+  {
+    "key": "audi q5",
+    "segment": "PREMIUM_SUV",
+    "aliases": [
+      "q5"
+    ],
+    "tags": [
+      "premium_electronics",
+      "turbo_medium",
+      "diesel_common",
+      "awd_optional"
+    ],
+    "parts": "zor",
+    "resale": "orta"
+  },
+  {
+    "key": "lexus nx",
+    "segment": "PREMIUM_SUV",
+    "aliases": [
+      "nx"
+    ],
+    "tags": [
+      "hybrid_common",
+      "premium_electronics",
+      "awd_optional"
+    ],
+    "parts": "zor",
+    "resale": "orta"
+  },
+  {
+    "key": "range rover evoque",
+    "segment": "E_SEGMENT",
+    "aliases": [
+      "evoque",
+      "range rover evoque"
+    ],
+    "tags": [
+      "premium_electronics",
+      "awd_optional",
+      "diesel_common"
+    ],
+    "parts": "çok zor",
+    "resale": "orta-yavaş"
+  },
+  {
+    "key": "togg t10x",
+    "segment": "EV",
+    "aliases": [
+      "t10x",
+      "togg"
+    ],
+    "tags": [
+      "electric",
+      "premium_electronics"
+    ],
+    "parts": "orta",
+    "resale": "orta"
+  },
+  {
+    "key": "tesla model y",
+    "segment": "EV",
+    "aliases": [
+      "model y",
+      "tesla y"
+    ],
+    "tags": [
+      "electric",
+      "premium_electronics"
+    ],
+    "parts": "orta-zor",
+    "resale": "orta"
+  },
+  {
+    "key": "byd seal u",
+    "segment": "EV",
+    "aliases": [
+      "seal u",
+      "byd seal u"
+    ],
+    "tags": [
+      "electric",
+      "premium_electronics"
+    ],
+    "parts": "orta",
+    "resale": "orta"
+  },
+  {
+    "key": "mg4",
+    "segment": "EV",
+    "aliases": [
+      "mg4"
+    ],
+    "tags": [
+      "electric"
+    ],
+    "parts": "orta",
+    "resale": "orta"
+  },
+  {
+    "key": "hyundai kona ev",
+    "segment": "EV",
+    "aliases": [
+      "kona ev",
+      "kona elektrik"
+    ],
+    "tags": [
+      "electric"
+    ],
+    "parts": "orta-kolay",
+    "resale": "orta"
+  },
+  {
+    "key": "hyundai ioniq 5",
+    "segment": "EV",
+    "aliases": [
+      "ioniq 5"
+    ],
+    "tags": [
+      "electric",
+      "premium_electronics"
+    ],
+    "parts": "orta",
+    "resale": "orta"
+  },
+  {
+    "key": "hyundai ioniq 6",
+    "segment": "EV",
+    "aliases": [
+      "ioniq 6"
+    ],
+    "tags": [
+      "electric",
+      "premium_electronics"
+    ],
+    "parts": "orta",
+    "resale": "orta"
+  },
+  {
+    "key": "renault zoe",
+    "segment": "EV",
+    "aliases": [
+      "zoe"
+    ],
+    "tags": [
+      "electric"
+    ],
+    "parts": "orta",
+    "resale": "orta"
+  },
+  {
+    "key": "fiat doblo",
+    "segment": "LCV",
+    "aliases": [
+      "doblo"
+    ],
+    "tags": [
+      "diesel_common"
+    ],
+    "parts": "çok kolay",
+    "resale": "hızlı"
+  },
+  {
+    "key": "ford tourneo courier",
+    "segment": "LCV",
+    "aliases": [
+      "courier",
+      "tourneo courier"
+    ],
+    "tags": [
+      "diesel_common"
+    ],
+    "parts": "orta-kolay",
+    "resale": "hızlı"
+  },
+  {
+    "key": "renault kangoo",
+    "segment": "LCV",
+    "aliases": [
+      "kangoo"
+    ],
+    "tags": [
+      "diesel_common"
+    ],
+    "parts": "kolay",
+    "resale": "hızlı"
+  }
+]

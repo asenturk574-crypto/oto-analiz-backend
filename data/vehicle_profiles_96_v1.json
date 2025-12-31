@@ -1,0 +1,3617 @@
+[
+  {
+    "key": "renault clio",
+    "make": "renault",
+    "segment": "B_HATCH",
+    "aliases": [
+      "clio",
+      "clio 4",
+      "clio 5"
+    ],
+    "tags": [
+      "turbo_small",
+      "dct_optional"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 5,
+      "parts_cost_index_1_5": 2,
+      "service_network_index_1_5": 5,
+      "resale_liquidity_score_1_5": 5
+    },
+    "risk_patterns": [
+      {
+        "topic": "Turbo/yağ bakımı hassasiyeti",
+        "severity": "orta",
+        "trigger": "uzun yağ değişim aralığı, soğuk kullanım",
+        "check": "yağ tüketimi, turbo ıslık/ses, çekiş",
+        "cost_band": "orta"
+      },
+      {
+        "topic": "DCT otomatik bakım hassasiyeti",
+        "severity": "orta",
+        "trigger": "bakım geçmişi belirsiz",
+        "check": "kalkış titreme, geri kaçırma, geçiş gecikmesi",
+        "cost_band": "orta-yüksek"
+      }
+    ],
+    "big_maintenance_watchlist": [
+      {
+        "item": "PCV/yağ tüketimi takibi",
+        "when": "100.000 km+",
+        "note": "yağ seviyesi, duman, buji durumu"
+      }
+    ],
+    "inspection_checklist": [
+      "Soğuk çalıştırma, rölanti, egzoz dumanı",
+      "Ön takım: burç/salıncak/rot başı; bozuk yolda ses",
+      "Debriyaj kavrama (manuel) / vites geçişleri (otomatik)",
+      "Klima, camlar, merkezi kilit, aydınlatmalar",
+      "Lastik diş, fren disk/balata, rot balans izleri"
+    ],
+    "disclaimer": "Bu girişler model bazlı kesin arıza iddiası değil; TR ikinci el piyasasında güç-aktarma/segment/tags temelli 'risk paterni' şablonlarıdır. Satın alma kararı için ekspertiz ve OBD şart."
+  },
+  {
+    "key": "hyundai i20",
+    "make": "hyundai",
+    "segment": "B_HATCH",
+    "aliases": [
+      "i20"
+    ],
+    "tags": [
+      "turbo_small",
+      "dct_optional"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 4,
+      "parts_cost_index_1_5": 2,
+      "service_network_index_1_5": 4,
+      "resale_liquidity_score_1_5": 4
+    },
+    "risk_patterns": [
+      {
+        "topic": "Turbo/yağ bakımı hassasiyeti",
+        "severity": "orta",
+        "trigger": "uzun yağ değişim aralığı, soğuk kullanım",
+        "check": "yağ tüketimi, turbo ıslık/ses, çekiş",
+        "cost_band": "orta"
+      },
+      {
+        "topic": "DCT otomatik bakım hassasiyeti",
+        "severity": "orta",
+        "trigger": "bakım geçmişi belirsiz",
+        "check": "kalkış titreme, geri kaçırma, geçiş gecikmesi",
+        "cost_band": "orta-yüksek"
+      }
+    ],
+    "big_maintenance_watchlist": [
+      {
+        "item": "PCV/yağ tüketimi takibi",
+        "when": "100.000 km+",
+        "note": "yağ seviyesi, duman, buji durumu"
+      }
+    ],
+    "inspection_checklist": [
+      "Soğuk çalıştırma, rölanti, egzoz dumanı",
+      "Ön takım: burç/salıncak/rot başı; bozuk yolda ses",
+      "Debriyaj kavrama (manuel) / vites geçişleri (otomatik)",
+      "Klima, camlar, merkezi kilit, aydınlatmalar",
+      "Lastik diş, fren disk/balata, rot balans izleri"
+    ],
+    "disclaimer": "Bu girişler model bazlı kesin arıza iddiası değil; TR ikinci el piyasasında güç-aktarma/segment/tags temelli 'risk paterni' şablonlarıdır. Satın alma kararı için ekspertiz ve OBD şart."
+  },
+  {
+    "key": "hyundai i10",
+    "make": "hyundai",
+    "segment": "A_B_HATCH",
+    "aliases": [
+      "i10"
+    ],
+    "tags": [
+      "auto_optional"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 4,
+      "parts_cost_index_1_5": 2,
+      "service_network_index_1_5": 4,
+      "resale_liquidity_score_1_5": 3
+    },
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [
+      "Motor yağ kaçağı, hararet geçmişi, soğutma sistemi",
+      "Şanzıman: geçiş vuruntusu, titreme, kaçak",
+      "Yürüyen: amortisör, salıncak, aks körüğü, direksiyon kutusu",
+      "Tramer-kaporta: şasi/podye kontrolü, boya ölçümü",
+      "Elektronik: park sensörü, multimedya, klima paneli"
+    ],
+    "disclaimer": "Bu girişler model bazlı kesin arıza iddiası değil; TR ikinci el piyasasında güç-aktarma/segment/tags temelli 'risk paterni' şablonlarıdır. Satın alma kararı için ekspertiz ve OBD şart."
+  },
+  {
+    "key": "fiat egea hatchback",
+    "make": "fiat",
+    "segment": "C_SEDAN",
+    "aliases": [
+      "egea hb",
+      "egea hatchback",
+      "egea hatch"
+    ],
+    "tags": [
+      "diesel_common",
+      "dct_optional"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 5,
+      "parts_cost_index_1_5": 2,
+      "service_network_index_1_5": 5,
+      "resale_liquidity_score_1_5": 5
+    },
+    "risk_patterns": [
+      {
+        "topic": "DCT otomatik bakım hassasiyeti",
+        "severity": "orta",
+        "trigger": "bakım geçmişi belirsiz",
+        "check": "kalkış titreme, geri kaçırma, geçiş gecikmesi",
+        "cost_band": "orta-yüksek"
+      }
+    ],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [
+      "Motor yağ kaçağı, hararet geçmişi, soğutma sistemi",
+      "Şanzıman: geçiş vuruntusu, titreme, kaçak",
+      "Yürüyen: amortisör, salıncak, aks körüğü, direksiyon kutusu",
+      "Tramer-kaporta: şasi/podye kontrolü, boya ölçümü",
+      "Elektronik: park sensörü, multimedya, klima paneli"
+    ],
+    "disclaimer": "Bu girişler model bazlı kesin arıza iddiası değil; TR ikinci el piyasasında güç-aktarma/segment/tags temelli 'risk paterni' şablonlarıdır. Satın alma kararı için ekspertiz ve OBD şart."
+  },
+  {
+    "key": "fiat egea sedan",
+    "make": "fiat",
+    "segment": "C_SEDAN",
+    "aliases": [
+      "egea",
+      "egea sedan",
+      "tipo sedan"
+    ],
+    "tags": [
+      "diesel_common",
+      "dct_optional",
+      "lpg_common"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 5,
+      "parts_cost_index_1_5": 2,
+      "service_network_index_1_5": 5,
+      "resale_liquidity_score_1_5": 5
+    },
+    "risk_patterns": [
+      {
+        "topic": "DCT otomatik bakım hassasiyeti",
+        "severity": "orta",
+        "trigger": "bakım geçmişi belirsiz",
+        "check": "kalkış titreme, geri kaçırma, geçiş gecikmesi",
+        "cost_band": "orta-yüksek"
+      },
+      {
+        "topic": "Subap ayarı/uyumu (LPG)",
+        "severity": "orta",
+        "trigger": "uzun süre yanlış ayar",
+        "check": "çekiş düşüşü, kompresyon, rölanti",
+        "cost_band": "orta"
+      }
+    ],
+    "big_maintenance_watchlist": [
+      {
+        "item": "Subap ayarı/kompresyon kontrolü",
+        "when": "80.000-120.000 km arası ve sonrası",
+        "note": "montaj/ayar kalitesine bağlı"
+      }
+    ],
+    "inspection_checklist": [
+      "Motor yağ kaçağı, hararet geçmişi, soğutma sistemi",
+      "Şanzıman: geçiş vuruntusu, titreme, kaçak",
+      "Yürüyen: amortisör, salıncak, aks körüğü, direksiyon kutusu",
+      "Tramer-kaporta: şasi/podye kontrolü, boya ölçümü",
+      "Elektronik: park sensörü, multimedya, klima paneli"
+    ],
+    "disclaimer": "Bu girişler model bazlı kesin arıza iddiası değil; TR ikinci el piyasasında güç-aktarma/segment/tags temelli 'risk paterni' şablonlarıdır. Satın alma kararı için ekspertiz ve OBD şart."
+  },
+  {
+    "key": "opel corsa",
+    "make": "opel",
+    "segment": "B_HATCH",
+    "aliases": [
+      "corsa"
+    ],
+    "tags": [
+      "turbo_small",
+      "auto_optional"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 4,
+      "parts_cost_index_1_5": 2,
+      "service_network_index_1_5": 4,
+      "resale_liquidity_score_1_5": 3
+    },
+    "risk_patterns": [
+      {
+        "topic": "Turbo/yağ bakımı hassasiyeti",
+        "severity": "orta",
+        "trigger": "uzun yağ değişim aralığı, soğuk kullanım",
+        "check": "yağ tüketimi, turbo ıslık/ses, çekiş",
+        "cost_band": "orta"
+      }
+    ],
+    "big_maintenance_watchlist": [
+      {
+        "item": "PCV/yağ tüketimi takibi",
+        "when": "100.000 km+",
+        "note": "yağ seviyesi, duman, buji durumu"
+      }
+    ],
+    "inspection_checklist": [
+      "Soğuk çalıştırma, rölanti, egzoz dumanı",
+      "Ön takım: burç/salıncak/rot başı; bozuk yolda ses",
+      "Debriyaj kavrama (manuel) / vites geçişleri (otomatik)",
+      "Klima, camlar, merkezi kilit, aydınlatmalar",
+      "Lastik diş, fren disk/balata, rot balans izleri"
+    ],
+    "disclaimer": "Bu girişler model bazlı kesin arıza iddiası değil; TR ikinci el piyasasında güç-aktarma/segment/tags temelli 'risk paterni' şablonlarıdır. Satın alma kararı için ekspertiz ve OBD şart."
+  },
+  {
+    "key": "peugeot 208",
+    "make": "peugeot",
+    "segment": "B_HATCH",
+    "aliases": [
+      "208"
+    ],
+    "tags": [
+      "turbo_small",
+      "auto_optional"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 4,
+      "parts_cost_index_1_5": 2,
+      "service_network_index_1_5": 4,
+      "resale_liquidity_score_1_5": 3
+    },
+    "risk_patterns": [
+      {
+        "topic": "Turbo/yağ bakımı hassasiyeti",
+        "severity": "orta",
+        "trigger": "uzun yağ değişim aralığı, soğuk kullanım",
+        "check": "yağ tüketimi, turbo ıslık/ses, çekiş",
+        "cost_band": "orta"
+      }
+    ],
+    "big_maintenance_watchlist": [
+      {
+        "item": "PCV/yağ tüketimi takibi",
+        "when": "100.000 km+",
+        "note": "yağ seviyesi, duman, buji durumu"
+      }
+    ],
+    "inspection_checklist": [
+      "Soğuk çalıştırma, rölanti, egzoz dumanı",
+      "Ön takım: burç/salıncak/rot başı; bozuk yolda ses",
+      "Debriyaj kavrama (manuel) / vites geçişleri (otomatik)",
+      "Klima, camlar, merkezi kilit, aydınlatmalar",
+      "Lastik diş, fren disk/balata, rot balans izleri"
+    ],
+    "disclaimer": "Bu girişler model bazlı kesin arıza iddiası değil; TR ikinci el piyasasında güç-aktarma/segment/tags temelli 'risk paterni' şablonlarıdır. Satın alma kararı için ekspertiz ve OBD şart."
+  },
+  {
+    "key": "vw polo",
+    "make": "vw",
+    "segment": "B_HATCH",
+    "aliases": [
+      "polo"
+    ],
+    "tags": [
+      "turbo_small",
+      "dsg_or_dct_optional"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 4,
+      "parts_cost_index_1_5": 2,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 4
+    },
+    "risk_patterns": [
+      {
+        "topic": "Turbo/yağ bakımı hassasiyeti",
+        "severity": "orta",
+        "trigger": "uzun yağ değişim aralığı, soğuk kullanım",
+        "check": "yağ tüketimi, turbo ıslık/ses, çekiş",
+        "cost_band": "orta"
+      }
+    ],
+    "big_maintenance_watchlist": [
+      {
+        "item": "PCV/yağ tüketimi takibi",
+        "when": "100.000 km+",
+        "note": "yağ seviyesi, duman, buji durumu"
+      }
+    ],
+    "inspection_checklist": [
+      "Soğuk çalıştırma, rölanti, egzoz dumanı",
+      "Ön takım: burç/salıncak/rot başı; bozuk yolda ses",
+      "Debriyaj kavrama (manuel) / vites geçişleri (otomatik)",
+      "Klima, camlar, merkezi kilit, aydınlatmalar",
+      "Lastik diş, fren disk/balata, rot balans izleri"
+    ],
+    "disclaimer": "Bu girişler model bazlı kesin arıza iddiası değil; TR ikinci el piyasasında güç-aktarma/segment/tags temelli 'risk paterni' şablonlarıdır. Satın alma kararı için ekspertiz ve OBD şart."
+  },
+  {
+    "key": "skoda fabia",
+    "make": "skoda",
+    "segment": "B_HATCH",
+    "aliases": [
+      "fabia"
+    ],
+    "tags": [
+      "turbo_small",
+      "dsg_or_dct_optional"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 4,
+      "parts_cost_index_1_5": 2,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "risk_patterns": [
+      {
+        "topic": "Turbo/yağ bakımı hassasiyeti",
+        "severity": "orta",
+        "trigger": "uzun yağ değişim aralığı, soğuk kullanım",
+        "check": "yağ tüketimi, turbo ıslık/ses, çekiş",
+        "cost_band": "orta"
+      }
+    ],
+    "big_maintenance_watchlist": [
+      {
+        "item": "PCV/yağ tüketimi takibi",
+        "when": "100.000 km+",
+        "note": "yağ seviyesi, duman, buji durumu"
+      }
+    ],
+    "inspection_checklist": [
+      "Soğuk çalıştırma, rölanti, egzoz dumanı",
+      "Ön takım: burç/salıncak/rot başı; bozuk yolda ses",
+      "Debriyaj kavrama (manuel) / vites geçişleri (otomatik)",
+      "Klima, camlar, merkezi kilit, aydınlatmalar",
+      "Lastik diş, fren disk/balata, rot balans izleri"
+    ],
+    "disclaimer": "Bu girişler model bazlı kesin arıza iddiası değil; TR ikinci el piyasasında güç-aktarma/segment/tags temelli 'risk paterni' şablonlarıdır. Satın alma kararı için ekspertiz ve OBD şart."
+  },
+  {
+    "key": "seat ibiza",
+    "make": "seat",
+    "segment": "B_HATCH",
+    "aliases": [
+      "ibiza"
+    ],
+    "tags": [
+      "turbo_small",
+      "dsg_or_dct_optional"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 4,
+      "parts_cost_index_1_5": 2,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "risk_patterns": [
+      {
+        "topic": "Turbo/yağ bakımı hassasiyeti",
+        "severity": "orta",
+        "trigger": "uzun yağ değişim aralığı, soğuk kullanım",
+        "check": "yağ tüketimi, turbo ıslık/ses, çekiş",
+        "cost_band": "orta"
+      }
+    ],
+    "big_maintenance_watchlist": [
+      {
+        "item": "PCV/yağ tüketimi takibi",
+        "when": "100.000 km+",
+        "note": "yağ seviyesi, duman, buji durumu"
+      }
+    ],
+    "inspection_checklist": [
+      "Soğuk çalıştırma, rölanti, egzoz dumanı",
+      "Ön takım: burç/salıncak/rot başı; bozuk yolda ses",
+      "Debriyaj kavrama (manuel) / vites geçişleri (otomatik)",
+      "Klima, camlar, merkezi kilit, aydınlatmalar",
+      "Lastik diş, fren disk/balata, rot balans izleri"
+    ],
+    "disclaimer": "Bu girişler model bazlı kesin arıza iddiası değil; TR ikinci el piyasasında güç-aktarma/segment/tags temelli 'risk paterni' şablonlarıdır. Satın alma kararı için ekspertiz ve OBD şart."
+  },
+  {
+    "key": "toyota yaris",
+    "make": "toyota",
+    "segment": "B_HATCH",
+    "aliases": [
+      "yaris"
+    ],
+    "tags": [
+      "hybrid_common",
+      "auto_optional"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 4,
+      "parts_cost_index_1_5": 2,
+      "service_network_index_1_5": 5,
+      "resale_liquidity_score_1_5": 4
+    },
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [
+      "Soğuk çalıştırma, rölanti, egzoz dumanı",
+      "Ön takım: burç/salıncak/rot başı; bozuk yolda ses",
+      "Debriyaj kavrama (manuel) / vites geçişleri (otomatik)",
+      "Klima, camlar, merkezi kilit, aydınlatmalar",
+      "Lastik diş, fren disk/balata, rot balans izleri"
+    ],
+    "disclaimer": "Bu girişler model bazlı kesin arıza iddiası değil; TR ikinci el piyasasında güç-aktarma/segment/tags temelli 'risk paterni' şablonlarıdır. Satın alma kararı için ekspertiz ve OBD şart."
+  },
+  {
+    "key": "kia rio",
+    "make": "kia",
+    "segment": "B_HATCH",
+    "aliases": [
+      "rio"
+    ],
+    "tags": [
+      "auto_optional"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 4,
+      "parts_cost_index_1_5": 2,
+      "service_network_index_1_5": 4,
+      "resale_liquidity_score_1_5": 3
+    },
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [
+      "Soğuk çalıştırma, rölanti, egzoz dumanı",
+      "Ön takım: burç/salıncak/rot başı; bozuk yolda ses",
+      "Debriyaj kavrama (manuel) / vites geçişleri (otomatik)",
+      "Klima, camlar, merkezi kilit, aydınlatmalar",
+      "Lastik diş, fren disk/balata, rot balans izleri"
+    ],
+    "disclaimer": "Bu girişler model bazlı kesin arıza iddiası değil; TR ikinci el piyasasında güç-aktarma/segment/tags temelli 'risk paterni' şablonlarıdır. Satın alma kararı için ekspertiz ve OBD şart."
+  },
+  {
+    "key": "suzuki swift",
+    "make": "suzuki",
+    "segment": "B_HATCH",
+    "aliases": [
+      "swift"
+    ],
+    "tags": [
+      "hybrid_common",
+      "auto_optional"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 3,
+      "parts_cost_index_1_5": 3,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [
+      "Soğuk çalıştırma, rölanti, egzoz dumanı",
+      "Ön takım: burç/salıncak/rot başı; bozuk yolda ses",
+      "Debriyaj kavrama (manuel) / vites geçişleri (otomatik)",
+      "Klima, camlar, merkezi kilit, aydınlatmalar",
+      "Lastik diş, fren disk/balata, rot balans izleri"
+    ],
+    "disclaimer": "Bu girişler model bazlı kesin arıza iddiası değil; TR ikinci el piyasasında güç-aktarma/segment/tags temelli 'risk paterni' şablonlarıdır. Satın alma kararı için ekspertiz ve OBD şart."
+  },
+  {
+    "key": "dacia sandero",
+    "make": "dacia",
+    "segment": "B_HATCH",
+    "aliases": [
+      "sandero",
+      "sandero stepway"
+    ],
+    "tags": [
+      "turbo_small"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 5,
+      "parts_cost_index_1_5": 2,
+      "service_network_index_1_5": 5,
+      "resale_liquidity_score_1_5": 3
+    },
+    "risk_patterns": [
+      {
+        "topic": "Turbo/yağ bakımı hassasiyeti",
+        "severity": "orta",
+        "trigger": "uzun yağ değişim aralığı, soğuk kullanım",
+        "check": "yağ tüketimi, turbo ıslık/ses, çekiş",
+        "cost_band": "orta"
+      }
+    ],
+    "big_maintenance_watchlist": [
+      {
+        "item": "PCV/yağ tüketimi takibi",
+        "when": "100.000 km+",
+        "note": "yağ seviyesi, duman, buji durumu"
+      }
+    ],
+    "inspection_checklist": [
+      "Soğuk çalıştırma, rölanti, egzoz dumanı",
+      "Ön takım: burç/salıncak/rot başı; bozuk yolda ses",
+      "Debriyaj kavrama (manuel) / vites geçişleri (otomatik)",
+      "Klima, camlar, merkezi kilit, aydınlatmalar",
+      "Lastik diş, fren disk/balata, rot balans izleri"
+    ],
+    "disclaimer": "Bu girişler model bazlı kesin arıza iddiası değil; TR ikinci el piyasasında güç-aktarma/segment/tags temelli 'risk paterni' şablonlarıdır. Satın alma kararı için ekspertiz ve OBD şart."
+  },
+  {
+    "key": "citroen c3",
+    "make": "citroen",
+    "segment": "B_HATCH",
+    "aliases": [
+      "c3"
+    ],
+    "tags": [
+      "turbo_small",
+      "auto_optional"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 4,
+      "parts_cost_index_1_5": 2,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "risk_patterns": [
+      {
+        "topic": "Turbo/yağ bakımı hassasiyeti",
+        "severity": "orta",
+        "trigger": "uzun yağ değişim aralığı, soğuk kullanım",
+        "check": "yağ tüketimi, turbo ıslık/ses, çekiş",
+        "cost_band": "orta"
+      }
+    ],
+    "big_maintenance_watchlist": [
+      {
+        "item": "PCV/yağ tüketimi takibi",
+        "when": "100.000 km+",
+        "note": "yağ seviyesi, duman, buji durumu"
+      }
+    ],
+    "inspection_checklist": [
+      "Soğuk çalıştırma, rölanti, egzoz dumanı",
+      "Ön takım: burç/salıncak/rot başı; bozuk yolda ses",
+      "Debriyaj kavrama (manuel) / vites geçişleri (otomatik)",
+      "Klima, camlar, merkezi kilit, aydınlatmalar",
+      "Lastik diş, fren disk/balata, rot balans izleri"
+    ],
+    "disclaimer": "Bu girişler model bazlı kesin arıza iddiası değil; TR ikinci el piyasasında güç-aktarma/segment/tags temelli 'risk paterni' şablonlarıdır. Satın alma kararı için ekspertiz ve OBD şart."
+  },
+  {
+    "key": "hyundai accent blue",
+    "make": "hyundai",
+    "segment": "B_SEDAN",
+    "aliases": [
+      "accent",
+      "accent blue"
+    ],
+    "tags": [
+      "lpg_common"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 5,
+      "parts_cost_index_1_5": 2,
+      "service_network_index_1_5": 4,
+      "resale_liquidity_score_1_5": 4
+    },
+    "risk_patterns": [
+      {
+        "topic": "Subap ayarı/uyumu (LPG)",
+        "severity": "orta",
+        "trigger": "uzun süre yanlış ayar",
+        "check": "çekiş düşüşü, kompresyon, rölanti",
+        "cost_band": "orta"
+      }
+    ],
+    "big_maintenance_watchlist": [
+      {
+        "item": "Subap ayarı/kompresyon kontrolü",
+        "when": "80.000-120.000 km arası ve sonrası",
+        "note": "montaj/ayar kalitesine bağlı"
+      }
+    ],
+    "inspection_checklist": [
+      "Motor yağ kaçağı, hararet geçmişi, soğutma sistemi",
+      "Şanzıman: geçiş vuruntusu, titreme, kaçak",
+      "Yürüyen: amortisör, salıncak, aks körüğü, direksiyon kutusu",
+      "Tramer-kaporta: şasi/podye kontrolü, boya ölçümü",
+      "Elektronik: park sensörü, multimedya, klima paneli"
+    ],
+    "disclaimer": "Bu girişler model bazlı kesin arıza iddiası değil; TR ikinci el piyasasında güç-aktarma/segment/tags temelli 'risk paterni' şablonlarıdır. Satın alma kararı için ekspertiz ve OBD şart."
+  },
+  {
+    "key": "renault symbol",
+    "make": "renault",
+    "segment": "B_SEDAN",
+    "aliases": [
+      "symbol"
+    ],
+    "tags": [
+      "lpg_common",
+      "diesel_common"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 5,
+      "parts_cost_index_1_5": 2,
+      "service_network_index_1_5": 5,
+      "resale_liquidity_score_1_5": 3
+    },
+    "risk_patterns": [
+      {
+        "topic": "Subap ayarı/uyumu (LPG)",
+        "severity": "orta",
+        "trigger": "uzun süre yanlış ayar",
+        "check": "çekiş düşüşü, kompresyon, rölanti",
+        "cost_band": "orta"
+      }
+    ],
+    "big_maintenance_watchlist": [
+      {
+        "item": "Subap ayarı/kompresyon kontrolü",
+        "when": "80.000-120.000 km arası ve sonrası",
+        "note": "montaj/ayar kalitesine bağlı"
+      }
+    ],
+    "inspection_checklist": [
+      "Motor yağ kaçağı, hararet geçmişi, soğutma sistemi",
+      "Şanzıman: geçiş vuruntusu, titreme, kaçak",
+      "Yürüyen: amortisör, salıncak, aks körüğü, direksiyon kutusu",
+      "Tramer-kaporta: şasi/podye kontrolü, boya ölçümü",
+      "Elektronik: park sensörü, multimedya, klima paneli"
+    ],
+    "disclaimer": "Bu girişler model bazlı kesin arıza iddiası değil; TR ikinci el piyasasında güç-aktarma/segment/tags temelli 'risk paterni' şablonlarıdır. Satın alma kararı için ekspertiz ve OBD şart."
+  },
+  {
+    "key": "fiat linea",
+    "make": "fiat",
+    "segment": "B_SEDAN",
+    "aliases": [
+      "linea"
+    ],
+    "tags": [
+      "diesel_common",
+      "lpg_common"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 5,
+      "parts_cost_index_1_5": 2,
+      "service_network_index_1_5": 5,
+      "resale_liquidity_score_1_5": 3
+    },
+    "risk_patterns": [
+      {
+        "topic": "Subap ayarı/uyumu (LPG)",
+        "severity": "orta",
+        "trigger": "uzun süre yanlış ayar",
+        "check": "çekiş düşüşü, kompresyon, rölanti",
+        "cost_band": "orta"
+      }
+    ],
+    "big_maintenance_watchlist": [
+      {
+        "item": "Subap ayarı/kompresyon kontrolü",
+        "when": "80.000-120.000 km arası ve sonrası",
+        "note": "montaj/ayar kalitesine bağlı"
+      }
+    ],
+    "inspection_checklist": [
+      "Motor yağ kaçağı, hararet geçmişi, soğutma sistemi",
+      "Şanzıman: geçiş vuruntusu, titreme, kaçak",
+      "Yürüyen: amortisör, salıncak, aks körüğü, direksiyon kutusu",
+      "Tramer-kaporta: şasi/podye kontrolü, boya ölçümü",
+      "Elektronik: park sensörü, multimedya, klima paneli"
+    ],
+    "disclaimer": "Bu girişler model bazlı kesin arıza iddiası değil; TR ikinci el piyasasında güç-aktarma/segment/tags temelli 'risk paterni' şablonlarıdır. Satın alma kararı için ekspertiz ve OBD şart."
+  },
+  {
+    "key": "toyota corolla",
+    "make": "toyota",
+    "segment": "C_SEDAN",
+    "aliases": [
+      "corolla"
+    ],
+    "tags": [
+      "hybrid_common",
+      "lpg_common"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 4,
+      "parts_cost_index_1_5": 2,
+      "service_network_index_1_5": 5,
+      "resale_liquidity_score_1_5": 5
+    },
+    "risk_patterns": [
+      {
+        "topic": "Subap ayarı/uyumu (LPG)",
+        "severity": "orta",
+        "trigger": "uzun süre yanlış ayar",
+        "check": "çekiş düşüşü, kompresyon, rölanti",
+        "cost_band": "orta"
+      }
+    ],
+    "big_maintenance_watchlist": [
+      {
+        "item": "Subap ayarı/kompresyon kontrolü",
+        "when": "80.000-120.000 km arası ve sonrası",
+        "note": "montaj/ayar kalitesine bağlı"
+      }
+    ],
+    "inspection_checklist": [
+      "Motor yağ kaçağı, hararet geçmişi, soğutma sistemi",
+      "Şanzıman: geçiş vuruntusu, titreme, kaçak",
+      "Yürüyen: amortisör, salıncak, aks körüğü, direksiyon kutusu",
+      "Tramer-kaporta: şasi/podye kontrolü, boya ölçümü",
+      "Elektronik: park sensörü, multimedya, klima paneli"
+    ],
+    "disclaimer": "Bu girişler model bazlı kesin arıza iddiası değil; TR ikinci el piyasasında güç-aktarma/segment/tags temelli 'risk paterni' şablonlarıdır. Satın alma kararı için ekspertiz ve OBD şart."
+  },
+  {
+    "key": "honda civic",
+    "make": "honda",
+    "segment": "C_SEDAN",
+    "aliases": [
+      "civic"
+    ],
+    "tags": [
+      "lpg_common",
+      "turbo_small"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 4,
+      "parts_cost_index_1_5": 2,
+      "service_network_index_1_5": 4,
+      "resale_liquidity_score_1_5": 5
+    },
+    "risk_patterns": [
+      {
+        "topic": "Subap ayarı/uyumu (LPG)",
+        "severity": "orta",
+        "trigger": "uzun süre yanlış ayar",
+        "check": "çekiş düşüşü, kompresyon, rölanti",
+        "cost_band": "orta"
+      },
+      {
+        "topic": "Turbo/yağ bakımı hassasiyeti",
+        "severity": "orta",
+        "trigger": "uzun yağ değişim aralığı, soğuk kullanım",
+        "check": "yağ tüketimi, turbo ıslık/ses, çekiş",
+        "cost_band": "orta"
+      }
+    ],
+    "big_maintenance_watchlist": [
+      {
+        "item": "Subap ayarı/kompresyon kontrolü",
+        "when": "80.000-120.000 km arası ve sonrası",
+        "note": "montaj/ayar kalitesine bağlı"
+      },
+      {
+        "item": "PCV/yağ tüketimi takibi",
+        "when": "100.000 km+",
+        "note": "yağ seviyesi, duman, buji durumu"
+      }
+    ],
+    "inspection_checklist": [
+      "Motor yağ kaçağı, hararet geçmişi, soğutma sistemi",
+      "Şanzıman: geçiş vuruntusu, titreme, kaçak",
+      "Yürüyen: amortisör, salıncak, aks körüğü, direksiyon kutusu",
+      "Tramer-kaporta: şasi/podye kontrolü, boya ölçümü",
+      "Elektronik: park sensörü, multimedya, klima paneli"
+    ],
+    "disclaimer": "Bu girişler model bazlı kesin arıza iddiası değil; TR ikinci el piyasasında güç-aktarma/segment/tags temelli 'risk paterni' şablonlarıdır. Satın alma kararı için ekspertiz ve OBD şart."
+  },
+  {
+    "key": "renault megane",
+    "make": "renault",
+    "segment": "C_SEDAN",
+    "aliases": [
+      "megane"
+    ],
+    "tags": [
+      "diesel_common",
+      "dct_optional",
+      "turbo_small"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 4,
+      "parts_cost_index_1_5": 2,
+      "service_network_index_1_5": 5,
+      "resale_liquidity_score_1_5": 4
+    },
+    "risk_patterns": [
+      {
+        "topic": "DCT otomatik bakım hassasiyeti",
+        "severity": "orta",
+        "trigger": "bakım geçmişi belirsiz",
+        "check": "kalkış titreme, geri kaçırma, geçiş gecikmesi",
+        "cost_band": "orta-yüksek"
+      },
+      {
+        "topic": "Turbo/yağ bakımı hassasiyeti",
+        "severity": "orta",
+        "trigger": "uzun yağ değişim aralığı, soğuk kullanım",
+        "check": "yağ tüketimi, turbo ıslık/ses, çekiş",
+        "cost_band": "orta"
+      }
+    ],
+    "big_maintenance_watchlist": [
+      {
+        "item": "PCV/yağ tüketimi takibi",
+        "when": "100.000 km+",
+        "note": "yağ seviyesi, duman, buji durumu"
+      }
+    ],
+    "inspection_checklist": [
+      "Motor yağ kaçağı, hararet geçmişi, soğutma sistemi",
+      "Şanzıman: geçiş vuruntusu, titreme, kaçak",
+      "Yürüyen: amortisör, salıncak, aks körüğü, direksiyon kutusu",
+      "Tramer-kaporta: şasi/podye kontrolü, boya ölçümü",
+      "Elektronik: park sensörü, multimedya, klima paneli"
+    ],
+    "disclaimer": "Bu girişler model bazlı kesin arıza iddiası değil; TR ikinci el piyasasında güç-aktarma/segment/tags temelli 'risk paterni' şablonlarıdır. Satın alma kararı için ekspertiz ve OBD şart."
+  },
+  {
+    "key": "opel astra",
+    "make": "opel",
+    "segment": "C_SEDAN",
+    "aliases": [
+      "astra"
+    ],
+    "tags": [
+      "diesel_common",
+      "turbo_small",
+      "auto_optional"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 4,
+      "parts_cost_index_1_5": 2,
+      "service_network_index_1_5": 4,
+      "resale_liquidity_score_1_5": 3
+    },
+    "risk_patterns": [
+      {
+        "topic": "Turbo/yağ bakımı hassasiyeti",
+        "severity": "orta",
+        "trigger": "uzun yağ değişim aralığı, soğuk kullanım",
+        "check": "yağ tüketimi, turbo ıslık/ses, çekiş",
+        "cost_band": "orta"
+      }
+    ],
+    "big_maintenance_watchlist": [
+      {
+        "item": "PCV/yağ tüketimi takibi",
+        "when": "100.000 km+",
+        "note": "yağ seviyesi, duman, buji durumu"
+      }
+    ],
+    "inspection_checklist": [
+      "Motor yağ kaçağı, hararet geçmişi, soğutma sistemi",
+      "Şanzıman: geçiş vuruntusu, titreme, kaçak",
+      "Yürüyen: amortisör, salıncak, aks körüğü, direksiyon kutusu",
+      "Tramer-kaporta: şasi/podye kontrolü, boya ölçümü",
+      "Elektronik: park sensörü, multimedya, klima paneli"
+    ],
+    "disclaimer": "Bu girişler model bazlı kesin arıza iddiası değil; TR ikinci el piyasasında güç-aktarma/segment/tags temelli 'risk paterni' şablonlarıdır. Satın alma kararı için ekspertiz ve OBD şart."
+  },
+  {
+    "key": "ford focus",
+    "make": "ford",
+    "segment": "C_SEDAN",
+    "aliases": [
+      "focus"
+    ],
+    "tags": [
+      "diesel_common",
+      "turbo_small",
+      "auto_optional"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 4,
+      "parts_cost_index_1_5": 2,
+      "service_network_index_1_5": 4,
+      "resale_liquidity_score_1_5": 3
+    },
+    "risk_patterns": [
+      {
+        "topic": "Turbo/yağ bakımı hassasiyeti",
+        "severity": "orta",
+        "trigger": "uzun yağ değişim aralığı, soğuk kullanım",
+        "check": "yağ tüketimi, turbo ıslık/ses, çekiş",
+        "cost_band": "orta"
+      }
+    ],
+    "big_maintenance_watchlist": [
+      {
+        "item": "PCV/yağ tüketimi takibi",
+        "when": "100.000 km+",
+        "note": "yağ seviyesi, duman, buji durumu"
+      }
+    ],
+    "inspection_checklist": [
+      "Motor yağ kaçağı, hararet geçmişi, soğutma sistemi",
+      "Şanzıman: geçiş vuruntusu, titreme, kaçak",
+      "Yürüyen: amortisör, salıncak, aks körüğü, direksiyon kutusu",
+      "Tramer-kaporta: şasi/podye kontrolü, boya ölçümü",
+      "Elektronik: park sensörü, multimedya, klima paneli"
+    ],
+    "disclaimer": "Bu girişler model bazlı kesin arıza iddiası değil; TR ikinci el piyasasında güç-aktarma/segment/tags temelli 'risk paterni' şablonlarıdır. Satın alma kararı için ekspertiz ve OBD şart."
+  },
+  {
+    "key": "vw golf",
+    "make": "vw",
+    "segment": "C_HATCH",
+    "aliases": [
+      "golf"
+    ],
+    "tags": [
+      "turbo_small",
+      "dsg_or_dct_optional",
+      "diesel_common"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 4,
+      "parts_cost_index_1_5": 2,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 4
+    },
+    "risk_patterns": [
+      {
+        "topic": "Turbo/yağ bakımı hassasiyeti",
+        "severity": "orta",
+        "trigger": "uzun yağ değişim aralığı, soğuk kullanım",
+        "check": "yağ tüketimi, turbo ıslık/ses, çekiş",
+        "cost_band": "orta"
+      }
+    ],
+    "big_maintenance_watchlist": [
+      {
+        "item": "PCV/yağ tüketimi takibi",
+        "when": "100.000 km+",
+        "note": "yağ seviyesi, duman, buji durumu"
+      }
+    ],
+    "inspection_checklist": [
+      "Motor yağ kaçağı, hararet geçmişi, soğutma sistemi",
+      "Şanzıman: geçiş vuruntusu, titreme, kaçak",
+      "Yürüyen: amortisör, salıncak, aks körüğü, direksiyon kutusu",
+      "Tramer-kaporta: şasi/podye kontrolü, boya ölçümü",
+      "Elektronik: park sensörü, multimedya, klima paneli"
+    ],
+    "disclaimer": "Bu girişler model bazlı kesin arıza iddiası değil; TR ikinci el piyasasında güç-aktarma/segment/tags temelli 'risk paterni' şablonlarıdır. Satın alma kararı için ekspertiz ve OBD şart."
+  },
+  {
+    "key": "seat leon",
+    "make": "seat",
+    "segment": "C_HATCH",
+    "aliases": [
+      "leon"
+    ],
+    "tags": [
+      "turbo_small",
+      "dsg_or_dct_optional"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 4,
+      "parts_cost_index_1_5": 2,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "risk_patterns": [
+      {
+        "topic": "Turbo/yağ bakımı hassasiyeti",
+        "severity": "orta",
+        "trigger": "uzun yağ değişim aralığı, soğuk kullanım",
+        "check": "yağ tüketimi, turbo ıslık/ses, çekiş",
+        "cost_band": "orta"
+      }
+    ],
+    "big_maintenance_watchlist": [
+      {
+        "item": "PCV/yağ tüketimi takibi",
+        "when": "100.000 km+",
+        "note": "yağ seviyesi, duman, buji durumu"
+      }
+    ],
+    "inspection_checklist": [
+      "Motor yağ kaçağı, hararet geçmişi, soğutma sistemi",
+      "Şanzıman: geçiş vuruntusu, titreme, kaçak",
+      "Yürüyen: amortisör, salıncak, aks körüğü, direksiyon kutusu",
+      "Tramer-kaporta: şasi/podye kontrolü, boya ölçümü",
+      "Elektronik: park sensörü, multimedya, klima paneli"
+    ],
+    "disclaimer": "Bu girişler model bazlı kesin arıza iddiası değil; TR ikinci el piyasasında güç-aktarma/segment/tags temelli 'risk paterni' şablonlarıdır. Satın alma kararı için ekspertiz ve OBD şart."
+  },
+  {
+    "key": "skoda octavia",
+    "make": "skoda",
+    "segment": "C_SEDAN",
+    "aliases": [
+      "octavia"
+    ],
+    "tags": [
+      "turbo_small",
+      "dsg_or_dct_optional",
+      "diesel_common"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 4,
+      "parts_cost_index_1_5": 2,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "risk_patterns": [
+      {
+        "topic": "Turbo/yağ bakımı hassasiyeti",
+        "severity": "orta",
+        "trigger": "uzun yağ değişim aralığı, soğuk kullanım",
+        "check": "yağ tüketimi, turbo ıslık/ses, çekiş",
+        "cost_band": "orta"
+      }
+    ],
+    "big_maintenance_watchlist": [
+      {
+        "item": "PCV/yağ tüketimi takibi",
+        "when": "100.000 km+",
+        "note": "yağ seviyesi, duman, buji durumu"
+      }
+    ],
+    "inspection_checklist": [
+      "Motor yağ kaçağı, hararet geçmişi, soğutma sistemi",
+      "Şanzıman: geçiş vuruntusu, titreme, kaçak",
+      "Yürüyen: amortisör, salıncak, aks körüğü, direksiyon kutusu",
+      "Tramer-kaporta: şasi/podye kontrolü, boya ölçümü",
+      "Elektronik: park sensörü, multimedya, klima paneli"
+    ],
+    "disclaimer": "Bu girişler model bazlı kesin arıza iddiası değil; TR ikinci el piyasasında güç-aktarma/segment/tags temelli 'risk paterni' şablonlarıdır. Satın alma kararı için ekspertiz ve OBD şart."
+  },
+  {
+    "key": "peugeot 308",
+    "make": "peugeot",
+    "segment": "C_HATCH",
+    "aliases": [
+      "308"
+    ],
+    "tags": [
+      "turbo_small",
+      "auto_optional",
+      "diesel_common"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 4,
+      "parts_cost_index_1_5": 2,
+      "service_network_index_1_5": 4,
+      "resale_liquidity_score_1_5": 3
+    },
+    "risk_patterns": [
+      {
+        "topic": "Turbo/yağ bakımı hassasiyeti",
+        "severity": "orta",
+        "trigger": "uzun yağ değişim aralığı, soğuk kullanım",
+        "check": "yağ tüketimi, turbo ıslık/ses, çekiş",
+        "cost_band": "orta"
+      }
+    ],
+    "big_maintenance_watchlist": [
+      {
+        "item": "PCV/yağ tüketimi takibi",
+        "when": "100.000 km+",
+        "note": "yağ seviyesi, duman, buji durumu"
+      }
+    ],
+    "inspection_checklist": [
+      "Motor yağ kaçağı, hararet geçmişi, soğutma sistemi",
+      "Şanzıman: geçiş vuruntusu, titreme, kaçak",
+      "Yürüyen: amortisör, salıncak, aks körüğü, direksiyon kutusu",
+      "Tramer-kaporta: şasi/podye kontrolü, boya ölçümü",
+      "Elektronik: park sensörü, multimedya, klima paneli"
+    ],
+    "disclaimer": "Bu girişler model bazlı kesin arıza iddiası değil; TR ikinci el piyasasında güç-aktarma/segment/tags temelli 'risk paterni' şablonlarıdır. Satın alma kararı için ekspertiz ve OBD şart."
+  },
+  {
+    "key": "hyundai elantra",
+    "make": "hyundai",
+    "segment": "C_SEDAN",
+    "aliases": [
+      "elantra"
+    ],
+    "tags": [
+      "auto_optional"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 4,
+      "parts_cost_index_1_5": 2,
+      "service_network_index_1_5": 4,
+      "resale_liquidity_score_1_5": 3
+    },
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [
+      "Motor yağ kaçağı, hararet geçmişi, soğutma sistemi",
+      "Şanzıman: geçiş vuruntusu, titreme, kaçak",
+      "Yürüyen: amortisör, salıncak, aks körüğü, direksiyon kutusu",
+      "Tramer-kaporta: şasi/podye kontrolü, boya ölçümü",
+      "Elektronik: park sensörü, multimedya, klima paneli"
+    ],
+    "disclaimer": "Bu girişler model bazlı kesin arıza iddiası değil; TR ikinci el piyasasında güç-aktarma/segment/tags temelli 'risk paterni' şablonlarıdır. Satın alma kararı için ekspertiz ve OBD şart."
+  },
+  {
+    "key": "hyundai i30",
+    "make": "hyundai",
+    "segment": "C_HATCH",
+    "aliases": [
+      "i30"
+    ],
+    "tags": [
+      "turbo_small",
+      "dct_optional"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 4,
+      "parts_cost_index_1_5": 2,
+      "service_network_index_1_5": 4,
+      "resale_liquidity_score_1_5": 3
+    },
+    "risk_patterns": [
+      {
+        "topic": "Turbo/yağ bakımı hassasiyeti",
+        "severity": "orta",
+        "trigger": "uzun yağ değişim aralığı, soğuk kullanım",
+        "check": "yağ tüketimi, turbo ıslık/ses, çekiş",
+        "cost_band": "orta"
+      },
+      {
+        "topic": "DCT otomatik bakım hassasiyeti",
+        "severity": "orta",
+        "trigger": "bakım geçmişi belirsiz",
+        "check": "kalkış titreme, geri kaçırma, geçiş gecikmesi",
+        "cost_band": "orta-yüksek"
+      }
+    ],
+    "big_maintenance_watchlist": [
+      {
+        "item": "PCV/yağ tüketimi takibi",
+        "when": "100.000 km+",
+        "note": "yağ seviyesi, duman, buji durumu"
+      }
+    ],
+    "inspection_checklist": [
+      "Motor yağ kaçağı, hararet geçmişi, soğutma sistemi",
+      "Şanzıman: geçiş vuruntusu, titreme, kaçak",
+      "Yürüyen: amortisör, salıncak, aks körüğü, direksiyon kutusu",
+      "Tramer-kaporta: şasi/podye kontrolü, boya ölçümü",
+      "Elektronik: park sensörü, multimedya, klima paneli"
+    ],
+    "disclaimer": "Bu girişler model bazlı kesin arıza iddiası değil; TR ikinci el piyasasında güç-aktarma/segment/tags temelli 'risk paterni' şablonlarıdır. Satın alma kararı için ekspertiz ve OBD şart."
+  },
+  {
+    "key": "kia ceed",
+    "make": "kia",
+    "segment": "C_HATCH",
+    "aliases": [
+      "ceed",
+      "cee'd"
+    ],
+    "tags": [
+      "turbo_small",
+      "dct_optional"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 4,
+      "parts_cost_index_1_5": 2,
+      "service_network_index_1_5": 4,
+      "resale_liquidity_score_1_5": 3
+    },
+    "risk_patterns": [
+      {
+        "topic": "Turbo/yağ bakımı hassasiyeti",
+        "severity": "orta",
+        "trigger": "uzun yağ değişim aralığı, soğuk kullanım",
+        "check": "yağ tüketimi, turbo ıslık/ses, çekiş",
+        "cost_band": "orta"
+      },
+      {
+        "topic": "DCT otomatik bakım hassasiyeti",
+        "severity": "orta",
+        "trigger": "bakım geçmişi belirsiz",
+        "check": "kalkış titreme, geri kaçırma, geçiş gecikmesi",
+        "cost_band": "orta-yüksek"
+      }
+    ],
+    "big_maintenance_watchlist": [
+      {
+        "item": "PCV/yağ tüketimi takibi",
+        "when": "100.000 km+",
+        "note": "yağ seviyesi, duman, buji durumu"
+      }
+    ],
+    "inspection_checklist": [
+      "Motor yağ kaçağı, hararet geçmişi, soğutma sistemi",
+      "Şanzıman: geçiş vuruntusu, titreme, kaçak",
+      "Yürüyen: amortisör, salıncak, aks körüğü, direksiyon kutusu",
+      "Tramer-kaporta: şasi/podye kontrolü, boya ölçümü",
+      "Elektronik: park sensörü, multimedya, klima paneli"
+    ],
+    "disclaimer": "Bu girişler model bazlı kesin arıza iddiası değil; TR ikinci el piyasasında güç-aktarma/segment/tags temelli 'risk paterni' şablonlarıdır. Satın alma kararı için ekspertiz ve OBD şart."
+  },
+  {
+    "key": "mazda 3",
+    "make": "mazda",
+    "segment": "C_HATCH",
+    "aliases": [
+      "mazda3",
+      "mazda 3"
+    ],
+    "tags": [
+      "auto_optional"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 3,
+      "parts_cost_index_1_5": 3,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [
+      "Motor yağ kaçağı, hararet geçmişi, soğutma sistemi",
+      "Şanzıman: geçiş vuruntusu, titreme, kaçak",
+      "Yürüyen: amortisör, salıncak, aks körüğü, direksiyon kutusu",
+      "Tramer-kaporta: şasi/podye kontrolü, boya ölçümü",
+      "Elektronik: park sensörü, multimedya, klima paneli"
+    ],
+    "disclaimer": "Bu girişler model bazlı kesin arıza iddiası değil; TR ikinci el piyasasında güç-aktarma/segment/tags temelli 'risk paterni' şablonlarıdır. Satın alma kararı için ekspertiz ve OBD şart."
+  },
+  {
+    "key": "citroen c4x",
+    "make": "citroen",
+    "segment": "C_SEDAN",
+    "aliases": [
+      "c4x",
+      "c4 x"
+    ],
+    "tags": [
+      "turbo_small",
+      "auto_optional"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 4,
+      "parts_cost_index_1_5": 2,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "risk_patterns": [
+      {
+        "topic": "Turbo/yağ bakımı hassasiyeti",
+        "severity": "orta",
+        "trigger": "uzun yağ değişim aralığı, soğuk kullanım",
+        "check": "yağ tüketimi, turbo ıslık/ses, çekiş",
+        "cost_band": "orta"
+      }
+    ],
+    "big_maintenance_watchlist": [
+      {
+        "item": "PCV/yağ tüketimi takibi",
+        "when": "100.000 km+",
+        "note": "yağ seviyesi, duman, buji durumu"
+      }
+    ],
+    "inspection_checklist": [
+      "Motor yağ kaçağı, hararet geçmişi, soğutma sistemi",
+      "Şanzıman: geçiş vuruntusu, titreme, kaçak",
+      "Yürüyen: amortisör, salıncak, aks körüğü, direksiyon kutusu",
+      "Tramer-kaporta: şasi/podye kontrolü, boya ölçümü",
+      "Elektronik: park sensörü, multimedya, klima paneli"
+    ],
+    "disclaimer": "Bu girişler model bazlı kesin arıza iddiası değil; TR ikinci el piyasasında güç-aktarma/segment/tags temelli 'risk paterni' şablonlarıdır. Satın alma kararı için ekspertiz ve OBD şart."
+  },
+  {
+    "key": "citroen c4",
+    "make": "citroen",
+    "segment": "C_HATCH",
+    "aliases": [
+      "c4"
+    ],
+    "tags": [
+      "turbo_small",
+      "auto_optional"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 4,
+      "parts_cost_index_1_5": 2,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "risk_patterns": [
+      {
+        "topic": "Turbo/yağ bakımı hassasiyeti",
+        "severity": "orta",
+        "trigger": "uzun yağ değişim aralığı, soğuk kullanım",
+        "check": "yağ tüketimi, turbo ıslık/ses, çekiş",
+        "cost_band": "orta"
+      }
+    ],
+    "big_maintenance_watchlist": [
+      {
+        "item": "PCV/yağ tüketimi takibi",
+        "when": "100.000 km+",
+        "note": "yağ seviyesi, duman, buji durumu"
+      }
+    ],
+    "inspection_checklist": [
+      "Motor yağ kaçağı, hararet geçmişi, soğutma sistemi",
+      "Şanzıman: geçiş vuruntusu, titreme, kaçak",
+      "Yürüyen: amortisör, salıncak, aks körüğü, direksiyon kutusu",
+      "Tramer-kaporta: şasi/podye kontrolü, boya ölçümü",
+      "Elektronik: park sensörü, multimedya, klima paneli"
+    ],
+    "disclaimer": "Bu girişler model bazlı kesin arıza iddiası değil; TR ikinci el piyasasında güç-aktarma/segment/tags temelli 'risk paterni' şablonlarıdır. Satın alma kararı için ekspertiz ve OBD şart."
+  },
+  {
+    "key": "toyota auris",
+    "make": "toyota",
+    "segment": "C_HATCH",
+    "aliases": [
+      "auris"
+    ],
+    "tags": [
+      "hybrid_common"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 4,
+      "parts_cost_index_1_5": 2,
+      "service_network_index_1_5": 5,
+      "resale_liquidity_score_1_5": 4
+    },
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [
+      "Motor yağ kaçağı, hararet geçmişi, soğutma sistemi",
+      "Şanzıman: geçiş vuruntusu, titreme, kaçak",
+      "Yürüyen: amortisör, salıncak, aks körüğü, direksiyon kutusu",
+      "Tramer-kaporta: şasi/podye kontrolü, boya ölçümü",
+      "Elektronik: park sensörü, multimedya, klima paneli"
+    ],
+    "disclaimer": "Bu girişler model bazlı kesin arıza iddiası değil; TR ikinci el piyasasında güç-aktarma/segment/tags temelli 'risk paterni' şablonlarıdır. Satın alma kararı için ekspertiz ve OBD şart."
+  },
+  {
+    "key": "renault captur",
+    "make": "renault",
+    "segment": "B_SUV",
+    "aliases": [
+      "captur"
+    ],
+    "tags": [
+      "turbo_small",
+      "auto_optional"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 4,
+      "parts_cost_index_1_5": 2,
+      "service_network_index_1_5": 5,
+      "resale_liquidity_score_1_5": 3
+    },
+    "risk_patterns": [
+      {
+        "topic": "Turbo/yağ bakımı hassasiyeti",
+        "severity": "orta",
+        "trigger": "uzun yağ değişim aralığı, soğuk kullanım",
+        "check": "yağ tüketimi, turbo ıslık/ses, çekiş",
+        "cost_band": "orta"
+      }
+    ],
+    "big_maintenance_watchlist": [
+      {
+        "item": "PCV/yağ tüketimi takibi",
+        "when": "100.000 km+",
+        "note": "yağ seviyesi, duman, buji durumu"
+      }
+    ],
+    "inspection_checklist": [
+      "Motor yağ kaçağı, hararet geçmişi, soğutma sistemi",
+      "Şanzıman: geçiş vuruntusu, titreme, kaçak",
+      "Yürüyen: amortisör, salıncak, aks körüğü, direksiyon kutusu",
+      "Tramer-kaporta: şasi/podye kontrolü, boya ölçümü",
+      "Elektronik: park sensörü, multimedya, klima paneli"
+    ],
+    "disclaimer": "Bu girişler model bazlı kesin arıza iddiası değil; TR ikinci el piyasasında güç-aktarma/segment/tags temelli 'risk paterni' şablonlarıdır. Satın alma kararı için ekspertiz ve OBD şart."
+  },
+  {
+    "key": "ford puma",
+    "make": "ford",
+    "segment": "B_SUV",
+    "aliases": [
+      "puma"
+    ],
+    "tags": [
+      "turbo_small",
+      "auto_optional"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 4,
+      "parts_cost_index_1_5": 2,
+      "service_network_index_1_5": 4,
+      "resale_liquidity_score_1_5": 3
+    },
+    "risk_patterns": [
+      {
+        "topic": "Turbo/yağ bakımı hassasiyeti",
+        "severity": "orta",
+        "trigger": "uzun yağ değişim aralığı, soğuk kullanım",
+        "check": "yağ tüketimi, turbo ıslık/ses, çekiş",
+        "cost_band": "orta"
+      }
+    ],
+    "big_maintenance_watchlist": [
+      {
+        "item": "PCV/yağ tüketimi takibi",
+        "when": "100.000 km+",
+        "note": "yağ seviyesi, duman, buji durumu"
+      }
+    ],
+    "inspection_checklist": [
+      "Motor yağ kaçağı, hararet geçmişi, soğutma sistemi",
+      "Şanzıman: geçiş vuruntusu, titreme, kaçak",
+      "Yürüyen: amortisör, salıncak, aks körüğü, direksiyon kutusu",
+      "Tramer-kaporta: şasi/podye kontrolü, boya ölçümü",
+      "Elektronik: park sensörü, multimedya, klima paneli"
+    ],
+    "disclaimer": "Bu girişler model bazlı kesin arıza iddiası değil; TR ikinci el piyasasında güç-aktarma/segment/tags temelli 'risk paterni' şablonlarıdır. Satın alma kararı için ekspertiz ve OBD şart."
+  },
+  {
+    "key": "peugeot 2008",
+    "make": "peugeot",
+    "segment": "B_SUV",
+    "aliases": [
+      "2008"
+    ],
+    "tags": [
+      "turbo_small",
+      "auto_optional"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 4,
+      "parts_cost_index_1_5": 2,
+      "service_network_index_1_5": 4,
+      "resale_liquidity_score_1_5": 3
+    },
+    "risk_patterns": [
+      {
+        "topic": "Turbo/yağ bakımı hassasiyeti",
+        "severity": "orta",
+        "trigger": "uzun yağ değişim aralığı, soğuk kullanım",
+        "check": "yağ tüketimi, turbo ıslık/ses, çekiş",
+        "cost_band": "orta"
+      }
+    ],
+    "big_maintenance_watchlist": [
+      {
+        "item": "PCV/yağ tüketimi takibi",
+        "when": "100.000 km+",
+        "note": "yağ seviyesi, duman, buji durumu"
+      }
+    ],
+    "inspection_checklist": [
+      "Motor yağ kaçağı, hararet geçmişi, soğutma sistemi",
+      "Şanzıman: geçiş vuruntusu, titreme, kaçak",
+      "Yürüyen: amortisör, salıncak, aks körüğü, direksiyon kutusu",
+      "Tramer-kaporta: şasi/podye kontrolü, boya ölçümü",
+      "Elektronik: park sensörü, multimedya, klima paneli"
+    ],
+    "disclaimer": "Bu girişler model bazlı kesin arıza iddiası değil; TR ikinci el piyasasında güç-aktarma/segment/tags temelli 'risk paterni' şablonlarıdır. Satın alma kararı için ekspertiz ve OBD şart."
+  },
+  {
+    "key": "vw t-cross",
+    "make": "vw",
+    "segment": "B_SUV",
+    "aliases": [
+      "t-cross",
+      "tcross"
+    ],
+    "tags": [
+      "turbo_small",
+      "dsg_or_dct_optional"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 4,
+      "parts_cost_index_1_5": 2,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "risk_patterns": [
+      {
+        "topic": "Turbo/yağ bakımı hassasiyeti",
+        "severity": "orta",
+        "trigger": "uzun yağ değişim aralığı, soğuk kullanım",
+        "check": "yağ tüketimi, turbo ıslık/ses, çekiş",
+        "cost_band": "orta"
+      }
+    ],
+    "big_maintenance_watchlist": [
+      {
+        "item": "PCV/yağ tüketimi takibi",
+        "when": "100.000 km+",
+        "note": "yağ seviyesi, duman, buji durumu"
+      }
+    ],
+    "inspection_checklist": [
+      "Motor yağ kaçağı, hararet geçmişi, soğutma sistemi",
+      "Şanzıman: geçiş vuruntusu, titreme, kaçak",
+      "Yürüyen: amortisör, salıncak, aks körüğü, direksiyon kutusu",
+      "Tramer-kaporta: şasi/podye kontrolü, boya ölçümü",
+      "Elektronik: park sensörü, multimedya, klima paneli"
+    ],
+    "disclaimer": "Bu girişler model bazlı kesin arıza iddiası değil; TR ikinci el piyasasında güç-aktarma/segment/tags temelli 'risk paterni' şablonlarıdır. Satın alma kararı için ekspertiz ve OBD şart."
+  },
+  {
+    "key": "vw taigo",
+    "make": "vw",
+    "segment": "B_SUV",
+    "aliases": [
+      "taigo"
+    ],
+    "tags": [
+      "turbo_small",
+      "dsg_or_dct_optional"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 4,
+      "parts_cost_index_1_5": 2,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 4
+    },
+    "risk_patterns": [
+      {
+        "topic": "Turbo/yağ bakımı hassasiyeti",
+        "severity": "orta",
+        "trigger": "uzun yağ değişim aralığı, soğuk kullanım",
+        "check": "yağ tüketimi, turbo ıslık/ses, çekiş",
+        "cost_band": "orta"
+      }
+    ],
+    "big_maintenance_watchlist": [
+      {
+        "item": "PCV/yağ tüketimi takibi",
+        "when": "100.000 km+",
+        "note": "yağ seviyesi, duman, buji durumu"
+      }
+    ],
+    "inspection_checklist": [
+      "Motor yağ kaçağı, hararet geçmişi, soğutma sistemi",
+      "Şanzıman: geçiş vuruntusu, titreme, kaçak",
+      "Yürüyen: amortisör, salıncak, aks körüğü, direksiyon kutusu",
+      "Tramer-kaporta: şasi/podye kontrolü, boya ölçümü",
+      "Elektronik: park sensörü, multimedya, klima paneli"
+    ],
+    "disclaimer": "Bu girişler model bazlı kesin arıza iddiası değil; TR ikinci el piyasasında güç-aktarma/segment/tags temelli 'risk paterni' şablonlarıdır. Satın alma kararı için ekspertiz ve OBD şart."
+  },
+  {
+    "key": "hyundai bayon",
+    "make": "hyundai",
+    "segment": "B_SUV",
+    "aliases": [
+      "bayon"
+    ],
+    "tags": [
+      "turbo_small",
+      "auto_optional"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 4,
+      "parts_cost_index_1_5": 2,
+      "service_network_index_1_5": 4,
+      "resale_liquidity_score_1_5": 3
+    },
+    "risk_patterns": [
+      {
+        "topic": "Turbo/yağ bakımı hassasiyeti",
+        "severity": "orta",
+        "trigger": "uzun yağ değişim aralığı, soğuk kullanım",
+        "check": "yağ tüketimi, turbo ıslık/ses, çekiş",
+        "cost_band": "orta"
+      }
+    ],
+    "big_maintenance_watchlist": [
+      {
+        "item": "PCV/yağ tüketimi takibi",
+        "when": "100.000 km+",
+        "note": "yağ seviyesi, duman, buji durumu"
+      }
+    ],
+    "inspection_checklist": [
+      "Motor yağ kaçağı, hararet geçmişi, soğutma sistemi",
+      "Şanzıman: geçiş vuruntusu, titreme, kaçak",
+      "Yürüyen: amortisör, salıncak, aks körüğü, direksiyon kutusu",
+      "Tramer-kaporta: şasi/podye kontrolü, boya ölçümü",
+      "Elektronik: park sensörü, multimedya, klima paneli"
+    ],
+    "disclaimer": "Bu girişler model bazlı kesin arıza iddiası değil; TR ikinci el piyasasında güç-aktarma/segment/tags temelli 'risk paterni' şablonlarıdır. Satın alma kararı için ekspertiz ve OBD şart."
+  },
+  {
+    "key": "skoda kamiq",
+    "make": "skoda",
+    "segment": "B_SUV",
+    "aliases": [
+      "kamiq"
+    ],
+    "tags": [
+      "turbo_small",
+      "dsg_or_dct_optional"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 4,
+      "parts_cost_index_1_5": 2,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "risk_patterns": [
+      {
+        "topic": "Turbo/yağ bakımı hassasiyeti",
+        "severity": "orta",
+        "trigger": "uzun yağ değişim aralığı, soğuk kullanım",
+        "check": "yağ tüketimi, turbo ıslık/ses, çekiş",
+        "cost_band": "orta"
+      }
+    ],
+    "big_maintenance_watchlist": [
+      {
+        "item": "PCV/yağ tüketimi takibi",
+        "when": "100.000 km+",
+        "note": "yağ seviyesi, duman, buji durumu"
+      }
+    ],
+    "inspection_checklist": [
+      "Motor yağ kaçağı, hararet geçmişi, soğutma sistemi",
+      "Şanzıman: geçiş vuruntusu, titreme, kaçak",
+      "Yürüyen: amortisör, salıncak, aks körüğü, direksiyon kutusu",
+      "Tramer-kaporta: şasi/podye kontrolü, boya ölçümü",
+      "Elektronik: park sensörü, multimedya, klima paneli"
+    ],
+    "disclaimer": "Bu girişler model bazlı kesin arıza iddiası değil; TR ikinci el piyasasında güç-aktarma/segment/tags temelli 'risk paterni' şablonlarıdır. Satın alma kararı için ekspertiz ve OBD şart."
+  },
+  {
+    "key": "seat arona",
+    "make": "seat",
+    "segment": "B_SUV",
+    "aliases": [
+      "arona"
+    ],
+    "tags": [
+      "turbo_small",
+      "dsg_or_dct_optional"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 4,
+      "parts_cost_index_1_5": 2,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "risk_patterns": [
+      {
+        "topic": "Turbo/yağ bakımı hassasiyeti",
+        "severity": "orta",
+        "trigger": "uzun yağ değişim aralığı, soğuk kullanım",
+        "check": "yağ tüketimi, turbo ıslık/ses, çekiş",
+        "cost_band": "orta"
+      }
+    ],
+    "big_maintenance_watchlist": [
+      {
+        "item": "PCV/yağ tüketimi takibi",
+        "when": "100.000 km+",
+        "note": "yağ seviyesi, duman, buji durumu"
+      }
+    ],
+    "inspection_checklist": [
+      "Motor yağ kaçağı, hararet geçmişi, soğutma sistemi",
+      "Şanzıman: geçiş vuruntusu, titreme, kaçak",
+      "Yürüyen: amortisör, salıncak, aks körüğü, direksiyon kutusu",
+      "Tramer-kaporta: şasi/podye kontrolü, boya ölçümü",
+      "Elektronik: park sensörü, multimedya, klima paneli"
+    ],
+    "disclaimer": "Bu girişler model bazlı kesin arıza iddiası değil; TR ikinci el piyasasında güç-aktarma/segment/tags temelli 'risk paterni' şablonlarıdır. Satın alma kararı için ekspertiz ve OBD şart."
+  },
+  {
+    "key": "nissan juke",
+    "make": "nissan",
+    "segment": "B_SUV",
+    "aliases": [
+      "juke"
+    ],
+    "tags": [
+      "turbo_small",
+      "cvt_optional"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 3,
+      "parts_cost_index_1_5": 3,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "risk_patterns": [
+      {
+        "topic": "Turbo/yağ bakımı hassasiyeti",
+        "severity": "orta",
+        "trigger": "uzun yağ değişim aralığı, soğuk kullanım",
+        "check": "yağ tüketimi, turbo ıslık/ses, çekiş",
+        "cost_band": "orta"
+      }
+    ],
+    "big_maintenance_watchlist": [
+      {
+        "item": "PCV/yağ tüketimi takibi",
+        "when": "100.000 km+",
+        "note": "yağ seviyesi, duman, buji durumu"
+      }
+    ],
+    "inspection_checklist": [
+      "Motor yağ kaçağı, hararet geçmişi, soğutma sistemi",
+      "Şanzıman: geçiş vuruntusu, titreme, kaçak",
+      "Yürüyen: amortisör, salıncak, aks körüğü, direksiyon kutusu",
+      "Tramer-kaporta: şasi/podye kontrolü, boya ölçümü",
+      "Elektronik: park sensörü, multimedya, klima paneli"
+    ],
+    "disclaimer": "Bu girişler model bazlı kesin arıza iddiası değil; TR ikinci el piyasasında güç-aktarma/segment/tags temelli 'risk paterni' şablonlarıdır. Satın alma kararı için ekspertiz ve OBD şart."
+  },
+  {
+    "key": "dacia duster",
+    "make": "dacia",
+    "segment": "C_SUV",
+    "aliases": [
+      "duster"
+    ],
+    "tags": [
+      "diesel_common",
+      "awd_optional"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 5,
+      "parts_cost_index_1_5": 2,
+      "service_network_index_1_5": 5,
+      "resale_liquidity_score_1_5": 4
+    },
+    "risk_patterns": [
+      {
+        "topic": "4x4 aktarma bakımı",
+        "severity": "orta",
+        "trigger": "yağ değişimleri ihmal",
+        "check": "dönüşte ses, titreşim, kaçak",
+        "cost_band": "orta"
+      }
+    ],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [
+      "Alt takım + fren/lastik (SUV’da daha hızlı yıpranır)",
+      "Direksiyon, amortisör, salıncak; bozuk yolda ses/titreşim",
+      "Şanzıman (otomatik/CVT/DCT) ısınınca davranış",
+      "4x4 varsa aktarma ve yağ kaçakları",
+      "Kaporta: tavan/kapı altı/alt şase darbeleri"
+    ],
+    "disclaimer": "Bu girişler model bazlı kesin arıza iddiası değil; TR ikinci el piyasasında güç-aktarma/segment/tags temelli 'risk paterni' şablonlarıdır. Satın alma kararı için ekspertiz ve OBD şart."
+  },
+  {
+    "key": "nissan qashqai",
+    "make": "nissan",
+    "segment": "C_SUV",
+    "aliases": [
+      "qashqai",
+      "kaşkay"
+    ],
+    "tags": [
+      "cvt_optional",
+      "diesel_common",
+      "hybrid_common"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 3,
+      "parts_cost_index_1_5": 3,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 4
+    },
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [
+      "Alt takım + fren/lastik (SUV’da daha hızlı yıpranır)",
+      "Direksiyon, amortisör, salıncak; bozuk yolda ses/titreşim",
+      "Şanzıman (otomatik/CVT/DCT) ısınınca davranış",
+      "4x4 varsa aktarma ve yağ kaçakları",
+      "Kaporta: tavan/kapı altı/alt şase darbeleri"
+    ],
+    "disclaimer": "Bu girişler model bazlı kesin arıza iddiası değil; TR ikinci el piyasasında güç-aktarma/segment/tags temelli 'risk paterni' şablonlarıdır. Satın alma kararı için ekspertiz ve OBD şart."
+  },
+  {
+    "key": "hyundai tucson",
+    "make": "hyundai",
+    "segment": "C_SUV",
+    "aliases": [
+      "tucson"
+    ],
+    "tags": [
+      "diesel_common",
+      "hybrid_common",
+      "auto_optional"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 4,
+      "parts_cost_index_1_5": 2,
+      "service_network_index_1_5": 4,
+      "resale_liquidity_score_1_5": 3
+    },
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [
+      "Alt takım + fren/lastik (SUV’da daha hızlı yıpranır)",
+      "Direksiyon, amortisör, salıncak; bozuk yolda ses/titreşim",
+      "Şanzıman (otomatik/CVT/DCT) ısınınca davranış",
+      "4x4 varsa aktarma ve yağ kaçakları",
+      "Kaporta: tavan/kapı altı/alt şase darbeleri"
+    ],
+    "disclaimer": "Bu girişler model bazlı kesin arıza iddiası değil; TR ikinci el piyasasında güç-aktarma/segment/tags temelli 'risk paterni' şablonlarıdır. Satın alma kararı için ekspertiz ve OBD şart."
+  },
+  {
+    "key": "kia sportage",
+    "make": "kia",
+    "segment": "C_SUV",
+    "aliases": [
+      "sportage"
+    ],
+    "tags": [
+      "diesel_common",
+      "hybrid_common",
+      "auto_optional"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 3,
+      "parts_cost_index_1_5": 2,
+      "service_network_index_1_5": 4,
+      "resale_liquidity_score_1_5": 3
+    },
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [
+      "Alt takım + fren/lastik (SUV’da daha hızlı yıpranır)",
+      "Direksiyon, amortisör, salıncak; bozuk yolda ses/titreşim",
+      "Şanzıman (otomatik/CVT/DCT) ısınınca davranış",
+      "4x4 varsa aktarma ve yağ kaçakları",
+      "Kaporta: tavan/kapı altı/alt şase darbeleri"
+    ],
+    "disclaimer": "Bu girişler model bazlı kesin arıza iddiası değil; TR ikinci el piyasasında güç-aktarma/segment/tags temelli 'risk paterni' şablonlarıdır. Satın alma kararı için ekspertiz ve OBD şart."
+  },
+  {
+    "key": "peugeot 3008",
+    "make": "peugeot",
+    "segment": "C_SUV",
+    "aliases": [
+      "3008"
+    ],
+    "tags": [
+      "diesel_common",
+      "auto_optional",
+      "turbo_small"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 3,
+      "parts_cost_index_1_5": 3,
+      "service_network_index_1_5": 4,
+      "resale_liquidity_score_1_5": 3
+    },
+    "risk_patterns": [
+      {
+        "topic": "Turbo/yağ bakımı hassasiyeti",
+        "severity": "orta",
+        "trigger": "uzun yağ değişim aralığı, soğuk kullanım",
+        "check": "yağ tüketimi, turbo ıslık/ses, çekiş",
+        "cost_band": "orta"
+      }
+    ],
+    "big_maintenance_watchlist": [
+      {
+        "item": "PCV/yağ tüketimi takibi",
+        "when": "100.000 km+",
+        "note": "yağ seviyesi, duman, buji durumu"
+      }
+    ],
+    "inspection_checklist": [
+      "Alt takım + fren/lastik (SUV’da daha hızlı yıpranır)",
+      "Direksiyon, amortisör, salıncak; bozuk yolda ses/titreşim",
+      "Şanzıman (otomatik/CVT/DCT) ısınınca davranış",
+      "4x4 varsa aktarma ve yağ kaçakları",
+      "Kaporta: tavan/kapı altı/alt şase darbeleri"
+    ],
+    "disclaimer": "Bu girişler model bazlı kesin arıza iddiası değil; TR ikinci el piyasasında güç-aktarma/segment/tags temelli 'risk paterni' şablonlarıdır. Satın alma kararı için ekspertiz ve OBD şart."
+  },
+  {
+    "key": "peugeot 5008",
+    "make": "peugeot",
+    "segment": "D_SUV",
+    "aliases": [
+      "5008"
+    ],
+    "tags": [
+      "diesel_common",
+      "auto_optional"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 3,
+      "parts_cost_index_1_5": 3,
+      "service_network_index_1_5": 4,
+      "resale_liquidity_score_1_5": 3
+    },
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [
+      "Motor yağ kaçağı, hararet geçmişi, soğutma sistemi",
+      "Şanzıman: geçiş vuruntusu, titreme, kaçak",
+      "Yürüyen: amortisör, salıncak, aks körüğü, direksiyon kutusu",
+      "Tramer-kaporta: şasi/podye kontrolü, boya ölçümü",
+      "Elektronik: park sensörü, multimedya, klima paneli"
+    ],
+    "disclaimer": "Bu girişler model bazlı kesin arıza iddiası değil; TR ikinci el piyasasında güç-aktarma/segment/tags temelli 'risk paterni' şablonlarıdır. Satın alma kararı için ekspertiz ve OBD şart."
+  },
+  {
+    "key": "vw t-roc",
+    "make": "vw",
+    "segment": "C_SUV",
+    "aliases": [
+      "t-roc",
+      "troc"
+    ],
+    "tags": [
+      "turbo_small",
+      "dsg_or_dct_optional"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 4,
+      "parts_cost_index_1_5": 2,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 4
+    },
+    "risk_patterns": [
+      {
+        "topic": "Turbo/yağ bakımı hassasiyeti",
+        "severity": "orta",
+        "trigger": "uzun yağ değişim aralığı, soğuk kullanım",
+        "check": "yağ tüketimi, turbo ıslık/ses, çekiş",
+        "cost_band": "orta"
+      }
+    ],
+    "big_maintenance_watchlist": [
+      {
+        "item": "PCV/yağ tüketimi takibi",
+        "when": "100.000 km+",
+        "note": "yağ seviyesi, duman, buji durumu"
+      }
+    ],
+    "inspection_checklist": [
+      "Alt takım + fren/lastik (SUV’da daha hızlı yıpranır)",
+      "Direksiyon, amortisör, salıncak; bozuk yolda ses/titreşim",
+      "Şanzıman (otomatik/CVT/DCT) ısınınca davranış",
+      "4x4 varsa aktarma ve yağ kaçakları",
+      "Kaporta: tavan/kapı altı/alt şase darbeleri"
+    ],
+    "disclaimer": "Bu girişler model bazlı kesin arıza iddiası değil; TR ikinci el piyasasında güç-aktarma/segment/tags temelli 'risk paterni' şablonlarıdır. Satın alma kararı için ekspertiz ve OBD şart."
+  },
+  {
+    "key": "vw tiguan",
+    "make": "vw",
+    "segment": "D_SUV",
+    "aliases": [
+      "tiguan"
+    ],
+    "tags": [
+      "turbo_small",
+      "dsg_or_dct_optional",
+      "diesel_common",
+      "awd_optional"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 4,
+      "parts_cost_index_1_5": 2,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "risk_patterns": [
+      {
+        "topic": "Turbo/yağ bakımı hassasiyeti",
+        "severity": "orta",
+        "trigger": "uzun yağ değişim aralığı, soğuk kullanım",
+        "check": "yağ tüketimi, turbo ıslık/ses, çekiş",
+        "cost_band": "orta"
+      },
+      {
+        "topic": "4x4 aktarma bakımı",
+        "severity": "orta",
+        "trigger": "yağ değişimleri ihmal",
+        "check": "dönüşte ses, titreşim, kaçak",
+        "cost_band": "orta"
+      }
+    ],
+    "big_maintenance_watchlist": [
+      {
+        "item": "PCV/yağ tüketimi takibi",
+        "when": "100.000 km+",
+        "note": "yağ seviyesi, duman, buji durumu"
+      }
+    ],
+    "inspection_checklist": [
+      "Motor yağ kaçağı, hararet geçmişi, soğutma sistemi",
+      "Şanzıman: geçiş vuruntusu, titreme, kaçak",
+      "Yürüyen: amortisör, salıncak, aks körüğü, direksiyon kutusu",
+      "Tramer-kaporta: şasi/podye kontrolü, boya ölçümü",
+      "Elektronik: park sensörü, multimedya, klima paneli"
+    ],
+    "disclaimer": "Bu girişler model bazlı kesin arıza iddiası değil; TR ikinci el piyasasında güç-aktarma/segment/tags temelli 'risk paterni' şablonlarıdır. Satın alma kararı için ekspertiz ve OBD şart."
+  },
+  {
+    "key": "ford kuga",
+    "make": "ford",
+    "segment": "C_SUV",
+    "aliases": [
+      "kuga"
+    ],
+    "tags": [
+      "diesel_common",
+      "hybrid_common",
+      "auto_optional"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 4,
+      "parts_cost_index_1_5": 2,
+      "service_network_index_1_5": 4,
+      "resale_liquidity_score_1_5": 3
+    },
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [
+      "Alt takım + fren/lastik (SUV’da daha hızlı yıpranır)",
+      "Direksiyon, amortisör, salıncak; bozuk yolda ses/titreşim",
+      "Şanzıman (otomatik/CVT/DCT) ısınınca davranış",
+      "4x4 varsa aktarma ve yağ kaçakları",
+      "Kaporta: tavan/kapı altı/alt şase darbeleri"
+    ],
+    "disclaimer": "Bu girişler model bazlı kesin arıza iddiası değil; TR ikinci el piyasasında güç-aktarma/segment/tags temelli 'risk paterni' şablonlarıdır. Satın alma kararı için ekspertiz ve OBD şart."
+  },
+  {
+    "key": "opel mokka",
+    "make": "opel",
+    "segment": "B_SUV",
+    "aliases": [
+      "mokka"
+    ],
+    "tags": [
+      "turbo_small",
+      "auto_optional",
+      "electric_optional"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 3,
+      "parts_cost_index_1_5": 3,
+      "service_network_index_1_5": 4,
+      "resale_liquidity_score_1_5": 3
+    },
+    "risk_patterns": [
+      {
+        "topic": "Turbo/yağ bakımı hassasiyeti",
+        "severity": "orta",
+        "trigger": "uzun yağ değişim aralığı, soğuk kullanım",
+        "check": "yağ tüketimi, turbo ıslık/ses, çekiş",
+        "cost_band": "orta"
+      }
+    ],
+    "big_maintenance_watchlist": [
+      {
+        "item": "PCV/yağ tüketimi takibi",
+        "when": "100.000 km+",
+        "note": "yağ seviyesi, duman, buji durumu"
+      }
+    ],
+    "inspection_checklist": [
+      "Motor yağ kaçağı, hararet geçmişi, soğutma sistemi",
+      "Şanzıman: geçiş vuruntusu, titreme, kaçak",
+      "Yürüyen: amortisör, salıncak, aks körüğü, direksiyon kutusu",
+      "Tramer-kaporta: şasi/podye kontrolü, boya ölçümü",
+      "Elektronik: park sensörü, multimedya, klima paneli"
+    ],
+    "disclaimer": "Bu girişler model bazlı kesin arıza iddiası değil; TR ikinci el piyasasında güç-aktarma/segment/tags temelli 'risk paterni' şablonlarıdır. Satın alma kararı için ekspertiz ve OBD şart."
+  },
+  {
+    "key": "opel grandland",
+    "make": "opel",
+    "segment": "C_SUV",
+    "aliases": [
+      "grandland",
+      "grandland x"
+    ],
+    "tags": [
+      "diesel_common",
+      "auto_optional"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 3,
+      "parts_cost_index_1_5": 3,
+      "service_network_index_1_5": 4,
+      "resale_liquidity_score_1_5": 3
+    },
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [
+      "Alt takım + fren/lastik (SUV’da daha hızlı yıpranır)",
+      "Direksiyon, amortisör, salıncak; bozuk yolda ses/titreşim",
+      "Şanzıman (otomatik/CVT/DCT) ısınınca davranış",
+      "4x4 varsa aktarma ve yağ kaçakları",
+      "Kaporta: tavan/kapı altı/alt şase darbeleri"
+    ],
+    "disclaimer": "Bu girişler model bazlı kesin arıza iddiası değil; TR ikinci el piyasasında güç-aktarma/segment/tags temelli 'risk paterni' şablonlarıdır. Satın alma kararı için ekspertiz ve OBD şart."
+  },
+  {
+    "key": "citroen c5 aircross",
+    "make": "citroen",
+    "segment": "C_SUV",
+    "aliases": [
+      "c5 aircross"
+    ],
+    "tags": [
+      "diesel_common",
+      "auto_optional"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 3,
+      "parts_cost_index_1_5": 3,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [
+      "Alt takım + fren/lastik (SUV’da daha hızlı yıpranır)",
+      "Direksiyon, amortisör, salıncak; bozuk yolda ses/titreşim",
+      "Şanzıman (otomatik/CVT/DCT) ısınınca davranış",
+      "4x4 varsa aktarma ve yağ kaçakları",
+      "Kaporta: tavan/kapı altı/alt şase darbeleri"
+    ],
+    "disclaimer": "Bu girişler model bazlı kesin arıza iddiası değil; TR ikinci el piyasasında güç-aktarma/segment/tags temelli 'risk paterni' şablonlarıdır. Satın alma kararı için ekspertiz ve OBD şart."
+  },
+  {
+    "key": "toyota c-hr",
+    "make": "toyota",
+    "segment": "C_SUV",
+    "aliases": [
+      "c-hr",
+      "chr"
+    ],
+    "tags": [
+      "hybrid_common"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 4,
+      "parts_cost_index_1_5": 2,
+      "service_network_index_1_5": 5,
+      "resale_liquidity_score_1_5": 4
+    },
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [
+      "Alt takım + fren/lastik (SUV’da daha hızlı yıpranır)",
+      "Direksiyon, amortisör, salıncak; bozuk yolda ses/titreşim",
+      "Şanzıman (otomatik/CVT/DCT) ısınınca davranış",
+      "4x4 varsa aktarma ve yağ kaçakları",
+      "Kaporta: tavan/kapı altı/alt şase darbeleri"
+    ],
+    "disclaimer": "Bu girişler model bazlı kesin arıza iddiası değil; TR ikinci el piyasasında güç-aktarma/segment/tags temelli 'risk paterni' şablonlarıdır. Satın alma kararı için ekspertiz ve OBD şart."
+  },
+  {
+    "key": "toyota corolla cross",
+    "make": "toyota",
+    "segment": "C_SUV",
+    "aliases": [
+      "corolla cross"
+    ],
+    "tags": [
+      "hybrid_common"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 4,
+      "parts_cost_index_1_5": 2,
+      "service_network_index_1_5": 5,
+      "resale_liquidity_score_1_5": 4
+    },
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [
+      "Alt takım + fren/lastik (SUV’da daha hızlı yıpranır)",
+      "Direksiyon, amortisör, salıncak; bozuk yolda ses/titreşim",
+      "Şanzıman (otomatik/CVT/DCT) ısınınca davranış",
+      "4x4 varsa aktarma ve yağ kaçakları",
+      "Kaporta: tavan/kapı altı/alt şase darbeleri"
+    ],
+    "disclaimer": "Bu girişler model bazlı kesin arıza iddiası değil; TR ikinci el piyasasında güç-aktarma/segment/tags temelli 'risk paterni' şablonlarıdır. Satın alma kararı için ekspertiz ve OBD şart."
+  },
+  {
+    "key": "toyota rav4",
+    "make": "toyota",
+    "segment": "D_SUV",
+    "aliases": [
+      "rav4",
+      "rav 4"
+    ],
+    "tags": [
+      "hybrid_common",
+      "awd_optional"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 4,
+      "parts_cost_index_1_5": 2,
+      "service_network_index_1_5": 5,
+      "resale_liquidity_score_1_5": 3
+    },
+    "risk_patterns": [
+      {
+        "topic": "4x4 aktarma bakımı",
+        "severity": "orta",
+        "trigger": "yağ değişimleri ihmal",
+        "check": "dönüşte ses, titreşim, kaçak",
+        "cost_band": "orta"
+      }
+    ],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [
+      "Motor yağ kaçağı, hararet geçmişi, soğutma sistemi",
+      "Şanzıman: geçiş vuruntusu, titreme, kaçak",
+      "Yürüyen: amortisör, salıncak, aks körüğü, direksiyon kutusu",
+      "Tramer-kaporta: şasi/podye kontrolü, boya ölçümü",
+      "Elektronik: park sensörü, multimedya, klima paneli"
+    ],
+    "disclaimer": "Bu girişler model bazlı kesin arıza iddiası değil; TR ikinci el piyasasında güç-aktarma/segment/tags temelli 'risk paterni' şablonlarıdır. Satın alma kararı için ekspertiz ve OBD şart."
+  },
+  {
+    "key": "honda hrv",
+    "make": "honda",
+    "segment": "C_SUV",
+    "aliases": [
+      "hr-v",
+      "hrv"
+    ],
+    "tags": [
+      "hybrid_common",
+      "cvt_optional"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 4,
+      "parts_cost_index_1_5": 2,
+      "service_network_index_1_5": 4,
+      "resale_liquidity_score_1_5": 3
+    },
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [
+      "Alt takım + fren/lastik (SUV’da daha hızlı yıpranır)",
+      "Direksiyon, amortisör, salıncak; bozuk yolda ses/titreşim",
+      "Şanzıman (otomatik/CVT/DCT) ısınınca davranış",
+      "4x4 varsa aktarma ve yağ kaçakları",
+      "Kaporta: tavan/kapı altı/alt şase darbeleri"
+    ],
+    "disclaimer": "Bu girişler model bazlı kesin arıza iddiası değil; TR ikinci el piyasasında güç-aktarma/segment/tags temelli 'risk paterni' şablonlarıdır. Satın alma kararı için ekspertiz ve OBD şart."
+  },
+  {
+    "key": "honda crv",
+    "make": "honda",
+    "segment": "D_SUV",
+    "aliases": [
+      "cr-v",
+      "crv"
+    ],
+    "tags": [
+      "hybrid_common",
+      "cvt_optional",
+      "awd_optional"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 3,
+      "parts_cost_index_1_5": 2,
+      "service_network_index_1_5": 4,
+      "resale_liquidity_score_1_5": 3
+    },
+    "risk_patterns": [
+      {
+        "topic": "4x4 aktarma bakımı",
+        "severity": "orta",
+        "trigger": "yağ değişimleri ihmal",
+        "check": "dönüşte ses, titreşim, kaçak",
+        "cost_band": "orta"
+      }
+    ],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [
+      "Motor yağ kaçağı, hararet geçmişi, soğutma sistemi",
+      "Şanzıman: geçiş vuruntusu, titreme, kaçak",
+      "Yürüyen: amortisör, salıncak, aks körüğü, direksiyon kutusu",
+      "Tramer-kaporta: şasi/podye kontrolü, boya ölçümü",
+      "Elektronik: park sensörü, multimedya, klima paneli"
+    ],
+    "disclaimer": "Bu girişler model bazlı kesin arıza iddiası değil; TR ikinci el piyasasında güç-aktarma/segment/tags temelli 'risk paterni' şablonlarıdır. Satın alma kararı için ekspertiz ve OBD şart."
+  },
+  {
+    "key": "mazda cx-5",
+    "make": "mazda",
+    "segment": "D_SUV",
+    "aliases": [
+      "cx-5",
+      "cx5"
+    ],
+    "tags": [
+      "awd_optional"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 3,
+      "parts_cost_index_1_5": 3,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "risk_patterns": [
+      {
+        "topic": "4x4 aktarma bakımı",
+        "severity": "orta",
+        "trigger": "yağ değişimleri ihmal",
+        "check": "dönüşte ses, titreşim, kaçak",
+        "cost_band": "orta"
+      }
+    ],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [
+      "Motor yağ kaçağı, hararet geçmişi, soğutma sistemi",
+      "Şanzıman: geçiş vuruntusu, titreme, kaçak",
+      "Yürüyen: amortisör, salıncak, aks körüğü, direksiyon kutusu",
+      "Tramer-kaporta: şasi/podye kontrolü, boya ölçümü",
+      "Elektronik: park sensörü, multimedya, klima paneli"
+    ],
+    "disclaimer": "Bu girişler model bazlı kesin arıza iddiası değil; TR ikinci el piyasasında güç-aktarma/segment/tags temelli 'risk paterni' şablonlarıdır. Satın alma kararı için ekspertiz ve OBD şart."
+  },
+  {
+    "key": "renault arkana",
+    "make": "renault",
+    "segment": "C_SUV",
+    "aliases": [
+      "arkana"
+    ],
+    "tags": [
+      "turbo_small",
+      "auto_optional"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 4,
+      "parts_cost_index_1_5": 2,
+      "service_network_index_1_5": 5,
+      "resale_liquidity_score_1_5": 3
+    },
+    "risk_patterns": [
+      {
+        "topic": "Turbo/yağ bakımı hassasiyeti",
+        "severity": "orta",
+        "trigger": "uzun yağ değişim aralığı, soğuk kullanım",
+        "check": "yağ tüketimi, turbo ıslık/ses, çekiş",
+        "cost_band": "orta"
+      }
+    ],
+    "big_maintenance_watchlist": [
+      {
+        "item": "PCV/yağ tüketimi takibi",
+        "when": "100.000 km+",
+        "note": "yağ seviyesi, duman, buji durumu"
+      }
+    ],
+    "inspection_checklist": [
+      "Alt takım + fren/lastik (SUV’da daha hızlı yıpranır)",
+      "Direksiyon, amortisör, salıncak; bozuk yolda ses/titreşim",
+      "Şanzıman (otomatik/CVT/DCT) ısınınca davranış",
+      "4x4 varsa aktarma ve yağ kaçakları",
+      "Kaporta: tavan/kapı altı/alt şase darbeleri"
+    ],
+    "disclaimer": "Bu girişler model bazlı kesin arıza iddiası değil; TR ikinci el piyasasında güç-aktarma/segment/tags temelli 'risk paterni' şablonlarıdır. Satın alma kararı için ekspertiz ve OBD şart."
+  },
+  {
+    "key": "renault austral",
+    "make": "renault",
+    "segment": "C_SUV",
+    "aliases": [
+      "austral"
+    ],
+    "tags": [
+      "hybrid_common",
+      "auto_optional"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 4,
+      "parts_cost_index_1_5": 2,
+      "service_network_index_1_5": 5,
+      "resale_liquidity_score_1_5": 3
+    },
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [
+      "Alt takım + fren/lastik (SUV’da daha hızlı yıpranır)",
+      "Direksiyon, amortisör, salıncak; bozuk yolda ses/titreşim",
+      "Şanzıman (otomatik/CVT/DCT) ısınınca davranış",
+      "4x4 varsa aktarma ve yağ kaçakları",
+      "Kaporta: tavan/kapı altı/alt şase darbeleri"
+    ],
+    "disclaimer": "Bu girişler model bazlı kesin arıza iddiası değil; TR ikinci el piyasasında güç-aktarma/segment/tags temelli 'risk paterni' şablonlarıdır. Satın alma kararı için ekspertiz ve OBD şart."
+  },
+  {
+    "key": "nissan x-trail",
+    "make": "nissan",
+    "segment": "D_SUV",
+    "aliases": [
+      "x-trail",
+      "xtrail"
+    ],
+    "tags": [
+      "cvt_optional",
+      "awd_optional",
+      "hybrid_common"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 3,
+      "parts_cost_index_1_5": 3,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "risk_patterns": [
+      {
+        "topic": "4x4 aktarma bakımı",
+        "severity": "orta",
+        "trigger": "yağ değişimleri ihmal",
+        "check": "dönüşte ses, titreşim, kaçak",
+        "cost_band": "orta"
+      }
+    ],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [
+      "Motor yağ kaçağı, hararet geçmişi, soğutma sistemi",
+      "Şanzıman: geçiş vuruntusu, titreme, kaçak",
+      "Yürüyen: amortisör, salıncak, aks körüğü, direksiyon kutusu",
+      "Tramer-kaporta: şasi/podye kontrolü, boya ölçümü",
+      "Elektronik: park sensörü, multimedya, klima paneli"
+    ],
+    "disclaimer": "Bu girişler model bazlı kesin arıza iddiası değil; TR ikinci el piyasasında güç-aktarma/segment/tags temelli 'risk paterni' şablonlarıdır. Satın alma kararı için ekspertiz ve OBD şart."
+  },
+  {
+    "key": "vw passat",
+    "make": "vw",
+    "segment": "D_SEDAN",
+    "aliases": [
+      "passat"
+    ],
+    "tags": [
+      "dsg_or_dct_optional",
+      "diesel_common"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 3,
+      "parts_cost_index_1_5": 3,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 4
+    },
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [
+      "Konfor donanımları: klima, koltuk ısıtma, ekran/sensörler",
+      "Şanzıman ve tork konvertörü/DCT: vuruntu-kaydırma testleri",
+      "Direksiyon kutusu, süspansiyon burçları, motor takozları",
+      "Uzun yol titreşim: balans, jant, aks, rulman",
+      "Tramer + servis geçmişi (bu segmentte çok kritik)"
+    ],
+    "disclaimer": "Bu girişler model bazlı kesin arıza iddiası değil; TR ikinci el piyasasında güç-aktarma/segment/tags temelli 'risk paterni' şablonlarıdır. Satın alma kararı için ekspertiz ve OBD şart."
+  },
+  {
+    "key": "skoda superb",
+    "make": "skoda",
+    "segment": "D_SEDAN",
+    "aliases": [
+      "superb"
+    ],
+    "tags": [
+      "dsg_or_dct_optional",
+      "diesel_common"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 3,
+      "parts_cost_index_1_5": 3,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [
+      "Konfor donanımları: klima, koltuk ısıtma, ekran/sensörler",
+      "Şanzıman ve tork konvertörü/DCT: vuruntu-kaydırma testleri",
+      "Direksiyon kutusu, süspansiyon burçları, motor takozları",
+      "Uzun yol titreşim: balans, jant, aks, rulman",
+      "Tramer + servis geçmişi (bu segmentte çok kritik)"
+    ],
+    "disclaimer": "Bu girişler model bazlı kesin arıza iddiası değil; TR ikinci el piyasasında güç-aktarma/segment/tags temelli 'risk paterni' şablonlarıdır. Satın alma kararı için ekspertiz ve OBD şart."
+  },
+  {
+    "key": "peugeot 508",
+    "make": "peugeot",
+    "segment": "D_SEDAN",
+    "aliases": [
+      "508"
+    ],
+    "tags": [
+      "diesel_common",
+      "auto_optional"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 3,
+      "parts_cost_index_1_5": 3,
+      "service_network_index_1_5": 4,
+      "resale_liquidity_score_1_5": 3
+    },
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [
+      "Konfor donanımları: klima, koltuk ısıtma, ekran/sensörler",
+      "Şanzıman ve tork konvertörü/DCT: vuruntu-kaydırma testleri",
+      "Direksiyon kutusu, süspansiyon burçları, motor takozları",
+      "Uzun yol titreşim: balans, jant, aks, rulman",
+      "Tramer + servis geçmişi (bu segmentte çok kritik)"
+    ],
+    "disclaimer": "Bu girişler model bazlı kesin arıza iddiası değil; TR ikinci el piyasasında güç-aktarma/segment/tags temelli 'risk paterni' şablonlarıdır. Satın alma kararı için ekspertiz ve OBD şart."
+  },
+  {
+    "key": "opel insignia",
+    "make": "opel",
+    "segment": "D_SEDAN",
+    "aliases": [
+      "insignia"
+    ],
+    "tags": [
+      "diesel_common",
+      "auto_optional"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 3,
+      "parts_cost_index_1_5": 3,
+      "service_network_index_1_5": 4,
+      "resale_liquidity_score_1_5": 3
+    },
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [
+      "Konfor donanımları: klima, koltuk ısıtma, ekran/sensörler",
+      "Şanzıman ve tork konvertörü/DCT: vuruntu-kaydırma testleri",
+      "Direksiyon kutusu, süspansiyon burçları, motor takozları",
+      "Uzun yol titreşim: balans, jant, aks, rulman",
+      "Tramer + servis geçmişi (bu segmentte çok kritik)"
+    ],
+    "disclaimer": "Bu girişler model bazlı kesin arıza iddiası değil; TR ikinci el piyasasında güç-aktarma/segment/tags temelli 'risk paterni' şablonlarıdır. Satın alma kararı için ekspertiz ve OBD şart."
+  },
+  {
+    "key": "toyota camry",
+    "make": "toyota",
+    "segment": "D_SEDAN",
+    "aliases": [
+      "camry"
+    ],
+    "tags": [
+      "hybrid_common"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 4,
+      "parts_cost_index_1_5": 2,
+      "service_network_index_1_5": 5,
+      "resale_liquidity_score_1_5": 3
+    },
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [
+      "Konfor donanımları: klima, koltuk ısıtma, ekran/sensörler",
+      "Şanzıman ve tork konvertörü/DCT: vuruntu-kaydırma testleri",
+      "Direksiyon kutusu, süspansiyon burçları, motor takozları",
+      "Uzun yol titreşim: balans, jant, aks, rulman",
+      "Tramer + servis geçmişi (bu segmentte çok kritik)"
+    ],
+    "disclaimer": "Bu girişler model bazlı kesin arıza iddiası değil; TR ikinci el piyasasında güç-aktarma/segment/tags temelli 'risk paterni' şablonlarıdır. Satın alma kararı için ekspertiz ve OBD şart."
+  },
+  {
+    "key": "bmw 3 serisi",
+    "make": "bmw",
+    "segment": "PREMIUM_D",
+    "aliases": [
+      "bmw 320",
+      "320i",
+      "320d",
+      "3.20",
+      "3 serisi",
+      "3 series"
+    ],
+    "tags": [
+      "premium_electronics",
+      "turbo_medium",
+      "diesel_common",
+      "awd_optional"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 2,
+      "parts_cost_index_1_5": 4,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "risk_patterns": [
+      {
+        "topic": "4x4 aktarma bakımı",
+        "severity": "orta",
+        "trigger": "yağ değişimleri ihmal",
+        "check": "dönüşte ses, titreşim, kaçak",
+        "cost_band": "orta"
+      },
+      {
+        "topic": "Elektronik/konfor donanımı yaşlanması",
+        "severity": "orta",
+        "trigger": "10+ yaş",
+        "check": "ekran, sensör, klima, cam tavan, modüller",
+        "cost_band": "orta-yüksek"
+      }
+    ],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [
+      "Elektronik modüller: ekran, far, sensörler, cam tavan",
+      "Şanzıman: soğuk/ısınmış test, adaptasyon, kaçak kontrolü",
+      "Turbo/yağ tüketimi, kompresyon, OBD hata taraması",
+      "Süspansiyon: burçlar, amortisör, rotiller (pahalı kalem)",
+      "Servis geçmişi + orijinal parça/fatura doğrulama"
+    ],
+    "disclaimer": "Bu girişler model bazlı kesin arıza iddiası değil; TR ikinci el piyasasında güç-aktarma/segment/tags temelli 'risk paterni' şablonlarıdır. Satın alma kararı için ekspertiz ve OBD şart."
+  },
+  {
+    "key": "bmw 5 serisi",
+    "make": "bmw",
+    "segment": "E_SEGMENT",
+    "aliases": [
+      "bmw 520",
+      "520i",
+      "520d",
+      "5 serisi",
+      "5 series"
+    ],
+    "tags": [
+      "premium_electronics",
+      "turbo_medium",
+      "diesel_common",
+      "awd_optional"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 2,
+      "parts_cost_index_1_5": 4,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "risk_patterns": [
+      {
+        "topic": "4x4 aktarma bakımı",
+        "severity": "orta",
+        "trigger": "yağ değişimleri ihmal",
+        "check": "dönüşte ses, titreşim, kaçak",
+        "cost_band": "orta"
+      },
+      {
+        "topic": "Elektronik/konfor donanımı yaşlanması",
+        "severity": "orta",
+        "trigger": "10+ yaş",
+        "check": "ekran, sensör, klima, cam tavan, modüller",
+        "cost_band": "orta-yüksek"
+      }
+    ],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [
+      "Elektronik/konfor donanım taraması (çok kapsamlı)",
+      "Motor-şanzıman: OBD + test sürüşü (uzun)",
+      "Hava süspansiyon varsa kaçak/test",
+      "Soğutma/hararet geçmişi, yağ kaçakları",
+      "Servis geçmişi + tramer + detaylı ekspertiz şart"
+    ],
+    "disclaimer": "Bu girişler model bazlı kesin arıza iddiası değil; TR ikinci el piyasasında güç-aktarma/segment/tags temelli 'risk paterni' şablonlarıdır. Satın alma kararı için ekspertiz ve OBD şart."
+  },
+  {
+    "key": "mercedes c serisi",
+    "make": "mercedes",
+    "segment": "PREMIUM_D",
+    "aliases": [
+      "c180",
+      "c200",
+      "c220",
+      "c serisi",
+      "c class"
+    ],
+    "tags": [
+      "premium_electronics",
+      "turbo_medium",
+      "diesel_common"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 2,
+      "parts_cost_index_1_5": 4,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "risk_patterns": [
+      {
+        "topic": "Elektronik/konfor donanımı yaşlanması",
+        "severity": "orta",
+        "trigger": "10+ yaş",
+        "check": "ekran, sensör, klima, cam tavan, modüller",
+        "cost_band": "orta-yüksek"
+      }
+    ],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [
+      "Elektronik modüller: ekran, far, sensörler, cam tavan",
+      "Şanzıman: soğuk/ısınmış test, adaptasyon, kaçak kontrolü",
+      "Turbo/yağ tüketimi, kompresyon, OBD hata taraması",
+      "Süspansiyon: burçlar, amortisör, rotiller (pahalı kalem)",
+      "Servis geçmişi + orijinal parça/fatura doğrulama"
+    ],
+    "disclaimer": "Bu girişler model bazlı kesin arıza iddiası değil; TR ikinci el piyasasında güç-aktarma/segment/tags temelli 'risk paterni' şablonlarıdır. Satın alma kararı için ekspertiz ve OBD şart."
+  },
+  {
+    "key": "mercedes e serisi",
+    "make": "mercedes",
+    "segment": "E_SEGMENT",
+    "aliases": [
+      "e200",
+      "e220",
+      "e serisi",
+      "e class"
+    ],
+    "tags": [
+      "premium_electronics",
+      "turbo_medium",
+      "diesel_common"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 2,
+      "parts_cost_index_1_5": 4,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "risk_patterns": [
+      {
+        "topic": "Elektronik/konfor donanımı yaşlanması",
+        "severity": "orta",
+        "trigger": "10+ yaş",
+        "check": "ekran, sensör, klima, cam tavan, modüller",
+        "cost_band": "orta-yüksek"
+      }
+    ],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [
+      "Elektronik/konfor donanım taraması (çok kapsamlı)",
+      "Motor-şanzıman: OBD + test sürüşü (uzun)",
+      "Hava süspansiyon varsa kaçak/test",
+      "Soğutma/hararet geçmişi, yağ kaçakları",
+      "Servis geçmişi + tramer + detaylı ekspertiz şart"
+    ],
+    "disclaimer": "Bu girişler model bazlı kesin arıza iddiası değil; TR ikinci el piyasasında güç-aktarma/segment/tags temelli 'risk paterni' şablonlarıdır. Satın alma kararı için ekspertiz ve OBD şart."
+  },
+  {
+    "key": "audi a3",
+    "make": "audi",
+    "segment": "PREMIUM_D",
+    "aliases": [
+      "a3"
+    ],
+    "tags": [
+      "premium_electronics",
+      "turbo_small",
+      "dsg_or_dct_optional"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 2,
+      "parts_cost_index_1_5": 4,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "risk_patterns": [
+      {
+        "topic": "Turbo/yağ bakımı hassasiyeti",
+        "severity": "orta",
+        "trigger": "uzun yağ değişim aralığı, soğuk kullanım",
+        "check": "yağ tüketimi, turbo ıslık/ses, çekiş",
+        "cost_band": "orta"
+      },
+      {
+        "topic": "Elektronik/konfor donanımı yaşlanması",
+        "severity": "orta",
+        "trigger": "10+ yaş",
+        "check": "ekran, sensör, klima, cam tavan, modüller",
+        "cost_band": "orta-yüksek"
+      }
+    ],
+    "big_maintenance_watchlist": [
+      {
+        "item": "PCV/yağ tüketimi takibi",
+        "when": "100.000 km+",
+        "note": "yağ seviyesi, duman, buji durumu"
+      }
+    ],
+    "inspection_checklist": [
+      "Elektronik modüller: ekran, far, sensörler, cam tavan",
+      "Şanzıman: soğuk/ısınmış test, adaptasyon, kaçak kontrolü",
+      "Turbo/yağ tüketimi, kompresyon, OBD hata taraması",
+      "Süspansiyon: burçlar, amortisör, rotiller (pahalı kalem)",
+      "Servis geçmişi + orijinal parça/fatura doğrulama"
+    ],
+    "disclaimer": "Bu girişler model bazlı kesin arıza iddiası değil; TR ikinci el piyasasında güç-aktarma/segment/tags temelli 'risk paterni' şablonlarıdır. Satın alma kararı için ekspertiz ve OBD şart."
+  },
+  {
+    "key": "audi a4",
+    "make": "audi",
+    "segment": "PREMIUM_D",
+    "aliases": [
+      "a4"
+    ],
+    "tags": [
+      "premium_electronics",
+      "turbo_medium",
+      "dsg_or_dct_optional",
+      "diesel_common"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 2,
+      "parts_cost_index_1_5": 4,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "risk_patterns": [
+      {
+        "topic": "Elektronik/konfor donanımı yaşlanması",
+        "severity": "orta",
+        "trigger": "10+ yaş",
+        "check": "ekran, sensör, klima, cam tavan, modüller",
+        "cost_band": "orta-yüksek"
+      }
+    ],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [
+      "Elektronik modüller: ekran, far, sensörler, cam tavan",
+      "Şanzıman: soğuk/ısınmış test, adaptasyon, kaçak kontrolü",
+      "Turbo/yağ tüketimi, kompresyon, OBD hata taraması",
+      "Süspansiyon: burçlar, amortisör, rotiller (pahalı kalem)",
+      "Servis geçmişi + orijinal parça/fatura doğrulama"
+    ],
+    "disclaimer": "Bu girişler model bazlı kesin arıza iddiası değil; TR ikinci el piyasasında güç-aktarma/segment/tags temelli 'risk paterni' şablonlarıdır. Satın alma kararı için ekspertiz ve OBD şart."
+  },
+  {
+    "key": "audi a6",
+    "make": "audi",
+    "segment": "E_SEGMENT",
+    "aliases": [
+      "a6"
+    ],
+    "tags": [
+      "premium_electronics",
+      "turbo_medium",
+      "dsg_or_dct_optional",
+      "diesel_common"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 2,
+      "parts_cost_index_1_5": 4,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "risk_patterns": [
+      {
+        "topic": "Elektronik/konfor donanımı yaşlanması",
+        "severity": "orta",
+        "trigger": "10+ yaş",
+        "check": "ekran, sensör, klima, cam tavan, modüller",
+        "cost_band": "orta-yüksek"
+      }
+    ],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [
+      "Elektronik/konfor donanım taraması (çok kapsamlı)",
+      "Motor-şanzıman: OBD + test sürüşü (uzun)",
+      "Hava süspansiyon varsa kaçak/test",
+      "Soğutma/hararet geçmişi, yağ kaçakları",
+      "Servis geçmişi + tramer + detaylı ekspertiz şart"
+    ],
+    "disclaimer": "Bu girişler model bazlı kesin arıza iddiası değil; TR ikinci el piyasasında güç-aktarma/segment/tags temelli 'risk paterni' şablonlarıdır. Satın alma kararı için ekspertiz ve OBD şart."
+  },
+  {
+    "key": "volvo s60",
+    "make": "volvo",
+    "segment": "PREMIUM_D",
+    "aliases": [
+      "s60"
+    ],
+    "tags": [
+      "premium_electronics",
+      "turbo_medium"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 2,
+      "parts_cost_index_1_5": 4,
+      "service_network_index_1_5": 2,
+      "resale_liquidity_score_1_5": 2
+    },
+    "risk_patterns": [
+      {
+        "topic": "Elektronik/konfor donanımı yaşlanması",
+        "severity": "orta",
+        "trigger": "10+ yaş",
+        "check": "ekran, sensör, klima, cam tavan, modüller",
+        "cost_band": "orta-yüksek"
+      }
+    ],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [
+      "Elektronik modüller: ekran, far, sensörler, cam tavan",
+      "Şanzıman: soğuk/ısınmış test, adaptasyon, kaçak kontrolü",
+      "Turbo/yağ tüketimi, kompresyon, OBD hata taraması",
+      "Süspansiyon: burçlar, amortisör, rotiller (pahalı kalem)",
+      "Servis geçmişi + orijinal parça/fatura doğrulama"
+    ],
+    "disclaimer": "Bu girişler model bazlı kesin arıza iddiası değil; TR ikinci el piyasasında güç-aktarma/segment/tags temelli 'risk paterni' şablonlarıdır. Satın alma kararı için ekspertiz ve OBD şart."
+  },
+  {
+    "key": "volvo xc60",
+    "make": "volvo",
+    "segment": "PREMIUM_SUV",
+    "aliases": [
+      "xc60"
+    ],
+    "tags": [
+      "premium_electronics",
+      "turbo_medium",
+      "awd_optional",
+      "hybrid_common"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 2,
+      "parts_cost_index_1_5": 4,
+      "service_network_index_1_5": 2,
+      "resale_liquidity_score_1_5": 3
+    },
+    "risk_patterns": [
+      {
+        "topic": "4x4 aktarma bakımı",
+        "severity": "orta",
+        "trigger": "yağ değişimleri ihmal",
+        "check": "dönüşte ses, titreşim, kaçak",
+        "cost_band": "orta"
+      }
+    ],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [
+      "Motor yağ kaçağı, hararet geçmişi, soğutma sistemi",
+      "Şanzıman: geçiş vuruntusu, titreme, kaçak",
+      "Yürüyen: amortisör, salıncak, aks körüğü, direksiyon kutusu",
+      "Tramer-kaporta: şasi/podye kontrolü, boya ölçümü",
+      "Elektronik: park sensörü, multimedya, klima paneli"
+    ],
+    "disclaimer": "Bu girişler model bazlı kesin arıza iddiası değil; TR ikinci el piyasasında güç-aktarma/segment/tags temelli 'risk paterni' şablonlarıdır. Satın alma kararı için ekspertiz ve OBD şart."
+  },
+  {
+    "key": "mercedes glc",
+    "make": "mercedes",
+    "segment": "PREMIUM_SUV",
+    "aliases": [
+      "glc",
+      "glc 200",
+      "glc 220"
+    ],
+    "tags": [
+      "premium_electronics",
+      "turbo_medium",
+      "diesel_common",
+      "awd_optional"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 2,
+      "parts_cost_index_1_5": 4,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "risk_patterns": [
+      {
+        "topic": "4x4 aktarma bakımı",
+        "severity": "orta",
+        "trigger": "yağ değişimleri ihmal",
+        "check": "dönüşte ses, titreşim, kaçak",
+        "cost_band": "orta"
+      }
+    ],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [
+      "Motor yağ kaçağı, hararet geçmişi, soğutma sistemi",
+      "Şanzıman: geçiş vuruntusu, titreme, kaçak",
+      "Yürüyen: amortisör, salıncak, aks körüğü, direksiyon kutusu",
+      "Tramer-kaporta: şasi/podye kontrolü, boya ölçümü",
+      "Elektronik: park sensörü, multimedya, klima paneli"
+    ],
+    "disclaimer": "Bu girişler model bazlı kesin arıza iddiası değil; TR ikinci el piyasasında güç-aktarma/segment/tags temelli 'risk paterni' şablonlarıdır. Satın alma kararı için ekspertiz ve OBD şart."
+  },
+  {
+    "key": "bmw x1",
+    "make": "bmw",
+    "segment": "PREMIUM_SUV",
+    "aliases": [
+      "x1"
+    ],
+    "tags": [
+      "premium_electronics",
+      "turbo_small",
+      "dsg_or_dct_optional",
+      "awd_optional"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 2,
+      "parts_cost_index_1_5": 4,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "risk_patterns": [
+      {
+        "topic": "Turbo/yağ bakımı hassasiyeti",
+        "severity": "orta",
+        "trigger": "uzun yağ değişim aralığı, soğuk kullanım",
+        "check": "yağ tüketimi, turbo ıslık/ses, çekiş",
+        "cost_band": "orta"
+      },
+      {
+        "topic": "4x4 aktarma bakımı",
+        "severity": "orta",
+        "trigger": "yağ değişimleri ihmal",
+        "check": "dönüşte ses, titreşim, kaçak",
+        "cost_band": "orta"
+      }
+    ],
+    "big_maintenance_watchlist": [
+      {
+        "item": "PCV/yağ tüketimi takibi",
+        "when": "100.000 km+",
+        "note": "yağ seviyesi, duman, buji durumu"
+      }
+    ],
+    "inspection_checklist": [
+      "Motor yağ kaçağı, hararet geçmişi, soğutma sistemi",
+      "Şanzıman: geçiş vuruntusu, titreme, kaçak",
+      "Yürüyen: amortisör, salıncak, aks körüğü, direksiyon kutusu",
+      "Tramer-kaporta: şasi/podye kontrolü, boya ölçümü",
+      "Elektronik: park sensörü, multimedya, klima paneli"
+    ],
+    "disclaimer": "Bu girişler model bazlı kesin arıza iddiası değil; TR ikinci el piyasasında güç-aktarma/segment/tags temelli 'risk paterni' şablonlarıdır. Satın alma kararı için ekspertiz ve OBD şart."
+  },
+  {
+    "key": "bmw x3",
+    "make": "bmw",
+    "segment": "PREMIUM_SUV",
+    "aliases": [
+      "x3"
+    ],
+    "tags": [
+      "premium_electronics",
+      "turbo_medium",
+      "diesel_common",
+      "awd_optional"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 2,
+      "parts_cost_index_1_5": 4,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "risk_patterns": [
+      {
+        "topic": "4x4 aktarma bakımı",
+        "severity": "orta",
+        "trigger": "yağ değişimleri ihmal",
+        "check": "dönüşte ses, titreşim, kaçak",
+        "cost_band": "orta"
+      }
+    ],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [
+      "Motor yağ kaçağı, hararet geçmişi, soğutma sistemi",
+      "Şanzıman: geçiş vuruntusu, titreme, kaçak",
+      "Yürüyen: amortisör, salıncak, aks körüğü, direksiyon kutusu",
+      "Tramer-kaporta: şasi/podye kontrolü, boya ölçümü",
+      "Elektronik: park sensörü, multimedya, klima paneli"
+    ],
+    "disclaimer": "Bu girişler model bazlı kesin arıza iddiası değil; TR ikinci el piyasasında güç-aktarma/segment/tags temelli 'risk paterni' şablonlarıdır. Satın alma kararı için ekspertiz ve OBD şart."
+  },
+  {
+    "key": "audi q3",
+    "make": "audi",
+    "segment": "PREMIUM_SUV",
+    "aliases": [
+      "q3"
+    ],
+    "tags": [
+      "premium_electronics",
+      "turbo_small",
+      "dsg_or_dct_optional",
+      "awd_optional"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 2,
+      "parts_cost_index_1_5": 4,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "risk_patterns": [
+      {
+        "topic": "Turbo/yağ bakımı hassasiyeti",
+        "severity": "orta",
+        "trigger": "uzun yağ değişim aralığı, soğuk kullanım",
+        "check": "yağ tüketimi, turbo ıslık/ses, çekiş",
+        "cost_band": "orta"
+      },
+      {
+        "topic": "4x4 aktarma bakımı",
+        "severity": "orta",
+        "trigger": "yağ değişimleri ihmal",
+        "check": "dönüşte ses, titreşim, kaçak",
+        "cost_band": "orta"
+      }
+    ],
+    "big_maintenance_watchlist": [
+      {
+        "item": "PCV/yağ tüketimi takibi",
+        "when": "100.000 km+",
+        "note": "yağ seviyesi, duman, buji durumu"
+      }
+    ],
+    "inspection_checklist": [
+      "Motor yağ kaçağı, hararet geçmişi, soğutma sistemi",
+      "Şanzıman: geçiş vuruntusu, titreme, kaçak",
+      "Yürüyen: amortisör, salıncak, aks körüğü, direksiyon kutusu",
+      "Tramer-kaporta: şasi/podye kontrolü, boya ölçümü",
+      "Elektronik: park sensörü, multimedya, klima paneli"
+    ],
+    "disclaimer": "Bu girişler model bazlı kesin arıza iddiası değil; TR ikinci el piyasasında güç-aktarma/segment/tags temelli 'risk paterni' şablonlarıdır. Satın alma kararı için ekspertiz ve OBD şart."
+  },
+  {
+    "key": "audi q5",
+    "make": "audi",
+    "segment": "PREMIUM_SUV",
+    "aliases": [
+      "q5"
+    ],
+    "tags": [
+      "premium_electronics",
+      "turbo_medium",
+      "diesel_common",
+      "awd_optional"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 2,
+      "parts_cost_index_1_5": 4,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "risk_patterns": [
+      {
+        "topic": "4x4 aktarma bakımı",
+        "severity": "orta",
+        "trigger": "yağ değişimleri ihmal",
+        "check": "dönüşte ses, titreşim, kaçak",
+        "cost_band": "orta"
+      }
+    ],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [
+      "Motor yağ kaçağı, hararet geçmişi, soğutma sistemi",
+      "Şanzıman: geçiş vuruntusu, titreme, kaçak",
+      "Yürüyen: amortisör, salıncak, aks körüğü, direksiyon kutusu",
+      "Tramer-kaporta: şasi/podye kontrolü, boya ölçümü",
+      "Elektronik: park sensörü, multimedya, klima paneli"
+    ],
+    "disclaimer": "Bu girişler model bazlı kesin arıza iddiası değil; TR ikinci el piyasasında güç-aktarma/segment/tags temelli 'risk paterni' şablonlarıdır. Satın alma kararı için ekspertiz ve OBD şart."
+  },
+  {
+    "key": "lexus nx",
+    "make": "lexus",
+    "segment": "PREMIUM_SUV",
+    "aliases": [
+      "nx"
+    ],
+    "tags": [
+      "hybrid_common",
+      "premium_electronics",
+      "awd_optional"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 2,
+      "parts_cost_index_1_5": 4,
+      "service_network_index_1_5": 2,
+      "resale_liquidity_score_1_5": 3
+    },
+    "risk_patterns": [
+      {
+        "topic": "4x4 aktarma bakımı",
+        "severity": "orta",
+        "trigger": "yağ değişimleri ihmal",
+        "check": "dönüşte ses, titreşim, kaçak",
+        "cost_band": "orta"
+      }
+    ],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [
+      "Motor yağ kaçağı, hararet geçmişi, soğutma sistemi",
+      "Şanzıman: geçiş vuruntusu, titreme, kaçak",
+      "Yürüyen: amortisör, salıncak, aks körüğü, direksiyon kutusu",
+      "Tramer-kaporta: şasi/podye kontrolü, boya ölçümü",
+      "Elektronik: park sensörü, multimedya, klima paneli"
+    ],
+    "disclaimer": "Bu girişler model bazlı kesin arıza iddiası değil; TR ikinci el piyasasında güç-aktarma/segment/tags temelli 'risk paterni' şablonlarıdır. Satın alma kararı için ekspertiz ve OBD şart."
+  },
+  {
+    "key": "range rover evoque",
+    "make": "range",
+    "segment": "E_SEGMENT",
+    "aliases": [
+      "evoque",
+      "range rover evoque"
+    ],
+    "tags": [
+      "premium_electronics",
+      "awd_optional",
+      "diesel_common"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 1,
+      "parts_cost_index_1_5": 5,
+      "service_network_index_1_5": 1,
+      "resale_liquidity_score_1_5": 2
+    },
+    "risk_patterns": [
+      {
+        "topic": "4x4 aktarma bakımı",
+        "severity": "orta",
+        "trigger": "yağ değişimleri ihmal",
+        "check": "dönüşte ses, titreşim, kaçak",
+        "cost_band": "orta"
+      },
+      {
+        "topic": "Elektronik/konfor donanımı yaşlanması",
+        "severity": "orta",
+        "trigger": "10+ yaş",
+        "check": "ekran, sensör, klima, cam tavan, modüller",
+        "cost_band": "orta-yüksek"
+      }
+    ],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [
+      "Elektronik/konfor donanım taraması (çok kapsamlı)",
+      "Motor-şanzıman: OBD + test sürüşü (uzun)",
+      "Hava süspansiyon varsa kaçak/test",
+      "Soğutma/hararet geçmişi, yağ kaçakları",
+      "Servis geçmişi + tramer + detaylı ekspertiz şart"
+    ],
+    "disclaimer": "Bu girişler model bazlı kesin arıza iddiası değil; TR ikinci el piyasasında güç-aktarma/segment/tags temelli 'risk paterni' şablonlarıdır. Satın alma kararı için ekspertiz ve OBD şart."
+  },
+  {
+    "key": "togg t10x",
+    "make": "togg",
+    "segment": "EV",
+    "aliases": [
+      "t10x",
+      "togg"
+    ],
+    "tags": [
+      "electric",
+      "premium_electronics"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 3,
+      "parts_cost_index_1_5": 3,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [
+      "Motor yağ kaçağı, hararet geçmişi, soğutma sistemi",
+      "Şanzıman: geçiş vuruntusu, titreme, kaçak",
+      "Yürüyen: amortisör, salıncak, aks körüğü, direksiyon kutusu",
+      "Tramer-kaporta: şasi/podye kontrolü, boya ölçümü",
+      "Elektronik: park sensörü, multimedya, klima paneli"
+    ],
+    "disclaimer": "Bu girişler model bazlı kesin arıza iddiası değil; TR ikinci el piyasasında güç-aktarma/segment/tags temelli 'risk paterni' şablonlarıdır. Satın alma kararı için ekspertiz ve OBD şart."
+  },
+  {
+    "key": "tesla model y",
+    "make": "tesla",
+    "segment": "EV",
+    "aliases": [
+      "model y",
+      "tesla y"
+    ],
+    "tags": [
+      "electric",
+      "premium_electronics"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 2,
+      "parts_cost_index_1_5": 4,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [
+      "Motor yağ kaçağı, hararet geçmişi, soğutma sistemi",
+      "Şanzıman: geçiş vuruntusu, titreme, kaçak",
+      "Yürüyen: amortisör, salıncak, aks körüğü, direksiyon kutusu",
+      "Tramer-kaporta: şasi/podye kontrolü, boya ölçümü",
+      "Elektronik: park sensörü, multimedya, klima paneli"
+    ],
+    "disclaimer": "Bu girişler model bazlı kesin arıza iddiası değil; TR ikinci el piyasasında güç-aktarma/segment/tags temelli 'risk paterni' şablonlarıdır. Satın alma kararı için ekspertiz ve OBD şart."
+  },
+  {
+    "key": "byd seal u",
+    "make": "byd",
+    "segment": "EV",
+    "aliases": [
+      "seal u",
+      "byd seal u"
+    ],
+    "tags": [
+      "electric",
+      "premium_electronics"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 3,
+      "parts_cost_index_1_5": 3,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [
+      "Motor yağ kaçağı, hararet geçmişi, soğutma sistemi",
+      "Şanzıman: geçiş vuruntusu, titreme, kaçak",
+      "Yürüyen: amortisör, salıncak, aks körüğü, direksiyon kutusu",
+      "Tramer-kaporta: şasi/podye kontrolü, boya ölçümü",
+      "Elektronik: park sensörü, multimedya, klima paneli"
+    ],
+    "disclaimer": "Bu girişler model bazlı kesin arıza iddiası değil; TR ikinci el piyasasında güç-aktarma/segment/tags temelli 'risk paterni' şablonlarıdır. Satın alma kararı için ekspertiz ve OBD şart."
+  },
+  {
+    "key": "mg4",
+    "make": "mg4",
+    "segment": "EV",
+    "aliases": [
+      "mg4"
+    ],
+    "tags": [
+      "electric"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 3,
+      "parts_cost_index_1_5": 3,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [
+      "Motor yağ kaçağı, hararet geçmişi, soğutma sistemi",
+      "Şanzıman: geçiş vuruntusu, titreme, kaçak",
+      "Yürüyen: amortisör, salıncak, aks körüğü, direksiyon kutusu",
+      "Tramer-kaporta: şasi/podye kontrolü, boya ölçümü",
+      "Elektronik: park sensörü, multimedya, klima paneli"
+    ],
+    "disclaimer": "Bu girişler model bazlı kesin arıza iddiası değil; TR ikinci el piyasasında güç-aktarma/segment/tags temelli 'risk paterni' şablonlarıdır. Satın alma kararı için ekspertiz ve OBD şart."
+  },
+  {
+    "key": "hyundai kona ev",
+    "make": "hyundai",
+    "segment": "EV",
+    "aliases": [
+      "kona ev",
+      "kona elektrik"
+    ],
+    "tags": [
+      "electric"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 4,
+      "parts_cost_index_1_5": 2,
+      "service_network_index_1_5": 4,
+      "resale_liquidity_score_1_5": 3
+    },
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [
+      "Motor yağ kaçağı, hararet geçmişi, soğutma sistemi",
+      "Şanzıman: geçiş vuruntusu, titreme, kaçak",
+      "Yürüyen: amortisör, salıncak, aks körüğü, direksiyon kutusu",
+      "Tramer-kaporta: şasi/podye kontrolü, boya ölçümü",
+      "Elektronik: park sensörü, multimedya, klima paneli"
+    ],
+    "disclaimer": "Bu girişler model bazlı kesin arıza iddiası değil; TR ikinci el piyasasında güç-aktarma/segment/tags temelli 'risk paterni' şablonlarıdır. Satın alma kararı için ekspertiz ve OBD şart."
+  },
+  {
+    "key": "hyundai ioniq 5",
+    "make": "hyundai",
+    "segment": "EV",
+    "aliases": [
+      "ioniq 5"
+    ],
+    "tags": [
+      "electric",
+      "premium_electronics"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 3,
+      "parts_cost_index_1_5": 2,
+      "service_network_index_1_5": 4,
+      "resale_liquidity_score_1_5": 3
+    },
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [
+      "Motor yağ kaçağı, hararet geçmişi, soğutma sistemi",
+      "Şanzıman: geçiş vuruntusu, titreme, kaçak",
+      "Yürüyen: amortisör, salıncak, aks körüğü, direksiyon kutusu",
+      "Tramer-kaporta: şasi/podye kontrolü, boya ölçümü",
+      "Elektronik: park sensörü, multimedya, klima paneli"
+    ],
+    "disclaimer": "Bu girişler model bazlı kesin arıza iddiası değil; TR ikinci el piyasasında güç-aktarma/segment/tags temelli 'risk paterni' şablonlarıdır. Satın alma kararı için ekspertiz ve OBD şart."
+  },
+  {
+    "key": "hyundai ioniq 6",
+    "make": "hyundai",
+    "segment": "EV",
+    "aliases": [
+      "ioniq 6"
+    ],
+    "tags": [
+      "electric",
+      "premium_electronics"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 3,
+      "parts_cost_index_1_5": 2,
+      "service_network_index_1_5": 4,
+      "resale_liquidity_score_1_5": 3
+    },
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [
+      "Motor yağ kaçağı, hararet geçmişi, soğutma sistemi",
+      "Şanzıman: geçiş vuruntusu, titreme, kaçak",
+      "Yürüyen: amortisör, salıncak, aks körüğü, direksiyon kutusu",
+      "Tramer-kaporta: şasi/podye kontrolü, boya ölçümü",
+      "Elektronik: park sensörü, multimedya, klima paneli"
+    ],
+    "disclaimer": "Bu girişler model bazlı kesin arıza iddiası değil; TR ikinci el piyasasında güç-aktarma/segment/tags temelli 'risk paterni' şablonlarıdır. Satın alma kararı için ekspertiz ve OBD şart."
+  },
+  {
+    "key": "renault zoe",
+    "make": "renault",
+    "segment": "EV",
+    "aliases": [
+      "zoe"
+    ],
+    "tags": [
+      "electric"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 3,
+      "parts_cost_index_1_5": 2,
+      "service_network_index_1_5": 5,
+      "resale_liquidity_score_1_5": 3
+    },
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [
+      "Motor yağ kaçağı, hararet geçmişi, soğutma sistemi",
+      "Şanzıman: geçiş vuruntusu, titreme, kaçak",
+      "Yürüyen: amortisör, salıncak, aks körüğü, direksiyon kutusu",
+      "Tramer-kaporta: şasi/podye kontrolü, boya ölçümü",
+      "Elektronik: park sensörü, multimedya, klima paneli"
+    ],
+    "disclaimer": "Bu girişler model bazlı kesin arıza iddiası değil; TR ikinci el piyasasında güç-aktarma/segment/tags temelli 'risk paterni' şablonlarıdır. Satın alma kararı için ekspertiz ve OBD şart."
+  },
+  {
+    "key": "fiat doblo",
+    "make": "fiat",
+    "segment": "LCV",
+    "aliases": [
+      "doblo"
+    ],
+    "tags": [
+      "diesel_common"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 5,
+      "parts_cost_index_1_5": 2,
+      "service_network_index_1_5": 5,
+      "resale_liquidity_score_1_5": 5
+    },
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [
+      "Motor yağ kaçağı, hararet geçmişi, soğutma sistemi",
+      "Şanzıman: geçiş vuruntusu, titreme, kaçak",
+      "Yürüyen: amortisör, salıncak, aks körüğü, direksiyon kutusu",
+      "Tramer-kaporta: şasi/podye kontrolü, boya ölçümü",
+      "Elektronik: park sensörü, multimedya, klima paneli"
+    ],
+    "disclaimer": "Bu girişler model bazlı kesin arıza iddiası değil; TR ikinci el piyasasında güç-aktarma/segment/tags temelli 'risk paterni' şablonlarıdır. Satın alma kararı için ekspertiz ve OBD şart."
+  },
+  {
+    "key": "ford tourneo courier",
+    "make": "ford",
+    "segment": "LCV",
+    "aliases": [
+      "courier",
+      "tourneo courier"
+    ],
+    "tags": [
+      "diesel_common"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 4,
+      "parts_cost_index_1_5": 2,
+      "service_network_index_1_5": 4,
+      "resale_liquidity_score_1_5": 5
+    },
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [
+      "Motor yağ kaçağı, hararet geçmişi, soğutma sistemi",
+      "Şanzıman: geçiş vuruntusu, titreme, kaçak",
+      "Yürüyen: amortisör, salıncak, aks körüğü, direksiyon kutusu",
+      "Tramer-kaporta: şasi/podye kontrolü, boya ölçümü",
+      "Elektronik: park sensörü, multimedya, klima paneli"
+    ],
+    "disclaimer": "Bu girişler model bazlı kesin arıza iddiası değil; TR ikinci el piyasasında güç-aktarma/segment/tags temelli 'risk paterni' şablonlarıdır. Satın alma kararı için ekspertiz ve OBD şart."
+  },
+  {
+    "key": "renault kangoo",
+    "make": "renault",
+    "segment": "LCV",
+    "aliases": [
+      "kangoo"
+    ],
+    "tags": [
+      "diesel_common"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 4,
+      "parts_cost_index_1_5": 2,
+      "service_network_index_1_5": 5,
+      "resale_liquidity_score_1_5": 5
+    },
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [
+      "Motor yağ kaçağı, hararet geçmişi, soğutma sistemi",
+      "Şanzıman: geçiş vuruntusu, titreme, kaçak",
+      "Yürüyen: amortisör, salıncak, aks körüğü, direksiyon kutusu",
+      "Tramer-kaporta: şasi/podye kontrolü, boya ölçümü",
+      "Elektronik: park sensörü, multimedya, klima paneli"
+    ],
+    "disclaimer": "Bu girişler model bazlı kesin arıza iddiası değil; TR ikinci el piyasasında güç-aktarma/segment/tags temelli 'risk paterni' şablonlarıdır. Satın alma kararı için ekspertiz ve OBD şart."
+  }
+]

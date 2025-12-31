@@ -1,0 +1,53 @@
+{
+  "as_of": "2025-01",
+  "currency": "TRY",
+  "note": "Hyundai Türkiye 'Periyodik Bakım Tablosu Ocak 2025' dokümanından seed değerler. Değerler modele/motora göre değişir.",
+  "models": {
+    "i20_bayon_2020plus_1.0_tgdi_mhev": {
+      "intervals_km": [
+        15000,
+        30000,
+        45000,
+        60000,
+        75000,
+        90000
+      ],
+      "prices": [
+        7715,
+        7314,
+        6488,
+        12953,
+        6488,
+        16872
+      ]
+    },
+    "tucson_hybrid_2021plus": {
+      "intervals_km": [
+        15000,
+        30000,
+        45000,
+        60000
+      ],
+      "prices": [
+        12301,
+        8504,
+        11665,
+        20203
+      ]
+    },
+    "kona_ev_2020plus": {
+      "intervals_km": [
+        15000,
+        30000,
+        45000,
+        60000
+      ],
+      "prices": [
+        3841,
+        3841,
+        3841,
+        3841
+      ]
+    }
+  }
+}

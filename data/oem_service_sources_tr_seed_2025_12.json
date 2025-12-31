@@ -1,0 +1,110 @@
+{
+  "generated_at_local": "2025-12-31 Europe/Istanbul",
+  "purpose": "OEM/official-ish sources to seed TR maintenance/service/insurance datasets for Oto Analiz premium estimates.",
+  "sources": [
+    {
+      "brand": "Hyundai",
+      "category": "maintenance_prices",
+      "source_type": "seed_file_local",
+      "name": "Hyundai OEM periyodik bakım (seed)",
+      "path": "/mnt/data/hyundai_oem_service_seed_2025_01.json",
+      "notes": "Seed dosyası: Hyundai için periyodik bakım kalemleri/fiyat yaklaşımı. (Sohbette yüklenen yerel dosya)"
+    },
+    {
+      "brand": "Ford",
+      "category": "maintenance_prices",
+      "source_type": "official_calculator_page",
+      "name": "Periyodik Bakım İçerik ve Fiyatları (tavan fiyat)",
+      "url": "https://www.ford.com.tr/bakim-fiyati-hesapla",
+      "notes": "Araç bilgileri girilerek periyodik bakım içerik + tavan fiyat bilgisi alınabiliyor."
+    },
+    {
+      "brand": "Ford",
+      "category": "maintenance_packages",
+      "source_type": "official_calculator_page",
+      "name": "Bakım Paketi Hesaplama Aracı",
+      "url": "https://www.ford.com.tr/bakim-ve-onarimlar/bakim-paketi-hesaplama-araci",
+      "notes": "Şasi No + KM ile bakım paketi tavsiye edilen satış fiyatı gösteriliyor."
+    },
+    {
+      "brand": "Peugeot",
+      "category": "maintenance_packages",
+      "source_type": "official_calculator_page",
+      "name": "Full Servis Hesaplama",
+      "url": "https://talep.peugeot.com.tr/satis-sonrasi/full-servis",
+      "notes": "Model/Yıl/ay/km seçilerek sözleşme teklifi hesaplanıyor."
+    },
+    {
+      "brand": "Peugeot",
+      "category": "service_campaigns",
+      "source_type": "official_campaign_page",
+      "name": "Servis Kampanyaları (ör. kış bakım paketi)",
+      "url": "https://www.peugeot.com.tr/satis-sonrasi/bakim/servis-kampanyalari.html",
+      "notes": "Kampanya sayfasında '... TL'den başlayan' paketler gibi fiyat anchorları çıkabiliyor."
+    },
+    {
+      "brand": "Opel",
+      "category": "service_campaigns",
+      "source_type": "official_campaign_page",
+      "name": "Opel Servis Teklifleri (ör. kış bakım paketi)",
+      "url": "https://www.opel.com.tr/opel-sahipleri/servis-teklifleri/tumu.html",
+      "notes": "Kampanya sayfasında fiyat anchorları + paket kapsamı bulunabiliyor."
+    },
+    {
+      "brand": "Volkswagen",
+      "category": "maintenance_scopes_intervals",
+      "source_type": "official_pdf",
+      "name": "VW Bakım Kapsamları / Aralıkları (PDF)",
+      "url": "https://binekarac.vw.com.tr/idhub/content/dam/onehub_pkw/importers/tr/satis-sonrasi-hizmetler/pdf/vw_bakim_kapsamlari_aralik_2025.pdf",
+      "notes": "Bakım kontrol noktaları ve km/yıl aralıkları. Fiyat değil; kapsam/kalem için değerli."
+    },
+    {
+      "brand": "Volkswagen",
+      "category": "maintenance_overview",
+      "source_type": "official_page",
+      "name": "VW Periyodik Bakım sayfası (fiyat/indirim yönlendirmeleri)",
+      "url": "https://binekarac.vw.com.tr/tr/satis-sonrasi/bakim-onarim/periyodik-bakim-fiyatlari.html",
+      "notes": "İndirim dönemleri ve bakım dokümanlarına yönlendirme içeriyor."
+    },
+    {
+      "brand": "Renault",
+      "category": "service_packages",
+      "source_type": "official_page",
+      "name": "Renault 'Bütçe Paketleri' (4+ yaş)",
+      "url": "https://www.renault.com.tr/satis-sonrasi-hizmetler/dusuk-fiyat.html",
+      "notes": "Sabit fiyatlı bakım/onarım paketleri yaklaşımı (fiyatlar model bazlı form/teklifle değişebilir)."
+    },
+    {
+      "brand": "Renault",
+      "category": "service_campaigns",
+      "source_type": "official_campaign_page",
+      "name": "Renault Satış Sonrası Kampanyalar",
+      "url": "https://www.renault.com.tr/kampanyalar/satis-sonrasi-kampanyalari.html",
+      "notes": "Dönemsel kampanyalarla '... TL'den başlayan' paketler/indirimler yayınlanabiliyor."
+    },
+    {
+      "brand": "TSB",
+      "category": "kasko_vehicle_value",
+      "source_type": "official_archive_page",
+      "name": "Kasko Değer Listesi Arşivi (Türkiye Sigorta Birliği)",
+      "url": "https://www.tsb.org.tr/tr/kasko-deger-listesi",
+      "notes": "Kasko baz değer için resmi arşiv; band/prim hesabına temel alınabilir."
+    },
+    {
+      "brand": "SBM",
+      "category": "traffic_cap_table",
+      "source_type": "official_page",
+      "name": "Trafik Sigortası Azami Brüt Prim Tablosu",
+      "url": "https://sbm.org.tr/tr/trafik-sigortasi-azami-brut-prim-tablosu",
+      "notes": "Aylık tavan prim tabloları. Trafik sigortası bandı için resmi kaynak."
+    },
+    {
+      "brand": "GİB",
+      "category": "kasko_value_list_mtv",
+      "source_type": "official_page",
+      "name": "GİB Kasko Değer Listesi (MTV için listeler)",
+      "url": "https://www.gib.gov.tr/yardim-kaynaklar/yararli-bilgiler/kasko-deger-listesi",
+      "notes": "Kasko değer listesi bağlantıları ve yıl bazlı listeler (MTV referans)."
+    }
+  ]
+}
