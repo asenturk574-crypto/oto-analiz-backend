@@ -1008,8 +1008,6 @@ def _score_from_risk(risk_level: str) -> int:
 
 
 def _level_to_uncertainty(level: str) -> Tuple[str, int]:
-    # info_quality.level -> uncertainty
-    # yüksek bilgi -> düşük belirsizlik
     if level == "yüksek":
         return ("düşük", 22)
     if level == "orta":
@@ -1024,11 +1022,9 @@ def build_uncertainty(enriched: Dict[str, Any]) -> Dict[str, Any]:
 
     base_level, base_score = _level_to_uncertainty(iq.get("level", "orta"))
 
-    # Model profili bulunamadıysa belirsizlik artar
     if match == "segment_estimate":
         base_score += 12
 
-    # Eksik alanlar belirsizliği arttırır
     base_score += min(18, 3 * len(missing))
 
     score = _clamp(int(base_score), 0, 100)
@@ -1062,28 +1058,23 @@ def build_uncertainty(enriched: Dict[str, Any]) -> Dict[str, Any]:
 
 
 def _fit_score(req: AnalyzeRequest, enriched: Dict[str, Any]) -> int:
-    # kişiye uygunluk: kullanım tipi + yıllık km + yakıt tercihi + segment
     prof = enriched.get("profile", {}) or {}
     seg = (enriched.get("segment", {}) or {}).get("code", "C_SEDAN")
     fuel = (req.vehicle.fuel or req.profile.fuel_preference or "").lower()
 
     score = 72
 
-    # şehir içi + dizel + düşük km -> uygunluk düşer
     if prof.get("usage") == "city" and fuel == "diesel" and prof.get("yearly_km", 15000) < 12000:
         score -= 10
 
-    # yüksek km -> dizel/hybrid biraz artı (genel mantık)
     if prof.get("yearly_km", 15000) >= 30000:
         if fuel in ("diesel", "hybrid"):
             score += 5
         score += 2
 
-    # premium segment + düşük km -> masraf/uygunluk biraz düşebilir
     if seg in ("PREMIUM_D", "E_SEGMENT") and prof.get("yearly_km_band") == "düşük":
         score -= 6
 
-    # aile kullanımı için C/C-SUV/D artı
     if seg in ("C_SEDAN", "C_SUV", "D_SEDAN"):
         score += 3
 
@@ -1091,7 +1082,6 @@ def _fit_score(req: AnalyzeRequest, enriched: Dict[str, Any]) -> int:
 
 
 def _electronics_score(enriched: Dict[str, Any]) -> int:
-    # Elektronik/donanım hassasiyeti: yaş + premium segment ile düşer
     risk = enriched.get("risk", {}) or {}
     seg = (enriched.get("segment", {}) or {}).get("code", "C_SEDAN")
     age = risk.get("age") or 0
@@ -1121,7 +1111,6 @@ def build_flags(enriched: Dict[str, Any], req: AnalyzeRequest) -> Dict[str, List
     yellow: List[str] = []
     green: List[str] = []
 
-    # RED flags
     if age is not None and age >= 15:
         red.append("Yaş yüksek → büyük bakım/elektronik masraf ihtimali artar. (Aksiyon: servis geçmişi + detaylı ekspertiz + OBD)")
     if km >= 250_000:
@@ -1131,7 +1120,6 @@ def build_flags(enriched: Dict[str, Any], req: AnalyzeRequest) -> Dict[str, List
     if seg in ("PREMIUM_D", "E_SEGMENT") and ((age or 0) >= 10 or km >= 180_000):
         red.append("Premium + yaş/km yükseldikçe parça/işçilik maliyeti çarpan etkisi yapar. (Aksiyon: yedek bütçe + detaylı kontrol)")
 
-    # YELLOW flags
     if uq.get("level") in ("düşük", "orta"):
         yellow.append("İlan/araç bilgileri kısmi → skor bandı daha geniş yorumlanmalı. (Aksiyon: tramer + bakım faturası + net paket/motor)")
     if (enriched.get("market", {}) or {}).get("profile_match") == "segment_estimate":
@@ -1141,7 +1129,6 @@ def build_flags(enriched: Dict[str, Any], req: AnalyzeRequest) -> Dict[str, List
     if fuel in ("hybrid", "electric"):
         yellow.append("Hibrit/EV tarafında batarya sağlığı kritik. (Aksiyon: batarya raporu/garanti şartlarını doğrula)")
 
-    # GREEN flags
     if age is not None and age <= 6 and km <= 120_000:
         green.append("Yaş/km görece dengeli → büyük masraf olasılığı daha yönetilebilir. (Yine de ekspertiz şart)")
     if seg in ("C_SEDAN", "C_SUV"):
@@ -1151,7 +1138,6 @@ def build_flags(enriched: Dict[str, Any], req: AnalyzeRequest) -> Dict[str, List
     if prof.get("usage") == "highway":
         green.append("Uzun yol ağırlıklı kullanım → tüketim daha stabil olabilir; bakım disiplini değerli olur.")
 
-    # limit
     return {
         "red": red[:3],
         "yellow": yellow[:3],
@@ -1173,7 +1159,6 @@ def explain_indices(enriched: Dict[str, Any]) -> Dict[str, Dict[str, Any]]:
         reasons = []
         if match == "segment_estimate":
             reasons.append("Bu puanlar bu modelin direkt verisi değil; aynı segment emsallerinin ortalamasından tahmini türetildi.")
-        # segment heuristics
         if seg in ("PREMIUM_D", "E_SEGMENT"):
             reasons.append("Premium/üst sınıfta OEM parça ve işçilik maliyeti genelde daha yüksek olur; bazı parçalarda termin etkilenebilir.")
         else:
@@ -1240,7 +1225,6 @@ def explain_indices(enriched: Dict[str, Any]) -> Dict[str, Dict[str, Any]]:
 
 
 def build_value_and_negotiation(enriched: Dict[str, Any]) -> Dict[str, Any]:
-    # Pahalı/ucuz hükmü yok. Sadece "etiket" + pazarlık argümanı.
     costs = enriched.get("costs", {}) or {}
     listed = costs.get("listed_price_try")
     segment_code = (enriched.get("segment", {}) or {}).get("code", "C_SEDAN")
@@ -1259,7 +1243,6 @@ def build_value_and_negotiation(enriched: Dict[str, Any]) -> Dict[str, Any]:
             ],
         }
 
-    # nötr etiket: sadece büyüklüğe göre (senin önceki mantık)
     if listed < 500_000:
         label = "Uygun"
     elif listed < 1_200_000:
@@ -1267,7 +1250,6 @@ def build_value_and_negotiation(enriched: Dict[str, Any]) -> Dict[str, Any]:
     else:
         label = "Yüksek"
 
-    # hukuki güvenli yorum
     comment = "Değer yorumu; segment, yaş/km ve ilan detay düzeyine göre *yaklaşık* konumlandırma sağlar. Kesin piyasa fiyatı değildir."
     if segment_code in ("PREMIUM_D", "E_SEGMENT"):
         comment += " Premium/üst sınıfta aynı fiyat bandında bile masraf/riske bağlı değer algısı çok değişebilir."
@@ -1416,6 +1398,12 @@ def build_premium_template(req: AnalyzeRequest, enriched: Dict[str, Any]) -> Dic
     maint_mid = int((maint_min + maint_max) / 2)
     fuel_mid = costs.get("yearly_fuel_tr_mid")
 
+    maint_routine = int(costs.get("maintenance_routine_yearly_est") or int(maint_mid * 0.65))
+    maint_reserve = int(costs.get("maintenance_risk_reserve_yearly_est") or max(0, maint_mid - maint_routine))
+    total_mid = int(maint_mid + (fuel_mid or 0))
+
+    cons_band = costs.get("consumption_l_per_100km_band") or (None, None)
+
     mtv = (taxes.get("mtv") or {})
     insp = (fixed.get("inspection") or {})
 
@@ -1430,7 +1418,6 @@ def build_premium_template(req: AnalyzeRequest, enriched: Dict[str, Any]) -> Dic
     base_risk = risk.get("baseline_risk_level", "orta")
     overall = _score_from_risk(base_risk)
 
-    # extra
     uncertainty = build_uncertainty(enriched)
     flags = build_flags(enriched, req)
     indices_explain = explain_indices(enriched)
@@ -1439,25 +1426,26 @@ def build_premium_template(req: AnalyzeRequest, enriched: Dict[str, Any]) -> Dic
     personal_fit_score = _fit_score(req, enriched)
     electronics_100 = _electronics_score(enriched)
 
-    # basit alt skorlar
     economy_100 = _clamp(78 - int(parts_cost * 2), 0, 100)
     comfort_100 = _clamp(72 if enriched["segment"]["code"] in ("D_SEDAN", "PREMIUM_D", "E_SEGMENT") else 66, 0, 100)
     family_use_100 = _clamp(74 if enriched["segment"]["code"] in ("C_SEDAN", "C_SUV", "D_SEDAN") else 66, 0, 100)
     resale_100 = _clamp(int(resale_liq * 18), 0, 100)
 
-    # risk patterns
+    # risk patterns (SAĞLAMLAŞTIRILDI: string gelirse patlamaz)
     risk_patterns = risk.get("risk_patterns") or []
-    chronic_issues = []
+    chronic_issues: List[str] = []
     for r in risk_patterns[:7]:
-        t = r.get("topic") or "-"
-        sev = r.get("severity") or "orta"
-        trig = r.get("trigger") or "-"
-        chronic_issues.append(f"{t} ({sev}) – tetik: {trig}")
+        if isinstance(r, dict):
+            t = r.get("topic") or r.get("name") or "-"
+            sev = r.get("severity") or r.get("level") or "orta"
+            trig = r.get("trigger") or r.get("note") or "-"
+            chronic_issues.append(f"{t} ({sev}) – tetik: {trig}")
+        else:
+            chronic_issues.append(str(r))
 
     warnings = build_personalized_warnings(enriched, req)
     checklist = build_buy_checklist(enriched, req, max_items=6)
 
-    # Tek bakış özet (3-4 satır)
     tek_bakis = [
         f"Skor: **{overall}/100** | Belirsizlik: **{uncertainty['level']}** (puan: {uncertainty['score_100']}/100)",
         f"Yıllık bakım bandı: **{_fmt_try(maint_min)} – {_fmt_try(maint_max)} TL** | Yakıt: **{_fmt_try(costs['yearly_fuel_tr_min'])} – {_fmt_try(costs['yearly_fuel_tr_max'])} TL**",
@@ -1466,56 +1454,75 @@ def build_premium_template(req: AnalyzeRequest, enriched: Dict[str, Any]) -> Dic
         tek_bakis.append(f"En kritik nokta: {flags['red'][0]}")
     tek_bakis.append("Netleştirme: Tramer + servis kayıtları + OBD taraması skorun güvenini artırır.")
 
-    # RESULT TEXT (premium ekranında gösterilecek)
+    # =========================================================
+    # RESULT TEXT (premium ekranında gösterilecek)  ✅ DEĞİŞEN TEK YER BURASI
+    # =========================================================
     lines: List[str] = []
     lines.append(f"## {title}")
     lines.append("")
+
     if (enriched.get("market", {}) or {}).get("profile_match") == "segment_estimate":
-        lines.append("**Not:** Bu model için doğrudan veri profili bulunamadı; aynı segmentteki emsallerden tahmini endeks/risk üretildi.")
+        lines.append("**Not:** Bu model için doğrudan veri profili bulunamadı; aynı segment emsallerinden **tahmini endeks/risk** üretildi.")
         lines.append("")
 
-    iq = enriched.get("info_quality", {})
-    lines.append(f"**Bilgi seviyesi:** {iq.get('level','-')} (eksikler: {', '.join(iq.get('missing_fields', [])[:6]) or 'yok'})")
+    iq = enriched.get("info_quality", {}) or {}
+    missing_preview = ", ".join((iq.get("missing_fields", []) or [])[:6]) or "yok"
+    lines.append(f"**Bilgi seviyesi:** {iq.get('level','-')} (eksikler: {missing_preview})")
     lines.append("")
 
-    lines.append("### 0) Tek bakış özet")
+    lines.append("---")
+    lines.append("### 0) Tek bakış özeti")
     for t in tek_bakis[:4]:
         lines.append(f"- {t}")
+    lines.append("---")
     lines.append("")
 
-    lines.append("### 1) Oto Analiz Skoru")
+    lines.append("### 1) Oto Analiz Skoru (yön gösterici)")
     lines.append(f"- Genel: **{overall}/100**")
     lines.append(f"- Mekanik: **{_clamp(overall + 2, 0, 100)}/100** | Kaporta: **{_clamp(overall - 1, 0, 100)}/100**")
-    lines.append(f"- Ekonomi: **{economy_100}/100** | Konfor: **{comfort_100}/100** | Aile kullanımı: **{family_use_100}/100**")
-    lines.append(f"- 2. el: **{resale_100}/100** | Elektronik/Donanım: **{electronics_100}/100** | Kişiye uygunluk: **{personal_fit_score}/100**")
+    lines.append(f"- Ekonomi: **{economy_100}/100** | Konfor: **{comfort_100}/100** | Aile: **{family_use_100}/100**")
+    lines.append(f"- 2. el: **{resale_100}/100** | Elektronik: **{electronics_100}/100** | Uygunluk: **{personal_fit_score}/100**")
+    lines.append("- Not: Skorlar **kesin teşhis** değildir; ilan+yaş+km+profil kombinasyonundan **tahmini** üretilir.")
     lines.append("")
 
     lines.append("### 2) Bayraklar (Kırmızı / Sarı / Yeşil)")
     if flags.get("red"):
-        lines.append("- **Kırmızı:**")
+        lines.append("- **Kırmızı (öncelikli kontrol):**")
         for x in flags["red"][:3]:
             lines.append(f"  - {x}")
     if flags.get("yellow"):
-        lines.append("- **Sarı:**")
+        lines.append("- **Sarı (belirsizlik / dikkat):**")
         for x in flags["yellow"][:3]:
             lines.append(f"  - {x}")
     if flags.get("green"):
-        lines.append("- **Yeşil:**")
+        lines.append("- **Yeşil (artı taraflar):**")
         for x in flags["green"][:3]:
             lines.append(f"  - {x}")
     lines.append("")
 
+    lines.append("---")
     lines.append("### 3) Yıllık maliyet özeti (tahmini band)")
-    lines.append(f"- Bakım: **{_fmt_try(maint_min)} – {_fmt_try(maint_max)} TL/yıl**")
-    lines.append(f"- Yakıt/enerji: **{_fmt_try(costs['yearly_fuel_tr_min'])} – {_fmt_try(costs['yearly_fuel_tr_max'])} TL/yıl** (orta: {_fmt_try(fuel_mid)} TL)")
+    lines.append(f"- **Toplam (bakım + yakıt) orta:** **~{_fmt_try(total_mid)} TL/yıl**")
+    lines.append(f"- Bakım bandı: **{_fmt_try(maint_min)} – {_fmt_try(maint_max)} TL/yıl**")
+    lines.append(f"  - Rutin bakım tahmini: **~{_fmt_try(maint_routine)} TL**")
+    lines.append(f"  - Risk payı (beklenmedik): **~{_fmt_try(maint_reserve)} TL**")
+    lines.append(f"- Yakıt/enerji bandı: **{_fmt_try(costs['yearly_fuel_tr_min'])} – {_fmt_try(costs['yearly_fuel_tr_max'])} TL/yıl** (orta: {_fmt_try(fuel_mid)} TL)")
+    if isinstance(cons_band, (list, tuple)) and len(cons_band) == 2 and cons_band[0] is not None:
+        lines.append(f"- Tüketim bandı (segment tahmini): **{cons_band[0]} – {cons_band[1]} L/100km**")
     if mtv.get("ok"):
         lines.append(f"- MTV: **{_fmt_try(mtv['mtv_yearly_try_min'])} – {_fmt_try(mtv['mtv_yearly_try_max'])} TL/yıl**")
     if insp.get("ok"):
         lines.append(f"- Muayene yıllık ortalama: **~{_fmt_try(insp['annual_equivalent_try_2026_estimated'])} TL/yıl**")
     if traffic.get("ok"):
-        lines.append(f"- Trafik sigortası: **{_fmt_try(traffic['traffic_est_try_min'])} – {_fmt_try(traffic['traffic_est_try_max'])} TL/yıl** (tavan: {_fmt_try(traffic['traffic_cap_try'])})")
+        mid = traffic.get("traffic_est_try_mid")
+        mid_txt = f" (orta: {_fmt_try(mid)})" if isinstance(mid, int) else ""
+        lines.append(f"- Trafik sigortası: **{_fmt_try(traffic['traffic_est_try_min'])} – {_fmt_try(traffic['traffic_est_try_max'])} TL/yıl**{mid_txt} (tavan: {_fmt_try(traffic['traffic_cap_try'])})")
     if kasko.get("ok"):
-        lines.append(f"- Kasko: **{_fmt_try(kasko['kasko_try_min'])} – {_fmt_try(kasko['kasko_try_max'])} TL/yıl**")
+        kmid = kasko.get("kasko_try_mid")
+        kmid_txt = f" (orta: {_fmt_try(kmid)})" if isinstance(kmid, int) else ""
+        lines.append(f"- Kasko: **{_fmt_try(kasko['kasko_try_min'])} – {_fmt_try(kasko['kasko_try_max'])} TL/yıl**{kmid_txt}")
+    lines.append("- Not: Bu bandlar, ilan bilgisi azaldıkça **daha geniş** tutulur.")
+    lines.append("---")
     lines.append("")
 
     lines.append("### 4) Risk & kronik eğilimler (tahmini)")
@@ -1526,7 +1533,7 @@ def build_premium_template(req: AnalyzeRequest, enriched: Dict[str, Any]) -> Dic
             lines.append(f"  - {ci}")
     if warnings:
         lines.append("- Uyarılar:")
-        for w in warnings[:5]:
+        for w in warnings[:6]:
             lines.append(f"  - {w}")
     lines.append("")
 
@@ -1588,10 +1595,22 @@ def build_premium_template(req: AnalyzeRequest, enriched: Dict[str, Any]) -> Dic
         lines.append(f"- {c}")
     lines.append("")
 
-    lines.append("### 10) Son özet")
-    lines.append("- Bu rapor; segment emsalleri, yaş/km ve kullanım profiline göre **tahmini band** üretir.")
-    lines.append("- **Kesin tespit** için ekspertiz + tramer + OBD taraması birlikte değerlendirilmelidir.")
-    lines.append("- Eğer belirsizlik yüksekse, skorlar “yön gösterici” olarak yorumlanmalı ve veri arttıkça rapor güncellenmelidir.")
+    # SON ÖZET (daha okunur, daha “final” hissi)
+    lines.append("---")
+    lines.append("### 10) Son özet (1 dakikalık karar notu)")
+    if personal_fit_score >= 78:
+        fit_label = "profilinle **uyumlu** görünüyor"
+    elif personal_fit_score >= 62:
+        fit_label = "profilinle **uyumlu ama dikkat isteyen** bir tablo var"
+    else:
+        fit_label = "profilinde **masraf/uyum riski daha yüksek** olabilir"
+
+    lines.append(f"- Genel tablo: Skor **{overall}/100**, belirsizlik **{uncertainty['level']}** → bu araç {fit_label}.")
+    lines.append(f"- Bütçe tarafı: Yıllık **bakım+yakıt orta ~{_fmt_try(total_mid)} TL** bandında düşün (sigorta/vergi ayrı).")
+    if flags.get("red"):
+        lines.append(f"- En kritik kontrol: **{flags['red'][0]}**")
+    lines.append("- Kesin tespit için: **Ekspertiz + Tramer + OBD** birlikte değerlendirilmelidir (bu rapor kesin hüküm içermez).")
+    lines.append("---")
 
     result_text = "\n".join(lines)
 
@@ -1697,11 +1716,6 @@ Kurallar:
 def premium_analyze_impl(req: AnalyzeRequest) -> Dict[str, Any]:
     enriched = build_enriched_context(req)
     base = build_premium_template(req, enriched)
-
-    # Eğer isterseniz, LLM sadece "summary" alanlarını daha doğal yapabilir.
-    # Bu sürümde base içinde summary/risk_analysis yok; dolayısıyla rewrite opsiyonel bırakıldı.
-    # İleride summary eklemek isterseniz açabiliriz.
-
     return base
 
 
@@ -1874,3 +1888,9 @@ async def otobot(req: OtoBotRequest) -> Dict[str, Any]:
         "suggested_segments": ["C-sedan", "C-SUV", "B-Hatch"],
         "example_models": ["Toyota Corolla", "Renault Megane", "Honda Civic", "Hyundai Tucson"]
     }
+
+
+if __name__ == "__main__":
+    # Lokal çalıştırma için:
+    # uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+    pass
