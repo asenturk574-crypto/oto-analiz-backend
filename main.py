@@ -1049,7 +1049,7 @@ def build_enriched_context(req: AnalyzeRequest) -> Dict[str, Any]:
 
 
 # =========================================================
-# PREMIUM TEMPLATE (deterministic)
+# PREMIUM TEMPLATE (deterministic) + KİŞİSELLEŞTİRME
 # =========================================================
 def _score_from_risk(risk_level: str) -> int:
     if risk_level == "düşük":
@@ -1061,6 +1061,135 @@ def _score_from_risk(risk_level: str) -> int:
     if risk_level == "yüksek":
         return 62
     return 74
+
+
+def build_personalized_warnings(enriched: Dict[str, Any], req: Optional[AnalyzeRequest] = None) -> List[str]:
+    """
+    Araç yaşı, km, kullanım tipi ve yakıta göre uyarıları kişiselleştir.
+    - Yeni & düşük km: kozmetik + garanti odaklı
+    - Yaşlı / yüksek km: motor / şanzıman / yürüyen odaklı
+    - Arada: dengeli
+    """
+    risk = enriched.get("risk", {}) or {}
+    profile = enriched.get("profile", {}) or {}
+
+    age = risk.get("age")
+    mileage = risk.get("mileage_km") or 0
+    usage = profile.get("usage", "mixed")
+    info_q = enriched.get("info_quality", {}) or {}
+
+    fuel = ""
+    if req is not None:
+        fuel = (req.vehicle.fuel or req.profile.fuel_preference or "") if hasattr(req, "vehicle") else ""
+    if not fuel:
+        fuel = profile.get("fuel_preference", "")
+
+    warnings: List[str] = []
+
+    # Bilgi seviyesi uyarısı
+    if info_q.get("level") == "düşük":
+        warnings.append("Bilgi seviyesi düşük: eksik alanlar var. Tahminler geniş band olarak verildi.")
+
+    # Yaş / km odaklı uyarılar
+    if age is not None and age <= 3 and mileage <= 60_000:
+        # Yeni, düşük km
+        warnings.append("Araç görece yeni ve düşük kilometreli; büyük mekanik sorun beklenmez, yine de garanti ve periyodik bakımları yetkili servisten doğrula.")
+        warnings.append("Kaporta/boya üzerindeki çizik, sürtme ve lokal boya işlemleri ile iç mekân yıpranmasını detaylı kontrol et; fiyat pazarlığında daha çok kozmetiği kullan.")
+        if usage == "city":
+            warnings.append("Yoğun şehir içi kullanımda fren ve lastiklerdeki aşınmayı, jant eğikliklerini ve süspansiyon darbelerini kontrol ettir.")
+    elif (age is not None and age >= 10) or mileage >= 180_000:
+        # Yaşlı veya yüksek km
+        warnings.append("Araç yaşlı veya yüksek kilometreli; motor, turbo/enjektör ve soğutma sistemi için detaylı mekanik kontrol şart.")
+        warnings.append("Otomatik şanzıman/diferansiyel için yağ değişim geçmişini sorgula; test sürüşünde vuruntu, gecikme ve titreme olup olmadığına bak.")
+        warnings.append("Lift üzerinde alt takım, aks körükleri, salıncak burçları ve direksiyon kutusu boşluklarını kontrol ettir; bu kalemlerin toplu değişimi ciddi maliyet çıkarabilir.")
+    else:
+        # Orta yaş/km
+        warnings.append("Araç yaş/km açısından orta seviyede; hem mekanik hem kozmetik durumu birlikte değerlendir, tek bir noktaya odaklanma.")
+        if usage == "city":
+            warnings.append("Şehir içi ağırlıklı kullanımda debriyaj (manuel), fren ve süspansiyon elemanlarına özellikle dikkat et.")
+        elif usage == "highway":
+            warnings.append("Uzun yol kullanımında taş izleri, cam çatlakları ve yüksek hızda balans titremelerini kontrol ettir.")
+
+    # Yakıt tipine göre ek uyarılar
+    f = str(fuel or "").lower()
+    if "diesel" in f:
+        warnings.append("Dizel motorda DPF/EGR ve enjektör sağlığını kontrol ettir; kısa mesafe ve şehir içi kullanımda kurumlanma riski artar.")
+    elif "lpg" in f:
+        warnings.append("LPG'li araçta montaj kalitesi, ayar ve subap durumu kritik; kompresyon testi ve egzoz değerlerini mutlaka kontrol ettir.")
+    elif "hybrid" in f or "electric" in f:
+        warnings.append("Hibrit/elektrikli araçlarda batarya sağlığı, garanti koşulları ve yetkili servis desteği uzun vadeli maliyeti belirler.")
+
+    # Var olan risk notlarını ekle (tekrar etmeden)
+    base_notes = risk.get("risk_notes") or []
+    for r in base_notes:
+        if r and r not in warnings:
+            warnings.append(r)
+
+    fuel_comment = risk.get("fuel_risk_comment")
+    if fuel_comment and fuel_comment not in warnings:
+        warnings.append(fuel_comment)
+
+    # Toplamı sınırlı tut
+    return warnings[:8]
+
+
+def build_buy_checklist(enriched: Dict[str, Any], req: Optional[AnalyzeRequest] = None, max_items: int = 6) -> List[str]:
+    """
+    Satın almadan önce yapılacaklar listesini araç yaş/km ve yakıt tipine göre kişiselleştirir.
+    Segmentten gelen inspection_checklist'i de karıştırır.
+    """
+    risk = enriched.get("risk", {}) or {}
+    profile = enriched.get("profile", {}) or {}
+
+    age = risk.get("age")
+    mileage = risk.get("mileage_km") or 0
+    usage = profile.get("usage", "mixed")
+
+    fuel = ""
+    if req is not None:
+        fuel = (req.vehicle.fuel or req.profile.fuel_preference or "") if hasattr(req, "vehicle") else ""
+    if not fuel:
+        fuel = profile.get("fuel_preference", "")
+
+    base_list = list(enriched.get("inspection_checklist") or [])
+    checklist: List[str] = []
+
+    # Yeni & düşük km
+    if age is not None and age <= 3 and mileage <= 60_000:
+        checklist.extend([
+            "Kaporta ve boya üzerinde çizik, sürtme ve lokal boyaları detaylı kontrol et; ağır hasar veya parça değişimi var mı bak.",
+            "İç mekân (koltuk, direksiyon, pedallar) yıpranma seviyesini kilometre ile karşılaştır; uyumsuzluk varsa sorgula.",
+            "Garantisi devam ediyorsa yetkili servis bakım kayıtlarını ve açık kampanya/geri çağırma olup olmadığını kontrol et.",
+        ])
+    # Yaşlı veya yüksek km
+    elif (age is not None and age >= 10) or mileage >= 180_000:
+        checklist.extend([
+            "Motor için kompresyon testi, yağ kaçak kontrolü ve üfleme testi yaptır.",
+            "Otomatik şanzımanda vuruntu, gecikmeli/vuruntulu geçiş ve titreme olup olmadığını test sürüşünde dene.",
+            "Lift üzerinde alt takım, aks körükleri, salıncak burçları ve direksiyon kutusu boşluklarını kontrol ettir.",
+        ])
+    # Orta yaş/km
+    else:
+        checklist.extend([
+            "Rutin bakım kalemlerinin (yağ, filtreler, triger, fren) ne zaman değiştiğini belgeyle doğrula.",
+            "Lastik diş derinliği, balans ve fren performansını test sürüşünde kontrol et.",
+        ])
+
+    # Yakıt tipine göre ek maddeler
+    f = str(fuel or "").lower()
+    if "diesel" in f:
+        checklist.append("Dizel araçta DPF/EGR durumu, enjektör kaçak testi ve turbo basıncını uzman bir serviste kontrol ettir.")
+    elif "lpg" in f:
+        checklist.append("LPG sisteminin ruhsata işli olup olmadığını, tesisatın projeli ve montajının düzgün olduğunu doğrula; subapların durumunu kontrol ettir.")
+
+    # Segment checklist'inden önemli maddeleri ekle
+    for item in base_list:
+        if len(checklist) >= max_items:
+            break
+        if item not in checklist:
+            checklist.append(item)
+
+    return checklist[:max_items]
 
 
 def build_premium_template(req: AnalyzeRequest, enriched: Dict[str, Any]) -> Dict[str, Any]:
@@ -1167,14 +1296,11 @@ def build_premium_template(req: AnalyzeRequest, enriched: Dict[str, Any]) -> Dic
         trig = r.get("trigger") or "-"
         chronic_issues.append(f"{t} ({sev}) – tetik: {trig}")
 
-    warnings = (risk.get("risk_notes") or [])[:]
-    if risk.get("fuel_risk_comment"):
-        warnings.append(risk["fuel_risk_comment"])
-    if enriched.get("info_quality", {}).get("level") == "düşük":
-        warnings.insert(0, "Bilgi seviyesi düşük: eksik alanlar var. Tahminler geniş band olarak verildi.")
+    # Kişiselleştirilmiş uyarılar
+    warnings = build_personalized_warnings(enriched, req)
 
-    # Inspection checklist
-    checklist = enriched.get("inspection_checklist") or []
+    # Inspection checklist (kişiselleştirilmiş)
+    checklist = build_buy_checklist(enriched, req, max_items=6)
     if checklist:
         negotiation_tips.append("Alım öncesi hızlı checklist: " + " | ".join(checklist[:5]))
 
@@ -1230,7 +1356,7 @@ def build_premium_template(req: AnalyzeRequest, enriched: Dict[str, Any]) -> Dic
     lines.append("")
 
     lines.append("### 6) Son yorum")
-    lines.append("Bu rapor; segment emsalleri, yaş/km ve kullanım profiline göre **band** üretir. Kesin karar için ekspertiz + tramer + OBD taraması mutlaka birlikte değerlendirilmeli.")
+    lines.append("Bu rapor; segment emsalleri, yaş/km ve kullanım profiline göre **band** üretir. Kesin karar için ekspertiz + tramer + OBD taraması mutlaka birlikte değerlendirilmelidir.")
 
     result_text = "\n".join(lines)
 
