@@ -57,6 +57,16 @@ class Profile(BaseModel):
     usage: str = "mixed"              # city / mixed / highway
     fuel_preference: str = "gasoline" # gasoline / diesel / lpg / hybrid / electric
 
+    # ✅ Şehir bilgisi (isteğe bağlı): İstanbul seçtiyse bunu yazar
+    city: Optional[str] = None        # "İstanbul" / "34" vb.
+    city_code: Optional[str] = None   # "34" vb. (plaka kodu)
+
+    # ✅ Vites tercihi (opsiyonel)
+    transmission_preference: Optional[str] = None  # auto / manual / any
+
+    class Config:
+        extra = "allow"
+
 
 class Vehicle(BaseModel):
     make: str = ""
@@ -64,6 +74,12 @@ class Vehicle(BaseModel):
     year: Optional[int] = Field(None, ge=1980, le=2035)
     mileage_km: Optional[int] = Field(None, ge=0)
     fuel: Optional[str] = None        # gasoline / diesel / lpg / hybrid / electric
+
+    # ✅ İlan/SS’den gelebilir
+    transmission: Optional[str] = None  # automatic / manual
+
+    class Config:
+        extra = "allow"
 
 
 class AnalyzeRequest(BaseModel):
@@ -311,6 +327,9 @@ TRAFFIC_CAPS: Dict[str, Any] = _load_json(_dp("traffic_caps_tr_2025_12_seed.json
 MTV_PACK: Dict[str, Any] = _load_json(_dp("mtv_tr_2025_2026_estimated_1895.json"), {})
 FIXED_COSTS: Dict[str, Any] = _load_json(_dp("fixed_costs_tr_2026_estimated.json"), {})
 
+# ✅ Yeni: Şehir trafik yoğunluğu (opsiyonel veri pack)
+CITY_CONGESTION: Dict[str, Any] = _load_json(_dp("city_congestion_tr_tomtom_2024_citycenter.json"), {})
+
 
 def _build_segment_stats(profiles: List[Dict[str, Any]]) -> Dict[str, Dict[str, float]]:
     agg: Dict[str, Dict[str, List[int]]] = {}
@@ -341,6 +360,201 @@ def _build_segment_stats(profiles: List[Dict[str, Any]]) -> Dict[str, Dict[str, 
 
 
 SEGMENT_STATS = _build_segment_stats(VEHICLE_PROFILES)
+
+
+# =========================================================
+# CITY + TRANSMISSION HELPERS (✅ yeni)
+# =========================================================
+def _zfill_plate(code: Any) -> Optional[str]:
+    if code is None:
+        return None
+    try:
+        c = str(int(str(code).strip()))
+        if 1 <= int(c) <= 81:
+            return c.zfill(2)
+    except:
+        pass
+    s = str(code).strip()
+    if s.isdigit():
+        try:
+            n = int(s)
+            if 1 <= n <= 81:
+                return str(n).zfill(2)
+        except:
+            pass
+    return None
+
+
+def _resolve_plate_city_code(req: AnalyzeRequest) -> str:
+    # 1) context üst öncelik
+    ctx = req.context or {}
+    code = _zfill_plate(ctx.get("plate_city_code") or ctx.get("city_code") or ctx.get("plate"))
+    if code:
+        return code
+
+    # 2) profile.city_code
+    p = req.profile or Profile()
+    code = _zfill_plate(getattr(p, "city_code", None))
+    if code:
+        return code
+
+    # 3) profile.city sayıysa
+    code = _zfill_plate(getattr(p, "city", None))
+    if code:
+        return code
+
+    # 4) profile.city isimse TRAFFIC_CAPS içinden eşleştir
+    city_name = getattr(p, "city", None)
+    if isinstance(city_name, str) and city_name.strip():
+        cities = (TRAFFIC_CAPS or {}).get("cities") or {}
+        target = _norm(city_name)
+        for k, v in cities.items():
+            nm = v.get("name")
+            if nm and _norm(nm) == target:
+                kk = _zfill_plate(k)
+                if kk:
+                    return kk
+
+    # default İstanbul
+    return "34"
+
+
+def _resolve_city_name_by_code(code: str) -> Optional[str]:
+    cities = (TRAFFIC_CAPS or {}).get("cities") or {}
+    c = _zfill_plate(code) or code
+    info = cities.get(c)
+    if isinstance(info, dict) and info.get("name"):
+        return info["name"]
+    return None
+
+
+def _infer_transmission(req: AnalyzeRequest) -> Optional[str]:
+    # 1) Vehicle alanı
+    if getattr(req.vehicle, "transmission", None):
+        t = _norm(str(req.vehicle.transmission))
+        if "auto" in t or "otom" in t:
+            return "automatic"
+        if "man" in t:
+            return "manual"
+
+    # 2) context
+    ctx = req.context or {}
+    for k in ("transmission", "vites", "gearbox", "sanziman"):
+        if ctx.get(k):
+            t = _norm(str(ctx.get(k)))
+            if "otom" in t or "auto" in t or "dsg" in t or "cvt" in t or "dct" in t:
+                return "automatic"
+            if "man" in t:
+                return "manual"
+
+    # 3) metin tarama
+    blob = f"{req.ad_description or ''} {json.dumps(ctx, ensure_ascii=False)} {req.vehicle.make} {req.vehicle.model}"
+    t = _norm(blob)
+    if any(x in t for x in ["otomatik", "automatic", "dsg", "s tronic", "s-tronic", "cvt", "dct", "edc", "powershift"]):
+        return "automatic"
+    if any(x in t for x in ["manuel", "manual"]):
+        return "manual"
+
+    return None
+
+
+def get_city_congestion_context(req: AnalyzeRequest) -> Dict[str, Any]:
+    code = _resolve_plate_city_code(req)
+    name = _resolve_city_name_by_code(code) or (getattr(req.profile, "city", None) if req.profile else None)
+
+    pack_cities = (CITY_CONGESTION or {}).get("cities") or {}
+    row = pack_cities.get(code)
+
+    if not isinstance(row, dict):
+        return {
+            "ok": False,
+            "city_code": code,
+            "city_name": name,
+            "source": (CITY_CONGESTION or {}).get("source"),
+            "note": "Bu şehir için trafik yoğunluğu datası yok; genel yorum üretilecek."
+        }
+
+    avg = row.get("avg_congestion_level_pct")
+    morning = row.get("morning_peak_pct")
+    evening = row.get("evening_peak_pct")
+
+    def _label(x: Optional[int]) -> str:
+        if not isinstance(x, int):
+            return "bilinmiyor"
+        if x >= 45:
+            return "çok yoğun"
+        if x >= 35:
+            return "yoğun"
+        if x >= 25:
+            return "orta"
+        return "rahat"
+
+    return {
+        "ok": True,
+        "city_code": code,
+        "city_name": row.get("name") or name,
+        "avg_pct": int(avg) if isinstance(avg, int) else None,
+        "morning_peak_pct": int(morning) if isinstance(morning, int) else None,
+        "evening_peak_pct": int(evening) if isinstance(evening, int) else None,
+        "label": _label(int(avg) if isinstance(avg, int) else None),
+        "source": (CITY_CONGESTION or {}).get("source"),
+        "note": None,
+    }
+
+
+def build_city_fit_lines(req: AnalyzeRequest, enriched: Dict[str, Any]) -> List[str]:
+    ctx = get_city_congestion_context(req)
+    prof = enriched.get("profile", {}) or {}
+    usage = prof.get("usage", "mixed")
+    yearly_km = int(prof.get("yearly_km", 15000) or 15000)
+
+    fuel = (req.vehicle.fuel or req.profile.fuel_preference or "").lower().strip()
+    trn = _infer_transmission(req)
+
+    out: List[str] = []
+
+    # şehir satırı
+    if ctx.get("city_name"):
+        if ctx.get("ok"):
+            out.append(
+                f"- Şehir: **{ctx['city_name']}** → trafik yoğunluğu **{ctx.get('label','-')}** "
+                f"(ortalama ~%{ctx.get('avg_pct','-')}, akşam pik ~%{ctx.get('evening_peak_pct','-')})."
+            )
+        else:
+            out.append(f"- Şehir: **{ctx['city_name']}** → trafik yoğunluğu verisi yok; genel şehir içi mantığıyla yorumlandı.")
+
+    # ağır trafik var mı?
+    heavy_city = False
+    if ctx.get("ok") and isinstance(ctx.get("evening_peak_pct"), int) and ctx["evening_peak_pct"] >= 70:
+        heavy_city = True
+    if usage == "city":
+        heavy_city = True
+
+    # vites yorumu
+    if heavy_city:
+        if trn == "manual":
+            out.append("- Trafik/stop-go senaryoda **manuel vites yorucu** olabilir; otomatik/yarı otomatik konforu ciddi artırır.")
+        elif trn == "automatic":
+            out.append("- Trafik yoğun kullanımda **otomatik/yarı otomatik** tercih, konfor ve günlük kullanım kolaylığı sağlar.")
+        else:
+            out.append("- Vites tipi net değil; yoğun trafikte otomatik/yarı otomatik genelde daha rahat bir tercih olur.")
+
+    # yakıt yorumu
+    if heavy_city:
+        if fuel == "diesel" and yearly_km < 15000:
+            out.append("- Yoğun şehir içi + düşük/orta km’de **dizelde DPF/EGR** tarafı daha hassas olabilir (kısa mesafe arttıkça risk büyür).")
+        if fuel in ("hybrid", "electric"):
+            out.append("- **Hibrit/EV**, stop-go trafikte tüketim avantajını ve rejenerasyon faydasını daha belirgin hissettirir.")
+        if fuel == "lpg":
+            out.append("- **LPG** şehir içinde ekonomik olabilir; ancak montaj/ayar kalitesi ve periyodik kontrol daha kritik hale gelir.")
+
+    # kullanım tipine bağla
+    if usage == "highway":
+        out.append("- Uzun yol ağırlıklı kullanımda tüketim daha stabil olur; bakım disiplini ve lastik/fren durumu öne çıkar.")
+    elif usage == "city":
+        out.append("- Şehir içi ağırlıkta fren/lastik/alt takım yıpranması daha hızlı olabilir; buna göre bütçe payı bırakmak mantıklı.")
+
+    return out[:6]
 
 
 # =========================================================
@@ -715,7 +929,9 @@ def estimate_vehicle_inspection(req: AnalyzeRequest) -> Dict[str, Any]:
 def estimate_traffic_insurance(req: AnalyzeRequest) -> Dict[str, Any]:
     caps = TRAFFIC_CAPS or {}
     cities = caps.get("cities") or {}
-    city_code = str((req.context or {}).get("plate_city_code") or "34")
+
+    # ✅ şehir kodunu artık profile/context/name’den doğru çöz
+    city_code = _resolve_plate_city_code(req)
     if city_code not in cities:
         city_code = "34"
 
@@ -1055,6 +1271,9 @@ def build_enriched_context(req: AnalyzeRequest) -> Dict[str, Any]:
             "yearly_km_band": yearly_km_band,
             "usage": p.usage,
             "fuel_preference": p.fuel_preference,
+            "city": getattr(p, "city", None),
+            "city_code": getattr(p, "city_code", None),
+            "transmission_preference": getattr(p, "transmission_preference", None),
         },
         "info_quality": info_q,
         "anchors_used": [
@@ -1067,7 +1286,7 @@ def build_enriched_context(req: AnalyzeRequest) -> Dict[str, Any]:
 
 
 # =========================================================
-# PREMIUM: EXTRA "DOLU DOLU" HELPERS (FLAGS / INDEX EXPLAIN / UNCERTAINTY / VALUE)
+# PREMIUM: EXTRA "DOLU DOLU" HELPERS
 # =========================================================
 def _score_from_risk(risk_level: str) -> int:
     if risk_level == "düşük":
@@ -1212,11 +1431,7 @@ def build_flags(enriched: Dict[str, Any], req: AnalyzeRequest) -> Dict[str, List
     if prof.get("usage") == "highway":
         green.append("Uzun yol ağırlıklı kullanım → tüketim daha stabil olabilir; bakım disiplini değerli olur.")
 
-    return {
-        "red": red[:3],
-        "yellow": yellow[:3],
-        "green": green[:3],
-    }
+    return {"red": red[:3], "yellow": yellow[:3], "green": green[:3]}
 
 
 def explain_indices(enriched: Dict[str, Any]) -> Dict[str, Dict[str, Any]]:
@@ -1266,7 +1481,7 @@ def explain_indices(enriched: Dict[str, Any]) -> Dict[str, Dict[str, Any]]:
             return "2. el likiditesi yüksek; temiz örneklerin alıcısı daha hızlı bulunabilir."
         return "Ortalama."
 
-    out = {
+    return {
         "parts_availability": {
             "score_1_5": parts_av,
             "meaning": _meaning(parts_av, "availability"),
@@ -1295,7 +1510,6 @@ def explain_indices(enriched: Dict[str, Any]) -> Dict[str, Dict[str, Any]]:
             "action": "Aksiyon: aynı segmentte 3–5 emsal ilanı (km/hasar/paket) kıyaslayıp fiyatlama mantığını kontrol et."
         },
     }
-    return out
 
 
 def build_value_and_negotiation(enriched: Dict[str, Any]) -> Dict[str, Any]:
@@ -1453,7 +1667,7 @@ def build_buy_checklist(enriched: Dict[str, Any], req: Optional[AnalyzeRequest] 
 
 
 # =========================================================
-# PREMIUM TEMPLATE (deterministic) + "DOLU DOLU" SECTIONS
+# PREMIUM TEMPLATE
 # =========================================================
 def build_premium_template(req: AnalyzeRequest, enriched: Dict[str, Any]) -> Dict[str, Any]:
     v = req.vehicle
@@ -1505,7 +1719,6 @@ def build_premium_template(req: AnalyzeRequest, enriched: Dict[str, Any]) -> Dic
     family_use_100 = _clamp(74 if enriched["segment"]["code"] in ("C_SEDAN", "C_SUV", "D_SEDAN") else 66, 0, 100)
     resale_100 = _clamp(int(resale_liq * 18), 0, 100)
 
-    # risk patterns (SAĞLAMLAŞTIRILDI: string gelirse patlamaz)
     risk_patterns = risk.get("risk_patterns") or []
     chronic_issues: List[str] = []
     for r in risk_patterns[:7]:
@@ -1529,7 +1742,7 @@ def build_premium_template(req: AnalyzeRequest, enriched: Dict[str, Any]) -> Dic
     tek_bakis.append("Netleştirme: Tramer + servis kayıtları + OBD taraması skorun güvenini artırır.")
 
     # =========================================================
-    # RESULT TEXT (premium ekranında gösterilecek)  ✅ DEĞİŞEN TEK YER BURASI
+    # RESULT TEXT
     # =========================================================
     lines: List[str] = []
     lines.append(f"## {title}")
@@ -1633,8 +1846,14 @@ def build_premium_template(req: AnalyzeRequest, enriched: Dict[str, Any]) -> Dic
     lines.append(f"  - {indices_explain['resale_liquidity']['action']}")
     lines.append("")
 
+    # ✅ ŞEHİR + TRAFİK + VİTES + YAKIT yorumları burada
     lines.append("### 6) Kişiye uygunluk (profil bazlı)")
     lines.append(f"- Profil: yıllık **{prof['yearly_km']} km** ({prof['yearly_km_band']}), kullanım: **{prof['usage']}**, yakıt tercihi: **{prof['fuel_preference']}**")
+
+    city_fit_lines = build_city_fit_lines(req, enriched)
+    for cl in city_fit_lines:
+        lines.append(cl)
+
     lines.append("- Bu bölüm; yıllık km ve kullanım tipine göre yakıt/segment mantığını yorumlar (kesin hüküm değil).")
     if prof["yearly_km_band"] == "düşük":
         lines.append("- Yıllık km düşükse, yüksek masraf potansiyelli seçeneklerde “gereksiz masraf” riski artabilir; bakım disiplini belirleyicidir.")
@@ -1669,7 +1888,6 @@ def build_premium_template(req: AnalyzeRequest, enriched: Dict[str, Any]) -> Dic
         lines.append(f"- {c}")
     lines.append("")
 
-    # SON ÖZET (daha okunur, daha “final” hissi)
     lines.append("---")
     lines.append("### 10) Son özet (1 dakikalık karar notu)")
     if personal_fit_score >= 78:
@@ -1688,7 +1906,6 @@ def build_premium_template(req: AnalyzeRequest, enriched: Dict[str, Any]) -> Dic
 
     result_text = "\n".join(lines)
 
-    # preview etiketi (fiyat varsa)
     price_tag = None
     if listed:
         if listed < 500_000:
@@ -1736,12 +1953,16 @@ def build_premium_template(req: AnalyzeRequest, enriched: Dict[str, Any]) -> Dic
                 "Belirsizlik ve netleştirme planı",
             ],
         },
-        "final_snapshot": {
-            "tek_bakis_lines": tek_bakis[:4],
-        },
+        "final_snapshot": {"tek_bakis_lines": tek_bakis[:4]},
         "result": result_text,
     }
     return out
+
+
+def premium_analyze_impl(req: AnalyzeRequest) -> Dict[str, Any]:
+    enriched = build_enriched_context(req)
+    base = build_premium_template(req, enriched)
+    return base
 
 
 # =========================================================
@@ -1766,36 +1987,6 @@ def call_llm_json(model_name: str, system_prompt: str, user_content: str) -> Opt
         return None
 
 
-SYSTEM_PROMPT_PREMIUM_REWRITE = """
-Sen Oto Analiz uygulaması için PREMIUM analiz metinlerini iyileştiren bir asistansın.
-Senden sadece şu alanları daha doğal ve bilgili yapmanı istiyorum:
-- summary.short_comment
-- summary.pros (3-5 madde)
-- summary.cons (3-5 madde)
-- summary.who_should_buy (1-3 cümle)
-- risk_analysis.warnings (5-10 madde, tekrar yok)
-
-Kurallar:
-- Rakamları UYDURMA, verilen sayıları değiştirme.
-- 'alınır/alınmaz/sakın/tehlikeli' gibi kesin ifadeler kullanma.
-- Dil Türkçe.
-ÇIKTI SADECE JSON:
-{
-  "summary": {"short_comment":"", "pros":[], "cons":[], "who_should_buy":""},
-  "risk_analysis": {"warnings":[]}
-}
-""".strip()
-
-
-def premium_analyze_impl(req: AnalyzeRequest) -> Dict[str, Any]:
-    enriched = build_enriched_context(req)
-    base = build_premium_template(req, enriched)
-    return base
-
-
-# =========================================================
-# NORMAL / MANUAL / COMPARE / OTOBOT (light LLM)
-# =========================================================
 SYSTEM_PROMPT_NORMAL = """
 Sen 'Oto Analiz' uygulaması için çalışan bir araç ilanı analiz asistanısın.
 ÇIKTIYI SADECE GEÇERLİ BİR JSON OLARAK DÖN. ŞABLON:

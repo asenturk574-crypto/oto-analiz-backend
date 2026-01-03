@@ -1,0 +1,17 @@
+{
+  "source": "TomTom Traffic Index 2024 (City Center) - TR (available cities only)",
+  "metric": "congestion_level_percent",
+  "cities": {
+    "01": { "name": "Adana", "avg_congestion_level_pct": 34, "morning_peak_pct": 47, "evening_peak_pct": 58 },
+    "06": { "name": "Ankara", "avg_congestion_level_pct": 40, "morning_peak_pct": 69, "evening_peak_pct": 75 },
+    "07": { "name": "Antalya", "avg_congestion_level_pct": 34, "morning_peak_pct": 48, "evening_peak_pct": 76 },
+    "16": { "name": "Bursa", "avg_congestion_level_pct": 31, "morning_peak_pct": 39, "evening_peak_pct": 75 },
+    "27": { "name": "Gaziantep", "avg_congestion_level_pct": 31, "morning_peak_pct": 38, "evening_peak_pct": 53 },
+    "33": { "name": "Mersin", "avg_congestion_level_pct": 35, "morning_peak_pct": 36, "evening_peak_pct": 59 },
+    "34": { "name": "İstanbul", "avg_congestion_level_pct": 41, "morning_peak_pct": 61, "evening_peak_pct": 85 },
+    "35": { "name": "İzmir", "avg_congestion_level_pct": 41, "morning_peak_pct": 54, "evening_peak_pct": 70 },
+    "38": { "name": "Kayseri", "avg_congestion_level_pct": 24, "morning_peak_pct": 27, "evening_peak_pct": 38 },
+    "41": { "name": "Kocaeli", "avg_congestion_level_pct": 27, "morning_peak_pct": 39, "evening_peak_pct": 66 },
+    "42": { "name": "Konya", "avg_congestion_level_pct": 28, "morning_peak_pct": 31, "evening_peak_pct": 59 }
+  }
+}
