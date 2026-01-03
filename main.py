@@ -155,6 +155,27 @@ def _clamp(n: int, lo: int, hi: int) -> int:
     return max(lo, min(hi, n))
 
 
+def _usage_tr(u: str) -> str:
+    u = (u or "").strip().lower()
+    if u == "city":
+        return "şehir içi"
+    if u == "highway":
+        return "uzun yol"
+    return "karma kullanım"  # mixed default
+
+
+def _fuel_tr(f: str) -> str:
+    f = (f or "").strip().lower()
+    mp = {
+        "gasoline": "benzin",
+        "diesel": "dizel",
+        "lpg": "lpg",
+        "hybrid": "hibrit",
+        "electric": "elektrik",
+    }
+    return mp.get(f, f or "-")
+
+
 def _parse_listed_price(req: AnalyzeRequest) -> Optional[int]:
     try:
         txt = (req.context or {}).get("listed_price_text") or ""
@@ -930,7 +951,6 @@ def estimate_traffic_insurance(req: AnalyzeRequest) -> Dict[str, Any]:
     caps = TRAFFIC_CAPS or {}
     cities = caps.get("cities") or {}
 
-    # ✅ şehir kodunu artık profile/context/name’den doğru çöz
     city_code = _resolve_plate_city_code(req)
     if city_code not in cities:
         city_code = "34"
@@ -1389,49 +1409,74 @@ def _electronics_score(enriched: Dict[str, Any]) -> int:
     return _clamp(int(score), 0, 100)
 
 
-def build_flags(enriched: Dict[str, Any], req: AnalyzeRequest) -> Dict[str, List[str]]:
-    risk = enriched.get("risk", {}) or {}
+def build_score_because(req: AnalyzeRequest, enriched: Dict[str, Any], overall: int, uncertainty: Dict[str, Any]) -> Dict[str, Any]:
+    """
+    Skor için kısa gerekçe (bayraksız, premium ton).
+    Döner: {"because":"...", "critical":["...","..."]}
+    """
     prof = enriched.get("profile", {}) or {}
-    uq = enriched.get("info_quality", {}) or {}
-    seg = (enriched.get("segment", {}) or {}).get("code", "C_SEDAN")
+    market = enriched.get("market", {}) or {}
+    seg_code = (enriched.get("segment", {}) or {}).get("code", "C_SEDAN")
 
+    fuel = (req.vehicle.fuel or req.profile.fuel_preference or "").lower().strip()
+    usage = (prof.get("usage") or "mixed").lower().strip()
+    match = (market.get("profile_match") or "")
+
+    risk = enriched.get("risk", {}) or {}
     age = risk.get("age")
     km = int(risk.get("mileage_km") or 0)
-    fuel = (req.vehicle.fuel or req.profile.fuel_preference or "").lower()
-    usage = prof.get("usage", "mixed")
 
-    red: List[str] = []
-    yellow: List[str] = []
-    green: List[str] = []
+    idx = (market.get("indices") or {})
+    parts_av = int(idx.get("parts_availability_score_1_5", 3))
+    resale_liq = int(idx.get("resale_liquidity_score_1_5", 3))
 
-    if age is not None and age >= 15:
-        red.append("Yaş yüksek → büyük bakım/elektronik masraf ihtimali artar. (Aksiyon: servis geçmişi + detaylı ekspertiz + OBD)")
-    if km >= 250_000:
-        red.append("Km çok yüksek → motor/şanzıman/alt takım masraf bandı büyür. (Aksiyon: test sürüşü + kompresyon/kaçak kontrolü)")
-    if fuel == "diesel" and usage == "city" and km >= 120_000:
-        red.append("Şehir içi ağırlıklı dizel → DPF/EGR/enjektör riski artabilir. (Aksiyon: DPF doluluk/arıza kodu kontrolü)")
-    if seg in ("PREMIUM_D", "E_SEGMENT") and ((age or 0) >= 10 or km >= 180_000):
-        red.append("Premium + yaş/km yükseldikçe parça/işçilik maliyeti çarpan etkisi yapar. (Aksiyon: yedek bütçe + detaylı kontrol)")
+    plus: List[str] = []
+    critical: List[str] = []
 
-    if uq.get("level") in ("düşük", "orta"):
-        yellow.append("İlan/araç bilgileri kısmi → skor bandı daha geniş yorumlanmalı. (Aksiyon: tramer + bakım faturası + net paket/motor)")
-    if (enriched.get("market", {}) or {}).get("profile_match") == "segment_estimate":
-        yellow.append("Bu model için direkt profil yok → emsal segmentten tahmin kullanıldı. (Aksiyon: motor/şanzıman/paket netleşirse iyileşir)")
-    if "lpg" in fuel:
-        yellow.append("LPG varsa montaj/ayar kalitesi belirleyici. (Aksiyon: kompresyon + subap durumu + proje/ruhsat kontrolü)")
+    # Belirsizlik
+    if uncertainty.get("level") == "düşük":
+        plus.append("bilgi seviyesi yüksek olduğu için belirsizlik düşük")
+    elif uncertainty.get("level") == "orta":
+        plus.append("bilgi seviyesi orta; bazı kalemler netleşirse skor daha güvenilir olur")
+    else:
+        critical.append("belirsizlik yüksek; tramer + servis kaydı + OBD ile netleştirmek önemli")
+
+    # Segment yaygınlık / parça
+    if parts_av >= 4 and seg_code in ("B_HATCH", "C_SEDAN", "C_SUV", "D_SEDAN"):
+        plus.append("segment/parça-usta erişimi görece rahat")
+    elif seg_code in ("PREMIUM_D", "E_SEGMENT"):
+        critical.append("premium/üst sınıfta parça-işçilik maliyeti daha yüksek eğilimli")
+
+    # 2.el
+    if resale_liq >= 4:
+        plus.append("2. el likidite tarafı güçlü eğilimli")
+
+    # Yakıt türü
     if fuel in ("hybrid", "electric"):
-        yellow.append("Hibrit/EV tarafında batarya sağlığı kritik. (Aksiyon: batarya raporu/garanti şartlarını doğrula)")
+        plus.append("şehir içi stop-go senaryoda hibrit/EV tüketim avantajı görülebilir")
+        critical.append("batarya sağlığını rapor/servis kaydıyla doğrulamak kritik")
+    if fuel == "diesel" and usage == "city" and int(prof.get("yearly_km", 15000) or 15000) < 15000:
+        critical.append("şehir içi + düşük/orta km’de dizelde DPF/EGR riski artabilir")
 
-    if age is not None and age <= 6 and km <= 120_000:
-        green.append("Yaş/km görece dengeli → büyük masraf olasılığı daha yönetilebilir. (Yine de ekspertiz şart)")
-    if seg in ("C_SEDAN", "C_SUV"):
-        green.append("Segment yaygın → parça/usta erişimi genelde daha rahat olur.")
-    if prof.get("yearly_km", 15000) >= 20000 and fuel in ("diesel", "hybrid"):
-        green.append("Yıllık km yüksekse yakıt ekonomisi avantajı daha anlamlı hale gelir.")
-    if prof.get("usage") == "highway":
-        green.append("Uzun yol ağırlıklı kullanım → tüketim daha stabil olabilir; bakım disiplini değerli olur.")
+    # Yaş/km
+    if (age is not None and age >= 10) or km >= 180_000:
+        critical.append("yaş/km yükseldikçe büyük bakım riski artabilir")
 
-    return {"red": red[:3], "yellow": yellow[:3], "green": green[:3]}
+    # Profil match
+    if match == "segment_estimate":
+        critical.append("bu model için direkt profil yok; emsal segmentten tahmin kullanıldı")
+
+    # temizle / sınırla
+    plus = [p for p in plus if p]
+    critical = [c for c in critical if c]
+
+    # kısa cümle
+    because_parts = []
+    if plus:
+        because_parts.append(", ".join(plus[:3]))
+    because = "Skor; " + ("; ".join(because_parts) if because_parts else "mevcut verilere göre dengeli bir tabloya işaret ediyor") + "."
+
+    return {"because": because, "critical": critical[:3]}
 
 
 def explain_indices(enriched: Dict[str, Any]) -> Dict[str, Dict[str, Any]]:
@@ -1707,7 +1752,6 @@ def build_premium_template(req: AnalyzeRequest, enriched: Dict[str, Any]) -> Dic
     overall = _score_from_risk(base_risk)
 
     uncertainty = build_uncertainty(enriched)
-    flags = build_flags(enriched, req)
     indices_explain = explain_indices(enriched)
     value_block = build_value_and_negotiation(enriched)
 
@@ -1733,13 +1777,16 @@ def build_premium_template(req: AnalyzeRequest, enriched: Dict[str, Any]) -> Dic
     warnings = build_personalized_warnings(enriched, req)
     checklist = build_buy_checklist(enriched, req, max_items=6)
 
-    tek_bakis = [
-        f"Skor: **{overall}/100** | Belirsizlik: **{uncertainty['level']}** (puan: {uncertainty['score_100']}/100)",
-        f"Yıllık bakım bandı: **{_fmt_try(maint_min)} – {_fmt_try(maint_max)} TL** | Yakıt: **{_fmt_try(costs['yearly_fuel_tr_min'])} – {_fmt_try(costs['yearly_fuel_tr_max'])} TL**",
-    ]
-    if flags.get("red"):
-        tek_bakis.append(f"En kritik nokta: {flags['red'][0]}")
-    tek_bakis.append("Netleştirme: Tramer + servis kayıtları + OBD taraması skorun güvenini artırır.")
+    # Skor gerekçesi (bayrak yok)
+    score_reason = build_score_because(req, enriched, overall, uncertainty)
+    critical_points = score_reason.get("critical") or []
+    main_critical = critical_points[0] if critical_points else None
+
+    # Varsayımlar satırı (maliyet için)
+    city_ctx = get_city_congestion_context(req)
+    city_name = city_ctx.get("city_name") or (prof.get("city") or "-")
+    usage_tr = _usage_tr(prof.get("usage", "mixed"))
+    fuel_pref_tr = _fuel_tr(prof.get("fuel_preference", ""))
 
     # =========================================================
     # RESULT TEXT
@@ -1758,37 +1805,21 @@ def build_premium_template(req: AnalyzeRequest, enriched: Dict[str, Any]) -> Dic
     lines.append("")
 
     lines.append("---")
-    lines.append("### 0) Tek bakış özeti")
-    for t in tek_bakis[:4]:
-        lines.append(f"- {t}")
-    lines.append("---")
-    lines.append("")
-
-    lines.append("### 1) Oto Analiz Skoru (yön gösterici)")
-    lines.append(f"- Genel: **{overall}/100**")
+    lines.append("### 0) Skor & Neden (tek bakış)")
+    lines.append(f"- Genel skor: **{overall}/100**")
+    lines.append(f"- Neden {overall}? {score_reason.get('because','Skor mevcut verilere göre üretildi.')}")
+    if critical_points:
+        lines.append("- Dikkat noktaları (özet):")
+        for cp in critical_points[:3]:
+            lines.append(f"  - {cp}")
     lines.append(f"- Mekanik: **{_clamp(overall + 2, 0, 100)}/100** | Kaporta: **{_clamp(overall - 1, 0, 100)}/100**")
     lines.append(f"- Ekonomi: **{economy_100}/100** | Konfor: **{comfort_100}/100** | Aile: **{family_use_100}/100**")
     lines.append(f"- 2. el: **{resale_100}/100** | Elektronik: **{electronics_100}/100** | Uygunluk: **{personal_fit_score}/100**")
     lines.append("- Not: Skorlar **kesin teşhis** değildir; ilan+yaş+km+profil kombinasyonundan **tahmini** üretilir.")
-    lines.append("")
-
-    lines.append("### 2) Bayraklar (Kırmızı / Sarı / Yeşil)")
-    if flags.get("red"):
-        lines.append("- **Kırmızı (öncelikli kontrol):**")
-        for x in flags["red"][:3]:
-            lines.append(f"  - {x}")
-    if flags.get("yellow"):
-        lines.append("- **Sarı (belirsizlik / dikkat):**")
-        for x in flags["yellow"][:3]:
-            lines.append(f"  - {x}")
-    if flags.get("green"):
-        lines.append("- **Yeşil (artı taraflar):**")
-        for x in flags["green"][:3]:
-            lines.append(f"  - {x}")
-    lines.append("")
-
     lines.append("---")
-    lines.append("### 3) Yıllık maliyet özeti (tahmini band)")
+    lines.append("")
+
+    lines.append("### 1) Yıllık maliyet özeti (tahmini band)")
     lines.append(f"- **Toplam (bakım + yakıt) orta:** **~{_fmt_try(total_mid)} TL/yıl**")
     lines.append(f"- Bakım bandı: **{_fmt_try(maint_min)} – {_fmt_try(maint_max)} TL/yıl**")
     lines.append(f"  - Rutin bakım tahmini: **~{_fmt_try(maint_routine)} TL**")
@@ -1808,11 +1839,12 @@ def build_premium_template(req: AnalyzeRequest, enriched: Dict[str, Any]) -> Dic
         kmid = kasko.get("kasko_try_mid")
         kmid_txt = f" (orta: {_fmt_try(kmid)})" if isinstance(kmid, int) else ""
         lines.append(f"- Kasko: **{_fmt_try(kasko['kasko_try_min'])} – {_fmt_try(kasko['kasko_try_max'])} TL/yıl**{kmid_txt}")
-    lines.append("- Not: Bu bandlar, ilan bilgisi azaldıkça **daha geniş** tutulur.")
+    lines.append(f"- Varsayımlar: yıllık **{prof['yearly_km']} km**, kullanım: **{usage_tr}**, şehir: **{city_name or '-'}**")
+    lines.append("- Not: Bu maliyet bandı **tahminidir**; şehir, sürüş tarzı, sigorta basamağı ve aracın kondisyonuna göre değişir.")
     lines.append("---")
     lines.append("")
 
-    lines.append("### 4) Risk & kronik eğilimler (tahmini)")
+    lines.append("### 2) Risk & kronik eğilimler (tahmini)")
     lines.append(f"- Baz risk seviyesi: **{base_risk}**")
     if chronic_issues:
         lines.append("- Öne çıkan risk paternleri:")
@@ -1824,7 +1856,7 @@ def build_premium_template(req: AnalyzeRequest, enriched: Dict[str, Any]) -> Dic
             lines.append(f"  - {w}")
     lines.append("")
 
-    lines.append("### 5) Parça / servis / 2. el endeksleri (puan + neye göre?)")
+    lines.append("### 3) Parça / servis / 2. el endeksleri (puan + neye göre?)")
     lines.append(f"- Parça bulunabilirliği: **{parts_av}/5** → {indices_explain['parts_availability']['meaning']}")
     for w in indices_explain["parts_availability"]["why"][:2]:
         lines.append(f"  - Neye göre: {w}")
@@ -1846,9 +1878,11 @@ def build_premium_template(req: AnalyzeRequest, enriched: Dict[str, Any]) -> Dic
     lines.append(f"  - {indices_explain['resale_liquidity']['action']}")
     lines.append("")
 
-    # ✅ ŞEHİR + TRAFİK + VİTES + YAKIT yorumları burada
-    lines.append("### 6) Kişiye uygunluk (profil bazlı)")
-    lines.append(f"- Profil: yıllık **{prof['yearly_km']} km** ({prof['yearly_km_band']}), kullanım: **{prof['usage']}**, yakıt tercihi: **{prof['fuel_preference']}**")
+    lines.append("### 4) Kişiye uygunluk (profil bazlı)")
+    lines.append(
+        f"- Profil: yıllık **{prof['yearly_km']} km** ({prof['yearly_km_band']}), "
+        f"kullanım: **{_usage_tr(prof['usage'])}**, yakıt tercihi: **{_fuel_tr(prof['fuel_preference'])}**"
+    )
 
     city_fit_lines = build_city_fit_lines(req, enriched)
     for cl in city_fit_lines:
@@ -1861,7 +1895,7 @@ def build_premium_template(req: AnalyzeRequest, enriched: Dict[str, Any]) -> Dic
         lines.append("- Yıllık km yüksekse yakıt ekonomisi ve düzenli bakım en kritik iki değişkendir.")
     lines.append("")
 
-    lines.append("### 7) Değer & pazarlık (hukuki güvenli, kesin hüküm yok)")
+    lines.append("### 5) Değer & pazarlık (hukuki güvenli, kesin hüküm yok)")
     if value_block.get("ok"):
         lines.append(f"- Fiyat etiketi: **{value_block.get('label')}**")
         lines.append(f"- Yorum: {value_block.get('comment')}")
@@ -1875,7 +1909,7 @@ def build_premium_template(req: AnalyzeRequest, enriched: Dict[str, Any]) -> Dic
             lines.append(f"  - {a}")
     lines.append("")
 
-    lines.append("### 8) Belirsizlik & raporu netleştirme planı")
+    lines.append("### 6) Belirsizlik & raporu netleştirme planı")
     lines.append(f"- Belirsizlik seviyesi: **{uncertainty['level']}** (puan: {uncertainty['score_100']}/100)")
     if uncertainty.get("how_to_improve"):
         lines.append("- Netleştirmek için:")
@@ -1883,13 +1917,13 @@ def build_premium_template(req: AnalyzeRequest, enriched: Dict[str, Any]) -> Dic
             lines.append(f"  - {h}")
     lines.append("")
 
-    lines.append("### 9) Satın almadan önce yapılacaklar (kısa checklist)")
+    lines.append("### 7) Satın almadan önce yapılacaklar (kısa checklist)")
     for c in checklist[:6]:
         lines.append(f"- {c}")
     lines.append("")
 
     lines.append("---")
-    lines.append("### 10) Son özet (1 dakikalık karar notu)")
+    lines.append("### 8) Son özet (1 dakikalık karar notu)")
     if personal_fit_score >= 78:
         fit_label = "profilinle **uyumlu** görünüyor"
     elif personal_fit_score >= 62:
@@ -1899,8 +1933,8 @@ def build_premium_template(req: AnalyzeRequest, enriched: Dict[str, Any]) -> Dic
 
     lines.append(f"- Genel tablo: Skor **{overall}/100**, belirsizlik **{uncertainty['level']}** → bu araç {fit_label}.")
     lines.append(f"- Bütçe tarafı: Yıllık **bakım+yakıt orta ~{_fmt_try(total_mid)} TL** bandında düşün (sigorta/vergi ayrı).")
-    if flags.get("red"):
-        lines.append(f"- En kritik kontrol: **{flags['red'][0]}**")
+    if main_critical:
+        lines.append(f"- En kritik kontrol: **{main_critical}**")
     lines.append("- Kesin tespit için: **Ekspertiz + Tramer + OBD** birlikte değerlendirilmelidir (bu rapor kesin hüküm içermez).")
     lines.append("---")
 
@@ -1935,25 +1969,27 @@ def build_premium_template(req: AnalyzeRequest, enriched: Dict[str, Any]) -> Dic
             "yearly_fuel_tr": int(fuel_mid or 0),
             "yearly_fuel_tr_min": costs["yearly_fuel_tr_min"],
             "yearly_fuel_tr_max": costs["yearly_fuel_tr_max"],
-            "notes": "Bandlar segment+yaş+km+profil ile tahmini üretilmiştir. Sigorta ve vergiler ayrı kalemlerdir.",
+            "notes": "Bandlar segment+yaş+km+profil ile tahmini üretilmiştir. Sigorta ve vergiler ayrı kalemlerdir. Şehir/sürüş tarzı/kondisyona göre değişebilir.",
         },
-        "flags": flags,
         "indices_explained": indices_explain,
         "uncertainty": uncertainty,
         "value_and_negotiation": value_block,
         "preview": {
             "title": title,
             "price_tag": price_tag,
-            "spoiler": "Skorlar + bayraklar + maliyet bandı + kişiye uygunluk + belirsizlik planı",
+            "spoiler": "Skor + nedenleri, maliyet bandı, kişiye uygunluk, endeks açıklamaları ve netleştirme planı",
             "bullets": [
-                "Genel & alt skorlar",
-                "Kırmızı/Sarı/Yeşil bayraklar",
-                "Yıllık maliyet bandı",
+                "Genel skor + gerekçe",
+                "Yıllık maliyet bandı (tahmini)",
+                "Kişiye uygunluk (şehir/traffic dahil)",
                 "Parça/servis/2.el endeksleri (neden?)",
                 "Belirsizlik ve netleştirme planı",
             ],
         },
-        "final_snapshot": {"tek_bakis_lines": tek_bakis[:4]},
+        "final_snapshot": {
+            "score_because": score_reason.get("because"),
+            "critical_points": critical_points[:3],
+        },
         "result": result_text,
     }
     return out
