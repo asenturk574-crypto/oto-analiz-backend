@@ -219,6 +219,8 @@ def _guess_tags(req: AnalyzeRequest) -> List[str]:
 # =========================================================
 # DATA PACK LOADER
 # =========================================================
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
 def _load_json(path: str, default: Any) -> Any:
     try:
         with open(path, "r", encoding="utf-8") as f:
@@ -228,11 +230,83 @@ def _load_json(path: str, default: Any) -> Any:
 
 
 def _dp(path_in_data: str) -> str:
-    return os.path.join(DATA_DIR, path_in_data)
+    # DATA_DIR env ile override edilebiliyor; relative ise main.py'nin bulunduğu klasöre göre çöz
+    data_dir = DATA_DIR
+    if not os.path.isabs(data_dir):
+        data_dir = os.path.join(BASE_DIR, data_dir)
+    return os.path.join(data_dir, path_in_data)
 
 
-ANCHORS: List[Dict[str, Any]] = _load_json(_dp("anchors_tr_popular_96.json"), [])
-VEHICLE_PROFILES: List[Dict[str, Any]] = _load_json(_dp("vehicle_profiles_96_v1.json"), [])
+def _merge_by_key_prefer_first(primary: List[Dict[str, Any]], secondary: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    """
+    primary + secondary birleştirir.
+    - Aynı 'key' varsa primary (örn. v2) kazanır
+    - key yoksa JSON-serialize ile kaba dedupe yapar
+    """
+    out: List[Dict[str, Any]] = []
+    seen_keys = set()
+    seen_fallback = set()
+
+    def k_of(d: Dict[str, Any]) -> Optional[str]:
+        k = d.get("key")
+        if not k:
+            return None
+        try:
+            return _norm(str(k))
+        except:
+            return None
+
+    def fallback_sig(d: Dict[str, Any]) -> str:
+        try:
+            return json.dumps(d, ensure_ascii=False, sort_keys=True)
+        except:
+            return str(d)
+
+    for src in (primary or []):
+        if not isinstance(src, dict):
+            continue
+        k = k_of(src)
+        if k:
+            if k in seen_keys:
+                continue
+            seen_keys.add(k)
+            out.append(src)
+        else:
+            sig = fallback_sig(src)
+            if sig in seen_fallback:
+                continue
+            seen_fallback.add(sig)
+            out.append(src)
+
+    for src in (secondary or []):
+        if not isinstance(src, dict):
+            continue
+        k = k_of(src)
+        if k:
+            if k in seen_keys:
+                continue
+            seen_keys.add(k)
+            out.append(src)
+        else:
+            sig = fallback_sig(src)
+            if sig in seen_fallback:
+                continue
+            seen_fallback.add(sig)
+            out.append(src)
+
+    return out
+
+
+# --- v2 varsa öncelikli oku (yoksa v1) + ikisini birlikte merge et
+ANCHORS_V2: List[Dict[str, Any]] = _load_json(_dp("anchors_tr_popular_v2_227.json"), [])
+ANCHORS_V1: List[Dict[str, Any]] = _load_json(_dp("anchors_tr_popular_96.json"), [])
+ANCHORS: List[Dict[str, Any]] = _merge_by_key_prefer_first(ANCHORS_V2, ANCHORS_V1)
+
+VEHICLE_PROFILES_V2: List[Dict[str, Any]] = _load_json(_dp("vehicle_profiles_v2_227.json"), [])
+VEHICLE_PROFILES_V1: List[Dict[str, Any]] = _load_json(_dp("vehicle_profiles_96_v1.json"), [])
+VEHICLE_PROFILES: List[Dict[str, Any]] = _merge_by_key_prefer_first(VEHICLE_PROFILES_V2, VEHICLE_PROFILES_V1)
+
+# Diğer pack dosyaları aynı isimle zaten güncellendiyse otomatik onları okur (replace yaptıysan yeni içerik okunur)
 TRAFFIC_CAPS: Dict[str, Any] = _load_json(_dp("traffic_caps_tr_2025_12_seed.json"), {})
 MTV_PACK: Dict[str, Any] = _load_json(_dp("mtv_tr_2025_2026_estimated_1895.json"), {})
 FIXED_COSTS: Dict[str, Any] = _load_json(_dp("fixed_costs_tr_2026_estimated.json"), {})
