@@ -1,44 +1,93 @@
 {
+  "A_HATCH": [
+    "Soğuk marş ve rölanti stabilitesi",
+    "Şanzıman (otomatikse) düşük hız geçişleri",
+    "Kaporta/şasi düzeltme ve boya ölçümü",
+    "Ön takım (rot, salıncak) ve lastik diş durumu",
+    "Klima, cam, merkezi kilit, multimedya fonksiyon testi"
+  ],
   "B_HATCH": [
-    "Soğuk çalıştırma, rölanti, egzoz dumanı",
-    "Ön takım: burç/salıncak/rot başı; bozuk yolda ses",
-    "Debriyaj kavrama (manuel) / vites geçişleri (otomatik)",
-    "Klima, camlar, merkezi kilit, aydınlatmalar",
-    "Lastik diş, fren disk/balata, rot balans izleri"
+    "Soğuk marş, tekleme/duman kontrolü",
+    "Şehir içi kullanım yıpranması: debriyaj, süspansiyon, direksiyon boşluk",
+    "Tramer/hasar kaydı ve şasi doğruluğu",
+    "Lastik-fren (disk/balata) aşınma",
+    "Elektrik: far/sinyal/ekran/park sensörü"
+  ],
+  "B_SEDAN": [
+    "Şasi/podye kontrolü (arkadan darbe çok kritik)",
+    "Direksiyon ve ön takım boşluk",
+    "Motor kompresyon ve yağ kaçakları",
+    "Klima ve ısıtma performansı",
+    "Kaporta boya ölçümü + cam/tavan kanalı"
+  ],
+  "C_HATCH": [
+    "Motor-şanzıman uyumu: çekiş, geçiş sarsıntısı",
+    "Yürüyen aksam: salıncak, amortisör, aks-körük",
+    "Fren performansı ve disk eğriliği",
+    "Elektrik/konfor donanımları (multimedya, sensörler)",
+    "Hasar kaydı + şasi ölçümü"
   ],
   "C_SEDAN": [
-    "Motor yağ kaçağı, hararet geçmişi, soğutma sistemi",
-    "Şanzıman: geçiş vuruntusu, titreme, kaçak",
-    "Yürüyen: amortisör, salıncak, aks körüğü, direksiyon kutusu",
-    "Tramer-kaporta: şasi/podye kontrolü, boya ölçümü",
-    "Elektronik: park sensörü, multimedya, klima paneli"
+    "Soğutma sistemi, hararet geçmişi",
+    "Şanzıman geçişleri ve kickdown",
+    "Ön-arka takım sesleri, amortisör kaçak",
+    "İç trim yıpranma (takside kullanım işareti olabilir)",
+    "Hasar kaydı, airbag geçmişi, şasi kontrol"
+  ],
+  "B_SUV": [
+    "Süspansiyon ve lastikler (SUV’larda maliyet artar)",
+    "Direksiyon kutusu/rot başları ses kontrolü",
+    "Turbo/dizelse DPF-EGR geçmişi",
+    "Frenler (ağırlık nedeniyle hızlı aşınır)",
+    "Şasi-alt koruma ve altı sürtme izleri"
   ],
   "C_SUV": [
-    "Alt takım + fren/lastik (SUV’da daha hızlı yıpranır)",
-    "Direksiyon, amortisör, salıncak; bozuk yolda ses/titreşim",
-    "Şanzıman (otomatik/CVT/DCT) ısınınca davranış",
-    "4x4 varsa aktarma ve yağ kaçakları",
-    "Kaporta: tavan/kapı altı/alt şase darbeleri"
+    "Ön/arka takım + salıncak burçları",
+    "Şanzıman (otomatikse) ısınma sonrası test sürüşü",
+    "4x4 varsa diferansiyel/transfer kaçakları",
+    "Frenler ve lastik uyumu",
+    "Şasi/alt takım darbeleri"
   ],
   "D_SEDAN": [
-    "Konfor donanımları: klima, koltuk ısıtma, ekran/sensörler",
-    "Şanzıman ve tork konvertörü/DCT: vuruntu-kaydırma testleri",
-    "Direksiyon kutusu, süspansiyon burçları, motor takozları",
-    "Uzun yol titreşim: balans, jant, aks, rulman",
-    "Tramer + servis geçmişi (bu segmentte çok kritik)"
+    "Otomatik şanzıman adaptasyon ve sarsıntı kontrol",
+    "Süspansiyon, rotiller, amortisör",
+    "Gövde düzeltme/boya ölçümü (uzun gövde hasarı kritik)",
+    "Elektrik/konfor: koltuk, klima, sunroof, sensörler",
+    "Motor kompresyon ve yağ kaçakları"
+  ],
+  "D_SUV": [
+    "4x4 sistemi testleri (varsa)",
+    "Süspansiyon ve şasi altı kontrol (arazi izi)",
+    "Fren ve lastik seti maliyeti",
+    "Motor-şanzıman ısınma sonrası test",
+    "Elektronik/ADAS hata taraması"
   ],
   "PREMIUM_D": [
-    "Elektronik modüller: ekran, far, sensörler, cam tavan",
-    "Şanzıman: soğuk/ısınmış test, adaptasyon, kaçak kontrolü",
-    "Turbo/yağ tüketimi, kompresyon, OBD hata taraması",
-    "Süspansiyon: burçlar, amortisör, rotiller (pahalı kalem)",
-    "Servis geçmişi + orijinal parça/fatura doğrulama"
+    "Detaylı arıza taraması (tüm modüller)",
+    "Süspansiyon: salıncak/burç/amortisör (maliyetli)",
+    "Şanzıman geçişleri: sarsıntı, gecikme, vuruntu",
+    "Soğutma sistemi ve yağ kaçakları",
+    "ADAS (radar/kamera) fonksiyon testi + kalibrasyon geçmişi"
   ],
   "E_SEGMENT": [
-    "Elektronik/konfor donanım taraması (çok kapsamlı)",
-    "Motor-şanzıman: OBD + test sürüşü (uzun)",
-    "Hava süspansiyon varsa kaçak/test",
-    "Soğutma/hararet geçmişi, yağ kaçakları",
-    "Servis geçmişi + tramer + detaylı ekspertiz şart"
+    "Havalı süspansiyon/aktif sistemler (varsa) kontrolü",
+    "Tüm elektronik modüller taraması (arızalar pahalı)",
+    "Şanzıman ve aktarma (yük altında test)",
+    "Soğutma ve yağ sızdırmazlık",
+    "Ekspertizde şasi ölçümü + airbag geçmişi"
+  ],
+  "LCV": [
+    "Şasi ve kapı mekanizmaları (sürgü, menteşe, kızak)",
+    "Debriyaj/volan ve şanzıman sesleri",
+    "Arka süspansiyon, makas yay (varsa) ve yük izi",
+    "Turbo/DPF (dizelse) geçmişi",
+    "Kasa tabanı, tavan, ticari kullanım izi"
+  ],
+  "PICKUP": [
+    "Şasi/pas/alt takım ve arazi izi",
+    "4x4 modları ve diferansiyel kilidi (varsa)",
+    "Diferansiyel/transfer yağ kaçakları",
+    "Kasa ve çekme kancası kullanım izi",
+    "Lastik ebat uyumu ve rot-balans"
   ]
 }

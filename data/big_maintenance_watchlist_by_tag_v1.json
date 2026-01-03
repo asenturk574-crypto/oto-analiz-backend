@@ -1,56 +1,143 @@
 {
+  "turbo_small": [
+    "Turbo revizyon/değişim ihtimali",
+    "Intercooler hortum/kelepçe kaçakları",
+    "Bobin-buji seti",
+    "Termostat/su pompası"
+  ],
   "diesel": [
-    {
-      "item": "DPF/EGR kontrol/temizlik ihtimali",
-      "when": "şehir içi + 120.000 km+",
-      "note": "rejenerasyon geçmişi, OBD hata kodları"
-    },
-    {
-      "item": "Enjektör test/geri dönüş",
-      "when": "150.000 km+",
-      "note": "yakıt sistemi sağlığı"
-    }
+    "DPF temizliği/değişimi",
+    "EGR temizliği/değişimi",
+    "Enjektör bakımı",
+    "Turbo revizyonu"
+  ],
+  "dci": [
+    "DPF/EGR işlemleri",
+    "Enjektör kontrolü",
+    "Turbo hortum/kelepçe",
+    "Motor kulakları"
+  ],
+  "tdi": [
+    "DPF/EGR işlemleri",
+    "Turbo/intercooler kaçakları",
+    "DSG yağı (varsa)",
+    "Enjektör kontrolü"
+  ],
+  "multijet": [
+    "Enjektör kontrolü",
+    "Turbo revizyonu",
+    "DPF/EGR (varsa)",
+    "Debriyaj seti (yüksek km)"
   ],
   "dsg": [
-    {
-      "item": "Şanzıman yağı ve filtre bakımı",
-      "when": "bakım geçmişi belirsizse hemen",
-      "note": "üretici aralığına göre (genelde 60-80 bin km)"
-    }
+    "Mechatronic/valf gövdesi",
+    "Kavrama seti",
+    "Şanzıman yağı+filtre (uygunsa)",
+    "Volan (çift kütle)"
+  ],
+  "dct": [
+    "Kavrama seti",
+    "Aktüatör/elektronik",
+    "Şanzıman yağı (varsa)",
+    "Volan"
   ],
   "cvt": [
-    {
-      "item": "CVT yağı bakımı",
-      "when": "bakım geçmişi belirsizse hemen",
-      "note": "ısı/yağ sağlığı kritik"
-    }
-  ],
-  "turbo_small": [
-    {
-      "item": "PCV/yağ tüketimi takibi",
-      "when": "100.000 km+",
-      "note": "yağ seviyesi, duman, buji durumu"
-    }
+    "CVT yağı",
+    "CVT kayış/pulley",
+    "Soğutma hattı/yağ kaçakları"
   ],
   "lpg_common": [
-    {
-      "item": "Subap ayarı/kompresyon kontrolü",
-      "when": "80.000-120.000 km arası ve sonrası",
-      "note": "montaj/ayar kalitesine bağlı"
-    }
+    "Subap ayarı/üst kapak",
+    "LPG enjektör+regülatör",
+    "Tüp süresi/proje",
+    "Buji-bobin"
   ],
   "hybrid": [
-    {
-      "item": "Hibrit batarya sağlık kontrolü",
-      "when": "8+ yıl / yüksek km",
-      "note": "servis test raporu"
-    }
+    "Hibrit batarya sağlık raporu",
+    "Inverter/konvertör soğutma",
+    "Rejeneratif fren uyumu",
+    "12V akü"
+  ],
+  "toyota_hybrid": [
+    "Hibrit batarya fan temizliği",
+    "Batarya sağlık raporu",
+    "E-CVT sıvısı (öneriye göre)",
+    "12V akü"
+  ],
+  "electric": [
+    "Batarya kapasite raporu",
+    "Soğutma sistemi",
+    "Şarj portu/konnektör",
+    "Yüksek voltaj izolasyon testi"
   ],
   "ev": [
-    {
-      "item": "Batarya SOH raporu + şarj geçmişi",
-      "when": "alım öncesi",
-      "note": "hızlı şarj oranı ve kapasite kaybı"
-    }
+    "Batarya/termal yönetim",
+    "Şarj altyapısı uyumu",
+    "12V akü"
+  ],
+  "awd": [
+    "Transfer kutusu yağı",
+    "Diferansiyel yağları",
+    "Aks-körük",
+    "Lastik seti eşleme"
+  ],
+  "premium_german": [
+    "Süspansiyon (salıncak/burç/amortisör)",
+    "Elektronik modül taraması",
+    "Fren disk-balata maliyeti",
+    "Soğutma sistemi"
+  ],
+  "premium_swedish": [
+    "Radar/kamera kalibrasyonu",
+    "Süspansiyon",
+    "Elektronik tarama"
+  ],
+  "lcv": [
+    "Debriyaj+volan",
+    "Arka süspansiyon",
+    "Kapı sürgü mekanizması",
+    "Turbo/DPF (dizelde)"
+  ],
+  "pickup": [
+    "Şasi/alt takım",
+    "4x4 aktarma yağları",
+    "Diferansiyel",
+    "Rot-balans/lastik"
+  ],
+  "puretech": [
+    "Triger kayışı kontrol/değişim",
+    "Yağ spesifikasyonu takibi",
+    "Emme temizliği"
+  ],
+  "tsi": [
+    "Emme temizliği",
+    "Turbo bakımı",
+    "PCV/valfler (varsa)"
+  ],
+  "tfsi": [
+    "Emme temizliği",
+    "Yağ tüketimi takibi",
+    "Turbo bakımı"
+  ],
+  "tce": [
+    "Bobin-buji",
+    "Turbo bakımı",
+    "Soğutma hattı"
+  ],
+  "ecoboost": [
+    "Soğutma sistemi",
+    "Turbo bakımı",
+    "Buji-bobin"
+  ],
+  "lux": [
+    "Havalı süspansiyon (varsa)",
+    "Elektronik modül/ADAS",
+    "Fren/süspansiyon yüksek maliyet",
+    "Soğutma sistemi"
+  ],
+  "domestic_tr": [
+    "Yazılım güncelleme geçmişi",
+    "Servis erişimi",
+    "Batarya garanti durumu"
   ]
 }

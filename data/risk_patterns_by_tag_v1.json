@@ -1,106 +1,348 @@
 {
-  "diesel": [
-    {
-      "topic": "DPF/EGR kurumlanma",
-      "severity": "orta",
-      "trigger": "şehir içi ağırlıklı kullanım + yüksek km",
-      "check": "rejenerasyon, çekiş düşüşü, arıza lambası, OBD hata kodu",
-      "cost_band": "orta-yüksek"
-    },
-    {
-      "topic": "Enjektör hassasiyeti",
-      "severity": "orta",
-      "trigger": "yakıt kalitesi + yüksek km",
-      "check": "tekleme, zor çalışma, duman",
-      "cost_band": "orta"
-    }
-  ],
-  "dsg": [
-    {
-      "topic": "DSG/DCT mekatronik-kavrama",
-      "severity": "orta-yüksek",
-      "trigger": "bakım/yağ geçmişi belirsiz + şehir içi",
-      "check": "kalkış titreme, vites geçiş vuruntu, ısınınca davranış",
-      "cost_band": "yüksek"
-    }
-  ],
-  "dct_optional": [
-    {
-      "topic": "DCT otomatik bakım hassasiyeti",
-      "severity": "orta",
-      "trigger": "bakım geçmişi belirsiz",
-      "check": "kalkış titreme, geri kaçırma, geçiş gecikmesi",
-      "cost_band": "orta-yüksek"
-    }
-  ],
-  "cvt": [
-    {
-      "topic": "CVT yağ/bakım hassasiyeti",
-      "severity": "orta",
-      "trigger": "yüksek tork + kötü bakım",
-      "check": "hızlanmada kaydırma hissi, uğultu, vuruntu",
-      "cost_band": "orta-yüksek"
-    }
-  ],
   "turbo_small": [
     {
-      "topic": "Turbo/yağ bakımı hassasiyeti",
-      "severity": "orta",
-      "trigger": "uzun yağ değişim aralığı, soğuk kullanım",
-      "check": "yağ tüketimi, turbo ıslık/ses, çekiş",
-      "cost_band": "orta"
+      "topic": "Turbo ve yağlama sağlığı",
+      "severity": "medium",
+      "trigger": "Uzun yağ değişim aralığı, ani yük/ani stop, düşük kaliteli yağ",
+      "check": "Soğukta duman, çekiş düşüklüğü, turbo ıslık sesi; yağ kaçakları; yağ bakım geçmişi."
+    },
+    {
+      "topic": "Direkt enjeksiyon karbon birikimi (varsa)",
+      "severity": "medium",
+      "trigger": "Kısa mesafe/şehir içi yoğun kullanım",
+      "check": "Rölanti dalgalanması, tekleme; emme manifoldu/EGR temizliği geçmişi."
+    },
+    {
+      "topic": "Soğutma sistemi ve ısı yönetimi",
+      "severity": "medium",
+      "trigger": "Termostat/hararet geçmişi",
+      "check": "Hararet geçmişi, fan çalışma, su eksiltme; kaçak kontrolü."
+    }
+  ],
+  "diesel": [
+    {
+      "topic": "DPF/EGR tıkanma riski",
+      "severity": "medium",
+      "trigger": "Kısa mesafe, düşük devir şehir içi",
+      "check": "Rejenerasyon geçmişi, çekiş düşüşü, uyarı ışıkları; OBD hata kodu taraması."
+    },
+    {
+      "topic": "Enjektör ve yüksek basınç pompası",
+      "severity": "medium",
+      "trigger": "Kalitesiz yakıt, yüksek km",
+      "check": "Soğukta geç çalışma, titreme, duman; yakıt sistemi sesleri."
+    },
+    {
+      "topic": "Turbo + intercooler kaçakları",
+      "severity": "medium",
+      "trigger": "Bakım ihmal, yüksek km",
+      "check": "Hortum/kelepçe, yağlanma; basınç kaçağı testleri."
+    }
+  ],
+  "dci": [
+    {
+      "topic": "DPF/EGR (dCi)",
+      "severity": "medium",
+      "trigger": "Şehir içi ağırlık",
+      "check": "EGR/DPF temizliği veya değişim geçmişi; OBD taraması."
+    },
+    {
+      "topic": "Enjektör geri kaçak kontrolü",
+      "severity": "medium",
+      "trigger": "Yüksek km",
+      "check": "Dengesiz rölanti, ilk marş; geri kaçak testi."
+    }
+  ],
+  "tdi": [
+    {
+      "topic": "DPF/EGR (TDI)",
+      "severity": "medium",
+      "trigger": "Kısa mesafe",
+      "check": "Rejenerasyon, EGR soğutucu kaçakları; OBD."
+    },
+    {
+      "topic": "Turbo/emme kaçakları (TDI)",
+      "severity": "medium",
+      "trigger": "Yüksek km/sert kullanım",
+      "check": "Basınç hortumları, duman, çekiş."
+    }
+  ],
+  "multijet": [
+    {
+      "topic": "Enjektör + turbo bakımı (MultiJet)",
+      "severity": "medium",
+      "trigger": "Yüksek km/bakım ihmal",
+      "check": "Duman/çekiş; yakıt tüketimi; bakım kayıtları."
     }
   ],
   "lpg_common": [
     {
-      "topic": "Subap ayarı/uyumu (LPG)",
-      "severity": "orta",
-      "trigger": "uzun süre yanlış ayar",
-      "check": "çekiş düşüşü, kompresyon, rölanti",
-      "cost_band": "orta"
+      "topic": "Subap/valf yuvası aşınması riski",
+      "severity": "medium",
+      "trigger": "Uyumsuz kit/yanlış ayar, yüksek sıcaklık",
+      "check": "Kompresyon testi, tekleme; supap ayarı/üst kapak geçmişi."
+    },
+    {
+      "topic": "LPG regülatör/enjektör bakımı",
+      "severity": "low",
+      "trigger": "Bakım aralığı geçmesi",
+      "check": "Gazda titreme/performans düşüşü; filtre değişim kayıtları."
+    },
+    {
+      "topic": "Tüp tarihi ve sızdırmazlık",
+      "severity": "high",
+      "trigger": "Tüp ömrü dolması/sızdırma",
+      "check": "Tüp üretim tarihi, proje/ruhsat; kaçak kontrolü."
+    }
+  ],
+  "dsg": [
+    {
+      "topic": "Mechatronic/valf gövdesi arızaları",
+      "severity": "medium",
+      "trigger": "Yoğun dur-kalk, ısı",
+      "check": "Vites geçişinde sarsıntı/kararsızlık; OBD şanzıman kodları."
+    },
+    {
+      "topic": "Kavrama (kuru tiplerde) aşınması",
+      "severity": "medium",
+      "trigger": "Dur-kalk, yokuşta bekleme",
+      "check": "Kalkış titremesi, geri viteste vuruntu; adaptasyon değerleri."
+    },
+    {
+      "topic": "Şanzıman yağı/servis geçmişi",
+      "severity": "low",
+      "trigger": "Yağ değişimi ihmal",
+      "check": "Bakım kaydı; yağ değişimi yapılmış mı (özellikle ıslak tiplerde)."
+    }
+  ],
+  "dct": [
+    {
+      "topic": "Kavrama ısınması ve aşınma",
+      "severity": "medium",
+      "trigger": "Dur-kalk, yokuşta bekleme",
+      "check": "Kalkış titremesi, kavrama kokusu; adaptasyon değerleri."
+    },
+    {
+      "topic": "Aktüatör/elektronik kontrol",
+      "severity": "medium",
+      "trigger": "Yaş/ısı",
+      "check": "Vites geçiş gecikmesi; OBD kod taraması."
+    }
+  ],
+  "cvt": [
+    {
+      "topic": "CVT kayış/pulley aşınması",
+      "severity": "medium",
+      "trigger": "Agresif kullanım, yüksek km",
+      "check": "Sabit hızda uğultu, devir dalgalanması; test sürüşü."
+    },
+    {
+      "topic": "CVT yağı değişim geçmişi",
+      "severity": "medium",
+      "trigger": "Yağ değişimi yapılmaması",
+      "check": "Bakım kaydı; yağı kokusu/renk; servis önerileri."
+    }
+  ],
+  "zf8": [
+    {
+      "topic": "Şanzıman yağı (ZF 8HP)",
+      "severity": "low",
+      "trigger": "Yüksek km/yağ değişimi ihmal",
+      "check": "Geçişlerde vuruntu; bakım kaydı (yağ+filtre)."
+    }
+  ],
+  "eat8": [
+    {
+      "topic": "Aisin EAT8 bakım disiplini",
+      "severity": "low",
+      "trigger": "Yüksek km/yağ ihmal",
+      "check": "Geçişlerde gecikme; yağ servis kaydı."
+    }
+  ],
+  "puretech": [
+    {
+      "topic": "Triger kayışı (yağ içinde çalışan tipler)",
+      "severity": "high",
+      "trigger": "Yanlış yağ / uzun bakım aralığı (bazı yıllarda)",
+      "check": "Bakım kayıtları, yağ spesifikasyonu; kayış kontrolü (serviste)."
+    },
+    {
+      "topic": "Direkt enjeksiyon karbon birikimi",
+      "severity": "medium",
+      "trigger": "Kısa mesafe",
+      "check": "Rölanti/çekiş; emme temizliği geçmişi."
+    }
+  ],
+  "tsi": [
+    {
+      "topic": "Direkt enjeksiyon karbon birikimi",
+      "severity": "medium",
+      "trigger": "Kısa mesafe",
+      "check": "Rölanti dalgalanması; emme temizliği."
+    },
+    {
+      "topic": "Turbo/soğutma hassasiyeti",
+      "severity": "medium",
+      "trigger": "Sert kullanım/yağ ihmal",
+      "check": "Duman/çekiş; soğutma sistemi."
+    }
+  ],
+  "tfsi": [
+    {
+      "topic": "Direkt enjeksiyon karbon birikimi",
+      "severity": "medium",
+      "trigger": "Şehir içi kullanım",
+      "check": "OBD, rölanti/çekiş; emme temizliği."
+    },
+    {
+      "topic": "Yağ tüketimi şikayetleri (bazı motorlarda)",
+      "severity": "medium",
+      "trigger": "Yaş/yüksek km",
+      "check": "Yağ eksiltme takibi; egzoz dumanı; sızdırmazlık."
+    }
+  ],
+  "tce": [
+    {
+      "topic": "Turbo + bobin/buji bakım hassasiyeti",
+      "severity": "medium",
+      "trigger": "Bakım ihmal",
+      "check": "Tekleme, çekiş; bobin/buji geçmişi."
+    }
+  ],
+  "ecoboost": [
+    {
+      "topic": "Soğutma/ısı yönetimi",
+      "severity": "medium",
+      "trigger": "Hararet geçmişi",
+      "check": "Su eksiltme, termostat; bakım kayıtları."
+    },
+    {
+      "topic": "Turbo ve yağ bakımı",
+      "severity": "medium",
+      "trigger": "Uzun yağ aralığı",
+      "check": "Turbo sesi/duman; yağ bakımı."
+    }
+  ],
+  "skyactiv": [
+    {
+      "topic": "Karbon birikimi (kullanıma bağlı)",
+      "severity": "low",
+      "trigger": "Çok kısa mesafe",
+      "check": "Rölanti/tekleme; bakım geçmişi."
+    }
+  ],
+  "ivtec": [
+    {
+      "topic": "LPG ile uyum (kit kalitesi)",
+      "severity": "medium",
+      "trigger": "Uyumsuz kit/yanlış ayar",
+      "check": "Subap ayarı, tekleme; kompresyon."
+    }
+  ],
+  "toyota_hybrid": [
+    {
+      "topic": "Hibrit batarya sağlık kontrolü",
+      "severity": "medium",
+      "trigger": "Yaş/yüksek km",
+      "check": "Serviste batarya raporu; fan temizliği; test sürüşünde tüketim."
+    },
+    {
+      "topic": "E-CVT/aktarma",
+      "severity": "low",
+      "trigger": "Bakım ihmal",
+      "check": "Bakım kayıtları; anormal ses."
     }
   ],
   "hybrid": [
     {
-      "topic": "Batarya/soğutma + 12V akü",
-      "severity": "düşük-orta",
-      "trigger": "yaş + bakım ihmal",
-      "check": "enerji akışı, uyarı ışıkları, fan/soğutma",
-      "cost_band": "orta"
+      "topic": "Batarya + inverter soğutma",
+      "severity": "medium",
+      "trigger": "Soğutma ihmal",
+      "check": "Soğutma fanı/kanalları; servis geçmişi; uyarı ışıkları."
+    }
+  ],
+  "electric": [
+    {
+      "topic": "Batarya degradasyonu ve menzil",
+      "severity": "medium",
+      "trigger": "Hızlı şarj ağırlığı/yaş",
+      "check": "Şarj geçmişi, gerçek menzil testi; batarya raporu (varsa)."
+    },
+    {
+      "topic": "Şarj ekipmanı/port",
+      "severity": "low",
+      "trigger": "Nem/darbe",
+      "check": "Portta oksit; AC/DC şarj denemesi."
     }
   ],
   "ev": [
     {
-      "topic": "Batarya sağlık/menzil",
-      "severity": "orta",
-      "trigger": "hızlı şarj geçmişi + yaş",
-      "check": "SOH raporu, menzil sapması, şarj hızı",
-      "cost_band": "yüksek"
+      "topic": "Batarya ve termal yönetim",
+      "severity": "medium",
+      "trigger": "Sıcaklık ekstremi",
+      "check": "Soğutma sistemi; menzil tutarlılığı."
+    }
+  ],
+  "awd": [
+    {
+      "topic": "Aktarma organları (transfer/diferansiyel)",
+      "severity": "medium",
+      "trigger": "Farklı lastik çapı/ihmal",
+      "check": "Tüm lastikler aynı ebat/diş; sızıntı; düşük hız manevrada ses."
+    }
+  ],
+  "premium_german": [
+    {
+      "topic": "Elektronik donanım ve sensörler",
+      "severity": "medium",
+      "trigger": "Yaş/önceki hasar",
+      "check": "Eksiksiz arıza taraması; tüm donanım fonksiyon testi."
     },
     {
-      "topic": "12V akü",
-      "severity": "düşük-orta",
-      "trigger": "yaş",
-      "check": "marş/uyarı",
-      "cost_band": "düşük"
+      "topic": "Süspansiyon ve yürüyen aksam maliyeti",
+      "severity": "medium",
+      "trigger": "Kötü yol/yüksek km",
+      "check": "Amortisör, salıncak, burç; test sürüşü ve lift kontrol."
     }
   ],
-  "awd_optional": [
+  "premium_swedish": [
     {
-      "topic": "4x4 aktarma bakımı",
-      "severity": "orta",
-      "trigger": "yağ değişimleri ihmal",
-      "check": "dönüşte ses, titreşim, kaçak",
-      "cost_band": "orta"
+      "topic": "Güvenlik sistemleri/sensörler",
+      "severity": "medium",
+      "trigger": "Ön hasar/kalibrasyon",
+      "check": "Radar/kamera kalibrasyonu, hata lambaları; arıza taraması."
     }
   ],
-  "premium": [
+  "lcv": [
     {
-      "topic": "Elektronik/konfor donanımı yaşlanması",
-      "severity": "orta",
-      "trigger": "10+ yaş",
-      "check": "ekran, sensör, klima, cam tavan, modüller",
-      "cost_band": "orta-yüksek"
+      "topic": "Yük ve ticari kullanım kaynaklı yıpranma",
+      "severity": "medium",
+      "trigger": "Ağır yük/şehir içi dur-kalk",
+      "check": "Debriyaj, şanzıman, arka süspansiyon; kapı kızakları."
+    }
+  ],
+  "pickup": [
+    {
+      "topic": "Şasi/alt takım ve 4x4 sistemi",
+      "severity": "medium",
+      "trigger": "Arazi kullanımı",
+      "check": "Şasi pas/ezik; difransiyel/transfer kaçak; 4x4 mod testi."
+    }
+  ],
+  "domestic_tr": [
+    {
+      "topic": "Servis ağı olgunluğu",
+      "severity": "low",
+      "trigger": "Bölgesel servis erişimi",
+      "check": "Yakın servis noktaları; yazılım güncelleme geçmişi."
+    }
+  ],
+  "lux": [
+    {
+      "topic": "Yüksek kompleksite ve bakım maliyeti",
+      "severity": "high",
+      "trigger": "Yaş/yüksek km",
+      "check": "Detaylı ekspertiz + servis geçmişi; modül taraması; havalı süspansiyon vb."
     }
   ]
 }

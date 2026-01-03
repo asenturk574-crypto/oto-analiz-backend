@@ -1,0 +1,5129 @@
+[
+  {
+    "key": "Renault Clio",
+    "segment": "B_HATCH",
+    "aliases": [
+      "Clio IV",
+      "Clio 4",
+      "Clio V",
+      "Clio 5",
+      "Clio"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 5,
+      "parts_cost_index_1_5": 1,
+      "service_network_index_1_5": 5,
+      "resale_liquidity_score_1_5": 5
+    },
+    "tags": [
+      "turbo_small",
+      "tce",
+      "dci",
+      "renault"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Renault Megane",
+    "segment": "C_HATCH",
+    "aliases": [
+      "Megane Sedan",
+      "Megane 4",
+      "Megane IV",
+      "Megane"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 5,
+      "parts_cost_index_1_5": 2,
+      "service_network_index_1_5": 5,
+      "resale_liquidity_score_1_5": 5
+    },
+    "tags": [
+      "turbo_small",
+      "tce",
+      "dci",
+      "renault"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Renault Symbol",
+    "segment": "B_SEDAN",
+    "aliases": [
+      "Symbol Joy",
+      "Symbol Touch",
+      "Symbol"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 4,
+      "parts_cost_index_1_5": 2,
+      "service_network_index_1_5": 4,
+      "resale_liquidity_score_1_5": 4
+    },
+    "tags": [
+      "dci",
+      "lpg_common",
+      "renault"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Renault Fluence",
+    "segment": "C_SEDAN",
+    "aliases": [
+      "Fluence 1.5 dCi",
+      "Fluence"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 4,
+      "parts_cost_index_1_5": 3,
+      "service_network_index_1_5": 4,
+      "resale_liquidity_score_1_5": 4
+    },
+    "tags": [
+      "dci",
+      "renault"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Renault Taliant",
+    "segment": "B_SEDAN",
+    "aliases": [
+      "Taliant 1.0 TCe",
+      "Taliant"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 4,
+      "parts_cost_index_1_5": 2,
+      "service_network_index_1_5": 4,
+      "resale_liquidity_score_1_5": 4
+    },
+    "tags": [
+      "turbo_small",
+      "tce",
+      "renault"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Renault Captur",
+    "segment": "B_SUV",
+    "aliases": [
+      "Captur E-Tech",
+      "Captur"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 4,
+      "parts_cost_index_1_5": 3,
+      "service_network_index_1_5": 4,
+      "resale_liquidity_score_1_5": 4
+    },
+    "tags": [
+      "turbo_small",
+      "tce",
+      "hybrid",
+      "renault"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Renault Kadjar",
+    "segment": "C_SUV",
+    "aliases": [
+      "Kadjar 1.3 TCe",
+      "Kadjar"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 4,
+      "parts_cost_index_1_5": 3,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "tags": [
+      "turbo_small",
+      "tce",
+      "renault"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Renault Austral",
+    "segment": "C_SUV",
+    "aliases": [
+      "Austral E-Tech",
+      "Austral"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 4,
+      "parts_cost_index_1_5": 3,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "tags": [
+      "hybrid",
+      "renault"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Renault Talisman",
+    "segment": "D_SEDAN",
+    "aliases": [
+      "Talisman 1.6 dCi",
+      "Talisman"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 4,
+      "parts_cost_index_1_5": 3,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "tags": [
+      "dci",
+      "dct",
+      "renault"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Fiat Egea",
+    "segment": "C_SEDAN",
+    "aliases": [
+      "Egea Sedan",
+      "Tipo",
+      "Tipo Sedan",
+      "Egea"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 5,
+      "parts_cost_index_1_5": 2,
+      "service_network_index_1_5": 5,
+      "resale_liquidity_score_1_5": 5
+    },
+    "tags": [
+      "multijet",
+      "lpg_common",
+      "fiat"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Fiat Egea Cross",
+    "segment": "B_SUV",
+    "aliases": [
+      "Egea Cross",
+      "Tipo Cross"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 4,
+      "parts_cost_index_1_5": 3,
+      "service_network_index_1_5": 4,
+      "resale_liquidity_score_1_5": 4
+    },
+    "tags": [
+      "multijet",
+      "fiat"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Fiat Linea",
+    "segment": "B_SEDAN",
+    "aliases": [
+      "Linea 1.3 Multijet",
+      "Linea"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 4,
+      "parts_cost_index_1_5": 2,
+      "service_network_index_1_5": 4,
+      "resale_liquidity_score_1_5": 4
+    },
+    "tags": [
+      "multijet",
+      "fiat"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Fiat Punto",
+    "segment": "B_HATCH",
+    "aliases": [
+      "Grande Punto",
+      "Punto"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 4,
+      "parts_cost_index_1_5": 2,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "tags": [
+      "multijet",
+      "fiat"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Fiat 500",
+    "segment": "A_HATCH",
+    "aliases": [
+      "Fiat 500e",
+      "500"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 3,
+      "parts_cost_index_1_5": 2,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "tags": [
+      "electric",
+      "fiat"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Fiat Doblo",
+    "segment": "LCV",
+    "aliases": [
+      "Doblo Combi",
+      "Doblo Cargo",
+      "Doblo"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 5,
+      "parts_cost_index_1_5": 2,
+      "service_network_index_1_5": 5,
+      "resale_liquidity_score_1_5": 5
+    },
+    "tags": [
+      "multijet",
+      "fiat"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Fiat Fiorino",
+    "segment": "LCV",
+    "aliases": [
+      "Fiorino Combi",
+      "Fiorino Cargo",
+      "Fiorino"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 5,
+      "parts_cost_index_1_5": 2,
+      "service_network_index_1_5": 5,
+      "resale_liquidity_score_1_5": 5
+    },
+    "tags": [
+      "multijet",
+      "fiat"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Toyota Corolla",
+    "segment": "C_SEDAN",
+    "aliases": [
+      "Corolla Hybrid",
+      "Corolla 1.6",
+      "Corolla"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 5,
+      "parts_cost_index_1_5": 2,
+      "service_network_index_1_5": 5,
+      "resale_liquidity_score_1_5": 5
+    },
+    "tags": [
+      "toyota",
+      "toyota_hybrid",
+      "hybrid"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Toyota Yaris",
+    "segment": "B_HATCH",
+    "aliases": [
+      "Yaris Hybrid",
+      "Yaris"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 4,
+      "parts_cost_index_1_5": 2,
+      "service_network_index_1_5": 4,
+      "resale_liquidity_score_1_5": 4
+    },
+    "tags": [
+      "hybrid",
+      "toyota_hybrid",
+      "toyota"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Toyota C-HR",
+    "segment": "C_SUV",
+    "aliases": [
+      "CHR",
+      "C HR",
+      "C-HR"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 4,
+      "parts_cost_index_1_5": 3,
+      "service_network_index_1_5": 4,
+      "resale_liquidity_score_1_5": 4
+    },
+    "tags": [
+      "hybrid",
+      "toyota_hybrid",
+      "toyota"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Toyota RAV4",
+    "segment": "D_SUV",
+    "aliases": [
+      "RAV4 Hybrid",
+      "RAV4"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 4,
+      "parts_cost_index_1_5": 4,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "tags": [
+      "hybrid",
+      "toyota_hybrid",
+      "awd",
+      "toyota"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Toyota Auris",
+    "segment": "C_HATCH",
+    "aliases": [
+      "Auris Hybrid",
+      "Auris"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 4,
+      "parts_cost_index_1_5": 3,
+      "service_network_index_1_5": 4,
+      "resale_liquidity_score_1_5": 4
+    },
+    "tags": [
+      "hybrid",
+      "toyota_hybrid",
+      "toyota"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Toyota Camry",
+    "segment": "D_SEDAN",
+    "aliases": [
+      "Camry Hybrid",
+      "Camry"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 3,
+      "parts_cost_index_1_5": 3,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "tags": [
+      "hybrid",
+      "toyota_hybrid",
+      "toyota"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Toyota Hilux",
+    "segment": "PICKUP",
+    "aliases": [
+      "Hilux 2.4 D-4D",
+      "Hilux"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 4,
+      "parts_cost_index_1_5": 3,
+      "service_network_index_1_5": 4,
+      "resale_liquidity_score_1_5": 5
+    },
+    "tags": [
+      "diesel",
+      "pickup",
+      "toyota"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Hyundai i10",
+    "segment": "A_HATCH",
+    "aliases": [
+      "i10"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 4,
+      "parts_cost_index_1_5": 2,
+      "service_network_index_1_5": 4,
+      "resale_liquidity_score_1_5": 4
+    },
+    "tags": [
+      "lpg_common",
+      "hyundai"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Hyundai i20",
+    "segment": "B_HATCH",
+    "aliases": [
+      "i20"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 5,
+      "parts_cost_index_1_5": 1,
+      "service_network_index_1_5": 5,
+      "resale_liquidity_score_1_5": 5
+    },
+    "tags": [
+      "turbo_small",
+      "hyundai"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Hyundai Bayon",
+    "segment": "B_SUV",
+    "aliases": [
+      "Bayon"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 4,
+      "parts_cost_index_1_5": 3,
+      "service_network_index_1_5": 4,
+      "resale_liquidity_score_1_5": 4
+    },
+    "tags": [
+      "turbo_small",
+      "hyundai"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Hyundai Elantra",
+    "segment": "C_SEDAN",
+    "aliases": [
+      "Elantra"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 4,
+      "parts_cost_index_1_5": 3,
+      "service_network_index_1_5": 4,
+      "resale_liquidity_score_1_5": 4
+    },
+    "tags": [
+      "hyundai"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Hyundai Tucson",
+    "segment": "C_SUV",
+    "aliases": [
+      "Tucson Hybrid",
+      "Tucson"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 4,
+      "parts_cost_index_1_5": 3,
+      "service_network_index_1_5": 4,
+      "resale_liquidity_score_1_5": 4
+    },
+    "tags": [
+      "hybrid",
+      "hyundai"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Hyundai Kona",
+    "segment": "B_SUV",
+    "aliases": [
+      "Kona Electric",
+      "Kona EV",
+      "Kona"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 4,
+      "parts_cost_index_1_5": 3,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "tags": [
+      "electric",
+      "hyundai"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Kia Picanto",
+    "segment": "A_HATCH",
+    "aliases": [
+      "Picanto"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 4,
+      "parts_cost_index_1_5": 2,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "tags": [
+      "kia"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Kia Rio",
+    "segment": "B_HATCH",
+    "aliases": [
+      "Rio"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 4,
+      "parts_cost_index_1_5": 2,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "tags": [
+      "kia"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Kia Stonic",
+    "segment": "B_SUV",
+    "aliases": [
+      "Stonic"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 4,
+      "parts_cost_index_1_5": 3,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "tags": [
+      "turbo_small",
+      "kia"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Kia Ceed",
+    "segment": "C_HATCH",
+    "aliases": [
+      "Ceed",
+      "Ceed SW"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 4,
+      "parts_cost_index_1_5": 3,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "tags": [
+      "turbo_small",
+      "kia"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Kia Sportage",
+    "segment": "C_SUV",
+    "aliases": [
+      "Sportage Hybrid",
+      "Sportage"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 4,
+      "parts_cost_index_1_5": 3,
+      "service_network_index_1_5": 4,
+      "resale_liquidity_score_1_5": 4
+    },
+    "tags": [
+      "hybrid",
+      "kia"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Kia Niro",
+    "segment": "B_SUV",
+    "aliases": [
+      "Niro Hybrid",
+      "Niro EV",
+      "Niro"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 3,
+      "parts_cost_index_1_5": 3,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "tags": [
+      "hybrid",
+      "electric",
+      "kia"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Ford Fiesta",
+    "segment": "B_HATCH",
+    "aliases": [
+      "Fiesta"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 4,
+      "parts_cost_index_1_5": 2,
+      "service_network_index_1_5": 4,
+      "resale_liquidity_score_1_5": 4
+    },
+    "tags": [
+      "ecoboost",
+      "turbo_small",
+      "ford"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Ford Focus",
+    "segment": "C_HATCH",
+    "aliases": [
+      "Focus Sedan",
+      "Focus"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 5,
+      "parts_cost_index_1_5": 2,
+      "service_network_index_1_5": 5,
+      "resale_liquidity_score_1_5": 5
+    },
+    "tags": [
+      "ecoboost",
+      "turbo_small",
+      "ford"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Ford Puma",
+    "segment": "B_SUV",
+    "aliases": [
+      "Puma"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 4,
+      "parts_cost_index_1_5": 3,
+      "service_network_index_1_5": 4,
+      "resale_liquidity_score_1_5": 4
+    },
+    "tags": [
+      "ecoboost",
+      "turbo_small",
+      "ford"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Ford Kuga",
+    "segment": "C_SUV",
+    "aliases": [
+      "Kuga Hybrid",
+      "Kuga"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 4,
+      "parts_cost_index_1_5": 3,
+      "service_network_index_1_5": 4,
+      "resale_liquidity_score_1_5": 4
+    },
+    "tags": [
+      "hybrid",
+      "ford"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Ford Mondeo",
+    "segment": "D_SEDAN",
+    "aliases": [
+      "Mondeo"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 4,
+      "parts_cost_index_1_5": 3,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "tags": [
+      "diesel",
+      "ford"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Ford Ranger",
+    "segment": "PICKUP",
+    "aliases": [
+      "Ranger"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 4,
+      "parts_cost_index_1_5": 3,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 4
+    },
+    "tags": [
+      "diesel",
+      "pickup",
+      "ford"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Volkswagen Polo",
+    "segment": "B_HATCH",
+    "aliases": [
+      "Polo"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 4,
+      "parts_cost_index_1_5": 2,
+      "service_network_index_1_5": 4,
+      "resale_liquidity_score_1_5": 4
+    },
+    "tags": [
+      "tsi",
+      "vw"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Volkswagen Golf",
+    "segment": "C_HATCH",
+    "aliases": [
+      "Golf",
+      "Golf VII",
+      "Golf 7",
+      "Golf VIII",
+      "Golf 8"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 4,
+      "parts_cost_index_1_5": 3,
+      "service_network_index_1_5": 4,
+      "resale_liquidity_score_1_5": 4
+    },
+    "tags": [
+      "tsi",
+      "dsg",
+      "vw"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Volkswagen Jetta",
+    "segment": "C_SEDAN",
+    "aliases": [
+      "Jetta"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 4,
+      "parts_cost_index_1_5": 3,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "tags": [
+      "tsi",
+      "vw"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Volkswagen Passat",
+    "segment": "D_SEDAN",
+    "aliases": [
+      "Passat"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 4,
+      "parts_cost_index_1_5": 3,
+      "service_network_index_1_5": 4,
+      "resale_liquidity_score_1_5": 4
+    },
+    "tags": [
+      "tsi",
+      "tdi",
+      "dsg",
+      "vw"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Volkswagen Tiguan",
+    "segment": "C_SUV",
+    "aliases": [
+      "Tiguan"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 4,
+      "parts_cost_index_1_5": 3,
+      "service_network_index_1_5": 4,
+      "resale_liquidity_score_1_5": 4
+    },
+    "tags": [
+      "tsi",
+      "dsg",
+      "vw"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Volkswagen T-Roc",
+    "segment": "B_SUV",
+    "aliases": [
+      "T Roc",
+      "T-Roc"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 4,
+      "parts_cost_index_1_5": 3,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "tags": [
+      "tsi",
+      "dsg",
+      "vw"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Volkswagen Taigo",
+    "segment": "B_SUV",
+    "aliases": [
+      "Taigo"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 3,
+      "parts_cost_index_1_5": 3,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "tags": [
+      "tsi",
+      "vw"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Skoda Fabia",
+    "segment": "B_HATCH",
+    "aliases": [
+      "Fabia"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 4,
+      "parts_cost_index_1_5": 2,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "tags": [
+      "tsi",
+      "skoda"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Skoda Scala",
+    "segment": "C_HATCH",
+    "aliases": [
+      "Scala"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 3,
+      "parts_cost_index_1_5": 3,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "tags": [
+      "tsi",
+      "skoda"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Skoda Octavia",
+    "segment": "C_SEDAN",
+    "aliases": [
+      "Octavia"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 4,
+      "parts_cost_index_1_5": 3,
+      "service_network_index_1_5": 4,
+      "resale_liquidity_score_1_5": 4
+    },
+    "tags": [
+      "tsi",
+      "tdi",
+      "dsg",
+      "skoda"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Skoda Superb",
+    "segment": "D_SEDAN",
+    "aliases": [
+      "Superb"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 4,
+      "parts_cost_index_1_5": 3,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "tags": [
+      "tsi",
+      "tdi",
+      "dsg",
+      "skoda"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Skoda Kamiq",
+    "segment": "B_SUV",
+    "aliases": [
+      "Kamiq"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 3,
+      "parts_cost_index_1_5": 3,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "tags": [
+      "tsi",
+      "skoda"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Skoda Karoq",
+    "segment": "C_SUV",
+    "aliases": [
+      "Karoq"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 3,
+      "parts_cost_index_1_5": 3,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "tags": [
+      "tsi",
+      "dsg",
+      "skoda"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Skoda Kodiaq",
+    "segment": "D_SUV",
+    "aliases": [
+      "Kodiaq"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 4,
+      "parts_cost_index_1_5": 4,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "tags": [
+      "tsi",
+      "dsg",
+      "awd",
+      "skoda"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "SEAT Ibiza",
+    "segment": "B_HATCH",
+    "aliases": [
+      "Ibiza"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 3,
+      "parts_cost_index_1_5": 2,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "tags": [
+      "tsi",
+      "seat"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "SEAT Leon",
+    "segment": "C_HATCH",
+    "aliases": [
+      "Leon"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 3,
+      "parts_cost_index_1_5": 3,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "tags": [
+      "tsi",
+      "dsg",
+      "seat"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "SEAT Arona",
+    "segment": "B_SUV",
+    "aliases": [
+      "Arona"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 3,
+      "parts_cost_index_1_5": 3,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "tags": [
+      "tsi",
+      "seat"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "SEAT Ateca",
+    "segment": "C_SUV",
+    "aliases": [
+      "Ateca"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 3,
+      "parts_cost_index_1_5": 3,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "tags": [
+      "tsi",
+      "dsg",
+      "seat"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Opel Corsa",
+    "segment": "B_HATCH",
+    "aliases": [
+      "Corsa"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 4,
+      "parts_cost_index_1_5": 2,
+      "service_network_index_1_5": 4,
+      "resale_liquidity_score_1_5": 4
+    },
+    "tags": [
+      "turbo_small",
+      "opel"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Opel Astra",
+    "segment": "C_HATCH",
+    "aliases": [
+      "Astra Sedan",
+      "Astra"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 4,
+      "parts_cost_index_1_5": 3,
+      "service_network_index_1_5": 4,
+      "resale_liquidity_score_1_5": 4
+    },
+    "tags": [
+      "turbo_small",
+      "opel"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Opel Insignia",
+    "segment": "D_SEDAN",
+    "aliases": [
+      "Insignia"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 4,
+      "parts_cost_index_1_5": 3,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "tags": [
+      "diesel",
+      "opel"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Opel Mokka",
+    "segment": "B_SUV",
+    "aliases": [
+      "Mokka"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 4,
+      "parts_cost_index_1_5": 3,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "tags": [
+      "turbo_small",
+      "opel"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Opel Crossland",
+    "segment": "B_SUV",
+    "aliases": [
+      "Crossland"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 3,
+      "parts_cost_index_1_5": 3,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "tags": [
+      "turbo_small",
+      "opel"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Opel Grandland",
+    "segment": "C_SUV",
+    "aliases": [
+      "Grandland"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 4,
+      "parts_cost_index_1_5": 3,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "tags": [
+      "turbo_small",
+      "opel"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Peugeot 208",
+    "segment": "B_HATCH",
+    "aliases": [
+      "208"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 4,
+      "parts_cost_index_1_5": 2,
+      "service_network_index_1_5": 4,
+      "resale_liquidity_score_1_5": 4
+    },
+    "tags": [
+      "turbo_small",
+      "puretech",
+      "peugeot"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Peugeot 308",
+    "segment": "C_HATCH",
+    "aliases": [
+      "308"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 4,
+      "parts_cost_index_1_5": 3,
+      "service_network_index_1_5": 4,
+      "resale_liquidity_score_1_5": 4
+    },
+    "tags": [
+      "turbo_small",
+      "puretech",
+      "eat8",
+      "peugeot"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Peugeot 2008",
+    "segment": "B_SUV",
+    "aliases": [
+      "2008"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 4,
+      "parts_cost_index_1_5": 3,
+      "service_network_index_1_5": 4,
+      "resale_liquidity_score_1_5": 4
+    },
+    "tags": [
+      "turbo_small",
+      "puretech",
+      "eat8",
+      "peugeot"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Peugeot 3008",
+    "segment": "C_SUV",
+    "aliases": [
+      "3008"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 4,
+      "parts_cost_index_1_5": 3,
+      "service_network_index_1_5": 4,
+      "resale_liquidity_score_1_5": 4
+    },
+    "tags": [
+      "turbo_small",
+      "puretech",
+      "eat8",
+      "peugeot"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Peugeot 5008",
+    "segment": "D_SUV",
+    "aliases": [
+      "5008"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 4,
+      "parts_cost_index_1_5": 4,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "tags": [
+      "turbo_small",
+      "puretech",
+      "eat8",
+      "peugeot"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Peugeot 508",
+    "segment": "D_SEDAN",
+    "aliases": [
+      "508"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 3,
+      "parts_cost_index_1_5": 3,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "tags": [
+      "eat8",
+      "peugeot"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Citroen C3",
+    "segment": "B_HATCH",
+    "aliases": [
+      "C3"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 4,
+      "parts_cost_index_1_5": 2,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "tags": [
+      "turbo_small",
+      "citroen"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Citroen C4",
+    "segment": "C_HATCH",
+    "aliases": [
+      "C4"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 4,
+      "parts_cost_index_1_5": 3,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "tags": [
+      "turbo_small",
+      "citroen"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Citroen C-Elysee",
+    "segment": "B_SEDAN",
+    "aliases": [
+      "C Elysee",
+      "C-Elysee"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 4,
+      "parts_cost_index_1_5": 2,
+      "service_network_index_1_5": 4,
+      "resale_liquidity_score_1_5": 4
+    },
+    "tags": [
+      "diesel",
+      "lpg_common",
+      "citroen"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Citroen C5 Aircross",
+    "segment": "C_SUV",
+    "aliases": [
+      "C5 Aircross"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 3,
+      "parts_cost_index_1_5": 3,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "tags": [
+      "eat8",
+      "citroen"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Dacia Sandero",
+    "segment": "B_HATCH",
+    "aliases": [
+      "Sandero Stepway",
+      "Sandero"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 4,
+      "parts_cost_index_1_5": 2,
+      "service_network_index_1_5": 4,
+      "resale_liquidity_score_1_5": 4
+    },
+    "tags": [
+      "lpg_common",
+      "dacia"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Dacia Logan",
+    "segment": "B_SEDAN",
+    "aliases": [
+      "Logan"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 4,
+      "parts_cost_index_1_5": 2,
+      "service_network_index_1_5": 4,
+      "resale_liquidity_score_1_5": 4
+    },
+    "tags": [
+      "lpg_common",
+      "dacia"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Dacia Duster",
+    "segment": "C_SUV",
+    "aliases": [
+      "Duster"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 4,
+      "parts_cost_index_1_5": 3,
+      "service_network_index_1_5": 4,
+      "resale_liquidity_score_1_5": 4
+    },
+    "tags": [
+      "lpg_common",
+      "awd",
+      "dacia"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Dacia Jogger",
+    "segment": "C_SUV",
+    "aliases": [
+      "Jogger"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 3,
+      "parts_cost_index_1_5": 3,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "tags": [
+      "lpg_common",
+      "dacia"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Nissan Micra",
+    "segment": "B_HATCH",
+    "aliases": [
+      "Micra"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 3,
+      "parts_cost_index_1_5": 2,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "tags": [
+      "turbo_small",
+      "nissan"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Nissan Juke",
+    "segment": "B_SUV",
+    "aliases": [
+      "Juke"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 4,
+      "parts_cost_index_1_5": 3,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "tags": [
+      "turbo_small",
+      "nissan"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Nissan Qashqai",
+    "segment": "C_SUV",
+    "aliases": [
+      "Qashqai"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 4,
+      "parts_cost_index_1_5": 3,
+      "service_network_index_1_5": 4,
+      "resale_liquidity_score_1_5": 4
+    },
+    "tags": [
+      "cvt",
+      "nissan"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Nissan X-Trail",
+    "segment": "D_SUV",
+    "aliases": [
+      "X Trail",
+      "X-Trail"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 4,
+      "parts_cost_index_1_5": 4,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "tags": [
+      "cvt",
+      "awd",
+      "nissan"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Honda Civic",
+    "segment": "C_SEDAN",
+    "aliases": [
+      "Civic FC5",
+      "Civic FE",
+      "Civic 1.6 i-VTEC",
+      "Civic"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 5,
+      "parts_cost_index_1_5": 2,
+      "service_network_index_1_5": 5,
+      "resale_liquidity_score_1_5": 5
+    },
+    "tags": [
+      "ivtec",
+      "lpg_common",
+      "honda"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Honda Jazz",
+    "segment": "B_HATCH",
+    "aliases": [
+      "Jazz"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 4,
+      "parts_cost_index_1_5": 2,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "tags": [
+      "cvt",
+      "hybrid",
+      "honda"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Honda HR-V",
+    "segment": "B_SUV",
+    "aliases": [
+      "HRV",
+      "HR-V"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 4,
+      "parts_cost_index_1_5": 3,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "tags": [
+      "cvt",
+      "honda"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Honda CR-V",
+    "segment": "D_SUV",
+    "aliases": [
+      "CRV",
+      "CR-V"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 3,
+      "parts_cost_index_1_5": 4,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "tags": [
+      "cvt",
+      "awd",
+      "hybrid",
+      "honda"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Mazda 3",
+    "segment": "C_HATCH",
+    "aliases": [
+      "Mazda3",
+      "3"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 3,
+      "parts_cost_index_1_5": 3,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "tags": [
+      "skyactiv",
+      "mazda"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Mazda 6",
+    "segment": "D_SEDAN",
+    "aliases": [
+      "Mazda6",
+      "6"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 3,
+      "parts_cost_index_1_5": 3,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "tags": [
+      "skyactiv",
+      "mazda"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Mazda CX-3",
+    "segment": "B_SUV",
+    "aliases": [
+      "CX3",
+      "CX-3"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 3,
+      "parts_cost_index_1_5": 3,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "tags": [
+      "skyactiv",
+      "mazda"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Mazda CX-5",
+    "segment": "C_SUV",
+    "aliases": [
+      "CX5",
+      "CX-5"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 3,
+      "parts_cost_index_1_5": 3,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "tags": [
+      "skyactiv",
+      "awd",
+      "mazda"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Suzuki Swift",
+    "segment": "B_HATCH",
+    "aliases": [
+      "Swift"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 3,
+      "parts_cost_index_1_5": 2,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "tags": [
+      "suzuki"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Suzuki Vitara",
+    "segment": "B_SUV",
+    "aliases": [
+      "Vitara"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 3,
+      "parts_cost_index_1_5": 3,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "tags": [
+      "awd",
+      "suzuki"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Suzuki S-Cross",
+    "segment": "B_SUV",
+    "aliases": [
+      "S Cross",
+      "S-Cross"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 3,
+      "parts_cost_index_1_5": 3,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "tags": [
+      "suzuki"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Mitsubishi Lancer",
+    "segment": "C_SEDAN",
+    "aliases": [
+      "Lancer"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 3,
+      "parts_cost_index_1_5": 3,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "tags": [
+      "mitsubishi"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Mitsubishi ASX",
+    "segment": "B_SUV",
+    "aliases": [
+      "ASX"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 3,
+      "parts_cost_index_1_5": 3,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "tags": [
+      "mitsubishi"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Mitsubishi Outlander",
+    "segment": "D_SUV",
+    "aliases": [
+      "Outlander PHEV",
+      "Outlander"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 3,
+      "parts_cost_index_1_5": 4,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "tags": [
+      "hybrid",
+      "awd",
+      "mitsubishi"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Chevrolet Cruze",
+    "segment": "C_SEDAN",
+    "aliases": [
+      "Cruze"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 4,
+      "parts_cost_index_1_5": 3,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "tags": [
+      "chevrolet"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Chevrolet Aveo",
+    "segment": "B_HATCH",
+    "aliases": [
+      "Aveo"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 4,
+      "parts_cost_index_1_5": 2,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "tags": [
+      "lpg_common",
+      "chevrolet"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Chevrolet Captiva",
+    "segment": "D_SUV",
+    "aliases": [
+      "Captiva"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 3,
+      "parts_cost_index_1_5": 4,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "tags": [
+      "diesel",
+      "awd",
+      "chevrolet"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "BMW 1 Serisi",
+    "segment": "C_HATCH",
+    "aliases": [
+      "BMW 1 Series",
+      "F20",
+      "F40",
+      "1 Serisi"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 3,
+      "parts_cost_index_1_5": 4,
+      "service_network_index_1_5": 4,
+      "resale_liquidity_score_1_5": 4
+    },
+    "tags": [
+      "premium_german",
+      "turbo_small",
+      "zf8",
+      "bmw"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "BMW 3 Serisi",
+    "segment": "PREMIUM_D",
+    "aliases": [
+      "BMW 3 Series",
+      "320i",
+      "320d",
+      "F30",
+      "G20",
+      "3 Serisi"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 2,
+      "parts_cost_index_1_5": 5,
+      "service_network_index_1_5": 4,
+      "resale_liquidity_score_1_5": 4
+    },
+    "tags": [
+      "premium_german",
+      "zf8",
+      "diesel",
+      "bmw"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "BMW 5 Serisi",
+    "segment": "E_SEGMENT",
+    "aliases": [
+      "BMW 5 Series",
+      "520i",
+      "520d",
+      "F10",
+      "G30",
+      "5 Serisi"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 2,
+      "parts_cost_index_1_5": 5,
+      "service_network_index_1_5": 4,
+      "resale_liquidity_score_1_5": 4
+    },
+    "tags": [
+      "premium_german",
+      "zf8",
+      "diesel",
+      "bmw"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "BMW X1",
+    "segment": "C_SUV",
+    "aliases": [
+      "BMW X1",
+      "F48",
+      "U11",
+      "X1"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 3,
+      "parts_cost_index_1_5": 4,
+      "service_network_index_1_5": 4,
+      "resale_liquidity_score_1_5": 4
+    },
+    "tags": [
+      "premium_german",
+      "awd",
+      "dct",
+      "bmw"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "BMW X3",
+    "segment": "D_SUV",
+    "aliases": [
+      "BMW X3",
+      "F25",
+      "G01",
+      "X3"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 3,
+      "parts_cost_index_1_5": 5,
+      "service_network_index_1_5": 4,
+      "resale_liquidity_score_1_5": 4
+    },
+    "tags": [
+      "premium_german",
+      "awd",
+      "zf8",
+      "bmw"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "BMW X5",
+    "segment": "D_SUV",
+    "aliases": [
+      "BMW X5",
+      "F15",
+      "G05",
+      "X5"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 3,
+      "parts_cost_index_1_5": 5,
+      "service_network_index_1_5": 4,
+      "resale_liquidity_score_1_5": 4
+    },
+    "tags": [
+      "premium_german",
+      "awd",
+      "zf8",
+      "bmw"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Mercedes-Benz A Serisi",
+    "segment": "C_HATCH",
+    "aliases": [
+      "A-Class",
+      "W176",
+      "W177",
+      "A Serisi"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 3,
+      "parts_cost_index_1_5": 4,
+      "service_network_index_1_5": 4,
+      "resale_liquidity_score_1_5": 4
+    },
+    "tags": [
+      "premium_german",
+      "turbo_small",
+      "dct",
+      "mercedes"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Mercedes-Benz C Serisi",
+    "segment": "PREMIUM_D",
+    "aliases": [
+      "C-Class",
+      "W204",
+      "W205",
+      "W206",
+      "C Serisi"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 2,
+      "parts_cost_index_1_5": 5,
+      "service_network_index_1_5": 4,
+      "resale_liquidity_score_1_5": 4
+    },
+    "tags": [
+      "premium_german",
+      "diesel",
+      "auto",
+      "mercedes"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Mercedes-Benz E Serisi",
+    "segment": "E_SEGMENT",
+    "aliases": [
+      "E-Class",
+      "W212",
+      "W213",
+      "E Serisi"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 2,
+      "parts_cost_index_1_5": 5,
+      "service_network_index_1_5": 4,
+      "resale_liquidity_score_1_5": 4
+    },
+    "tags": [
+      "premium_german",
+      "diesel",
+      "auto",
+      "mercedes"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Mercedes-Benz CLA",
+    "segment": "C_HATCH",
+    "aliases": [
+      "CLA",
+      "C117",
+      "C118"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 3,
+      "parts_cost_index_1_5": 4,
+      "service_network_index_1_5": 4,
+      "resale_liquidity_score_1_5": 4
+    },
+    "tags": [
+      "premium_german",
+      "dct",
+      "turbo_small",
+      "mercedes"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Mercedes-Benz GLA",
+    "segment": "B_SUV",
+    "aliases": [
+      "GLA",
+      "X156",
+      "H247"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 3,
+      "parts_cost_index_1_5": 4,
+      "service_network_index_1_5": 4,
+      "resale_liquidity_score_1_5": 4
+    },
+    "tags": [
+      "premium_german",
+      "dct",
+      "awd",
+      "mercedes"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Mercedes-Benz GLC",
+    "segment": "C_SUV",
+    "aliases": [
+      "GLC",
+      "X253",
+      "X254"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 3,
+      "parts_cost_index_1_5": 4,
+      "service_network_index_1_5": 4,
+      "resale_liquidity_score_1_5": 4
+    },
+    "tags": [
+      "premium_german",
+      "awd",
+      "auto",
+      "mercedes"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Audi A3",
+    "segment": "C_HATCH",
+    "aliases": [
+      "A3 Sedan",
+      "8V",
+      "8Y",
+      "A3"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 3,
+      "parts_cost_index_1_5": 4,
+      "service_network_index_1_5": 4,
+      "resale_liquidity_score_1_5": 4
+    },
+    "tags": [
+      "premium_german",
+      "tsi",
+      "dsg",
+      "audi"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Audi A4",
+    "segment": "PREMIUM_D",
+    "aliases": [
+      "A4",
+      "B8",
+      "B9"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 2,
+      "parts_cost_index_1_5": 5,
+      "service_network_index_1_5": 4,
+      "resale_liquidity_score_1_5": 4
+    },
+    "tags": [
+      "premium_german",
+      "tfsi",
+      "tdi",
+      "dsg",
+      "audi"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Audi A6",
+    "segment": "E_SEGMENT",
+    "aliases": [
+      "A6",
+      "C7",
+      "C8"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 2,
+      "parts_cost_index_1_5": 5,
+      "service_network_index_1_5": 4,
+      "resale_liquidity_score_1_5": 4
+    },
+    "tags": [
+      "premium_german",
+      "tfsi",
+      "tdi",
+      "dsg",
+      "audi"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Audi Q3",
+    "segment": "B_SUV",
+    "aliases": [
+      "Q3"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 3,
+      "parts_cost_index_1_5": 4,
+      "service_network_index_1_5": 4,
+      "resale_liquidity_score_1_5": 4
+    },
+    "tags": [
+      "premium_german",
+      "dsg",
+      "awd",
+      "audi"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Audi Q5",
+    "segment": "C_SUV",
+    "aliases": [
+      "Q5"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 3,
+      "parts_cost_index_1_5": 4,
+      "service_network_index_1_5": 4,
+      "resale_liquidity_score_1_5": 4
+    },
+    "tags": [
+      "premium_german",
+      "dsg",
+      "awd",
+      "audi"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Volvo XC40",
+    "segment": "C_SUV",
+    "aliases": [
+      "XC40 Recharge",
+      "XC40"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 3,
+      "parts_cost_index_1_5": 4,
+      "service_network_index_1_5": 4,
+      "resale_liquidity_score_1_5": 4
+    },
+    "tags": [
+      "premium_swedish",
+      "hybrid",
+      "electric",
+      "volvo"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Volvo XC60",
+    "segment": "D_SUV",
+    "aliases": [
+      "XC60"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 3,
+      "parts_cost_index_1_5": 5,
+      "service_network_index_1_5": 4,
+      "resale_liquidity_score_1_5": 4
+    },
+    "tags": [
+      "premium_swedish",
+      "awd",
+      "hybrid",
+      "volvo"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Volvo S60",
+    "segment": "PREMIUM_D",
+    "aliases": [
+      "S60"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 2,
+      "parts_cost_index_1_5": 5,
+      "service_network_index_1_5": 4,
+      "resale_liquidity_score_1_5": 4
+    },
+    "tags": [
+      "premium_swedish",
+      "turbo_small",
+      "volvo"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Volvo S90",
+    "segment": "E_SEGMENT",
+    "aliases": [
+      "S90"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 2,
+      "parts_cost_index_1_5": 5,
+      "service_network_index_1_5": 4,
+      "resale_liquidity_score_1_5": 4
+    },
+    "tags": [
+      "premium_swedish",
+      "volvo"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Lexus NX",
+    "segment": "C_SUV",
+    "aliases": [
+      "NX Hybrid",
+      "NX"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 3,
+      "parts_cost_index_1_5": 4,
+      "service_network_index_1_5": 4,
+      "resale_liquidity_score_1_5": 4
+    },
+    "tags": [
+      "hybrid",
+      "toyota_hybrid",
+      "premium",
+      "lexus"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Lexus RX",
+    "segment": "D_SUV",
+    "aliases": [
+      "RX Hybrid",
+      "RX"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 3,
+      "parts_cost_index_1_5": 5,
+      "service_network_index_1_5": 4,
+      "resale_liquidity_score_1_5": 4
+    },
+    "tags": [
+      "hybrid",
+      "toyota_hybrid",
+      "premium",
+      "awd",
+      "lexus"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Lexus ES",
+    "segment": "E_SEGMENT",
+    "aliases": [
+      "ES Hybrid",
+      "ES"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 2,
+      "parts_cost_index_1_5": 5,
+      "service_network_index_1_5": 4,
+      "resale_liquidity_score_1_5": 4
+    },
+    "tags": [
+      "hybrid",
+      "toyota_hybrid",
+      "premium",
+      "lexus"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Tesla Model 3",
+    "segment": "C_SEDAN",
+    "aliases": [
+      "Model3",
+      "Model 3"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 3,
+      "parts_cost_index_1_5": 4,
+      "service_network_index_1_5": 4,
+      "resale_liquidity_score_1_5": 4
+    },
+    "tags": [
+      "electric",
+      "ev",
+      "tesla"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Tesla Model Y",
+    "segment": "C_SUV",
+    "aliases": [
+      "ModelY",
+      "Model Y"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 3,
+      "parts_cost_index_1_5": 4,
+      "service_network_index_1_5": 4,
+      "resale_liquidity_score_1_5": 4
+    },
+    "tags": [
+      "electric",
+      "ev",
+      "tesla"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "TOGG T10X",
+    "segment": "C_SUV",
+    "aliases": [
+      "Togg T10X",
+      "T10 X",
+      "T10X"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 4,
+      "parts_cost_index_1_5": 3,
+      "service_network_index_1_5": 4,
+      "resale_liquidity_score_1_5": 4
+    },
+    "tags": [
+      "electric",
+      "ev",
+      "domestic_tr",
+      "togg"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "MG MG4",
+    "segment": "C_HATCH",
+    "aliases": [
+      "MG4 Electric",
+      "MG4"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 4,
+      "parts_cost_index_1_5": 3,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "tags": [
+      "electric",
+      "ev",
+      "mg"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "MG ZS",
+    "segment": "B_SUV",
+    "aliases": [
+      "MG ZS EV",
+      "ZS"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 4,
+      "parts_cost_index_1_5": 3,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "tags": [
+      "electric",
+      "ev",
+      "mg"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "BYD ATTO 3",
+    "segment": "C_SUV",
+    "aliases": [
+      "Atto3",
+      "ATTO 3"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 4,
+      "parts_cost_index_1_5": 3,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "tags": [
+      "electric",
+      "ev",
+      "byd"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "BYD DOLPHIN",
+    "segment": "B_HATCH",
+    "aliases": [
+      "Dolphin"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 4,
+      "parts_cost_index_1_5": 2,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "tags": [
+      "electric",
+      "ev",
+      "byd"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Chery Tiggo 7 Pro",
+    "segment": "C_SUV",
+    "aliases": [
+      "Tiggo7",
+      "Tiggo 7",
+      "Tiggo 7 Pro"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 4,
+      "parts_cost_index_1_5": 3,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "tags": [
+      "turbo_small",
+      "chery"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Chery Tiggo 8 Pro",
+    "segment": "D_SUV",
+    "aliases": [
+      "Tiggo8",
+      "Tiggo 8",
+      "Tiggo 8 Pro"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 4,
+      "parts_cost_index_1_5": 4,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "tags": [
+      "turbo_small",
+      "awd",
+      "chery"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Volkswagen Transporter",
+    "segment": "LCV",
+    "aliases": [
+      "Caravelle",
+      "Multivan",
+      "Transporter"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 4,
+      "parts_cost_index_1_5": 3,
+      "service_network_index_1_5": 4,
+      "resale_liquidity_score_1_5": 4
+    },
+    "tags": [
+      "tdi",
+      "lcv",
+      "vw"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Ford Transit",
+    "segment": "LCV",
+    "aliases": [
+      "Transit Custom",
+      "Connect",
+      "Transit"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 4,
+      "parts_cost_index_1_5": 3,
+      "service_network_index_1_5": 4,
+      "resale_liquidity_score_1_5": 4
+    },
+    "tags": [
+      "diesel",
+      "lcv",
+      "ford"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Renault Kangoo",
+    "segment": "LCV",
+    "aliases": [
+      "Kangoo",
+      "Kangoo Multix"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 4,
+      "parts_cost_index_1_5": 3,
+      "service_network_index_1_5": 4,
+      "resale_liquidity_score_1_5": 4
+    },
+    "tags": [
+      "diesel",
+      "lcv",
+      "renault"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Peugeot Partner",
+    "segment": "LCV",
+    "aliases": [
+      "Partner Tepee",
+      "Partner"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 4,
+      "parts_cost_index_1_5": 3,
+      "service_network_index_1_5": 4,
+      "resale_liquidity_score_1_5": 4
+    },
+    "tags": [
+      "diesel",
+      "lcv",
+      "peugeot"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Citroen Berlingo",
+    "segment": "LCV",
+    "aliases": [
+      "Berlingo"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 4,
+      "parts_cost_index_1_5": 3,
+      "service_network_index_1_5": 4,
+      "resale_liquidity_score_1_5": 4
+    },
+    "tags": [
+      "diesel",
+      "lcv",
+      "citroen"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Renault Scenic",
+    "segment": "C_SUV",
+    "aliases": [
+      "Scenic",
+      "Grand Scenic"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 3,
+      "parts_cost_index_1_5": 3,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "tags": [
+      "dci",
+      "renault"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Renault Laguna",
+    "segment": "D_SEDAN",
+    "aliases": [
+      "Laguna"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 3,
+      "parts_cost_index_1_5": 3,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "tags": [
+      "diesel",
+      "renault"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Fiat Panda",
+    "segment": "A_HATCH",
+    "aliases": [
+      "Panda"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 3,
+      "parts_cost_index_1_5": 2,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "tags": [
+      "fiat"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Fiat Freemont",
+    "segment": "D_SUV",
+    "aliases": [
+      "Freemont"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 3,
+      "parts_cost_index_1_5": 4,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "tags": [
+      "diesel",
+      "awd",
+      "fiat"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Toyota Prius",
+    "segment": "C_HATCH",
+    "aliases": [
+      "Prius Hybrid",
+      "Prius"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 3,
+      "parts_cost_index_1_5": 3,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "tags": [
+      "hybrid",
+      "toyota_hybrid",
+      "toyota"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Toyota Yaris Cross",
+    "segment": "B_SUV",
+    "aliases": [
+      "Yaris Cross Hybrid",
+      "Yaris Cross"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 4,
+      "parts_cost_index_1_5": 3,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "tags": [
+      "hybrid",
+      "toyota_hybrid",
+      "toyota"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Hyundai Accent Blue",
+    "segment": "B_SEDAN",
+    "aliases": [
+      "Accent Blue",
+      "Accent"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 4,
+      "parts_cost_index_1_5": 2,
+      "service_network_index_1_5": 4,
+      "resale_liquidity_score_1_5": 4
+    },
+    "tags": [
+      "diesel",
+      "lpg_common",
+      "hyundai"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Hyundai Getz",
+    "segment": "B_HATCH",
+    "aliases": [
+      "Getz"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 4,
+      "parts_cost_index_1_5": 2,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "tags": [
+      "lpg_common",
+      "hyundai"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Kia Cerato",
+    "segment": "C_SEDAN",
+    "aliases": [
+      "Cerato"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 3,
+      "parts_cost_index_1_5": 3,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "tags": [
+      "kia"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Kia Sorento",
+    "segment": "D_SUV",
+    "aliases": [
+      "Sorento"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 3,
+      "parts_cost_index_1_5": 4,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "tags": [
+      "diesel",
+      "awd",
+      "kia"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Ford Tourneo Courier",
+    "segment": "LCV",
+    "aliases": [
+      "Tourneo Courier"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 4,
+      "parts_cost_index_1_5": 3,
+      "service_network_index_1_5": 4,
+      "resale_liquidity_score_1_5": 4
+    },
+    "tags": [
+      "diesel",
+      "lcv",
+      "ford"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Ford Tourneo Connect",
+    "segment": "LCV",
+    "aliases": [
+      "Tourneo Connect"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 4,
+      "parts_cost_index_1_5": 3,
+      "service_network_index_1_5": 4,
+      "resale_liquidity_score_1_5": 4
+    },
+    "tags": [
+      "diesel",
+      "lcv",
+      "ford"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Opel Vectra",
+    "segment": "D_SEDAN",
+    "aliases": [
+      "Vectra"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 3,
+      "parts_cost_index_1_5": 3,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "tags": [
+      "lpg_common",
+      "opel"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Opel Zafira",
+    "segment": "LCV",
+    "aliases": [
+      "Zafira"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 3,
+      "parts_cost_index_1_5": 3,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "tags": [
+      "lpg_common",
+      "opel"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Peugeot 206",
+    "segment": "B_HATCH",
+    "aliases": [
+      "206"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 4,
+      "parts_cost_index_1_5": 2,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "tags": [
+      "lpg_common",
+      "peugeot"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Peugeot 207",
+    "segment": "B_HATCH",
+    "aliases": [
+      "207"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 4,
+      "parts_cost_index_1_5": 2,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "tags": [
+      "lpg_common",
+      "peugeot"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Peugeot 301",
+    "segment": "B_SEDAN",
+    "aliases": [
+      "301"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 4,
+      "parts_cost_index_1_5": 2,
+      "service_network_index_1_5": 4,
+      "resale_liquidity_score_1_5": 4
+    },
+    "tags": [
+      "diesel",
+      "lpg_common",
+      "peugeot"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Citroen C4 Picasso",
+    "segment": "C_SUV",
+    "aliases": [
+      "C4 Picasso",
+      "Grand Picasso"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 3,
+      "parts_cost_index_1_5": 3,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "tags": [
+      "diesel",
+      "citroen"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Nissan Almera",
+    "segment": "B_SEDAN",
+    "aliases": [
+      "Almera"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 3,
+      "parts_cost_index_1_5": 2,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "tags": [
+      "lpg_common",
+      "nissan"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Nissan Note",
+    "segment": "B_HATCH",
+    "aliases": [
+      "Note"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 3,
+      "parts_cost_index_1_5": 2,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "tags": [
+      "nissan"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Honda Accord",
+    "segment": "D_SEDAN",
+    "aliases": [
+      "Accord"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 3,
+      "parts_cost_index_1_5": 3,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "tags": [
+      "auto",
+      "honda"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Honda City",
+    "segment": "B_SEDAN",
+    "aliases": [
+      "City"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 4,
+      "parts_cost_index_1_5": 2,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "tags": [
+      "auto",
+      "honda"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Mazda CX-30",
+    "segment": "C_SUV",
+    "aliases": [
+      "CX30",
+      "CX-30"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 3,
+      "parts_cost_index_1_5": 3,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "tags": [
+      "skyactiv",
+      "mazda"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Suzuki Jimny",
+    "segment": "B_SUV",
+    "aliases": [
+      "Jimny"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 3,
+      "parts_cost_index_1_5": 3,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "tags": [
+      "awd",
+      "suzuki"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Mini Cooper",
+    "segment": "B_HATCH",
+    "aliases": [
+      "Mini Cooper",
+      "Cooper"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 3,
+      "parts_cost_index_1_5": 3,
+      "service_network_index_1_5": 4,
+      "resale_liquidity_score_1_5": 4
+    },
+    "tags": [
+      "premium",
+      "turbo_small",
+      "mini"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Alfa Romeo Giulietta",
+    "segment": "C_HATCH",
+    "aliases": [
+      "Giulietta"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 3,
+      "parts_cost_index_1_5": 3,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "tags": [
+      "turbo_small",
+      "alfa_romeo"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Alfa Romeo Giulia",
+    "segment": "PREMIUM_D",
+    "aliases": [
+      "Giulia"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 2,
+      "parts_cost_index_1_5": 4,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "tags": [
+      "turbo_small",
+      "alfa_romeo"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "BMW 2 Serisi",
+    "segment": "C_HATCH",
+    "aliases": [
+      "BMW 2 Series",
+      "F22",
+      "G42",
+      "2 Serisi"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 3,
+      "parts_cost_index_1_5": 4,
+      "service_network_index_1_5": 4,
+      "resale_liquidity_score_1_5": 4
+    },
+    "tags": [
+      "premium_german",
+      "zf8",
+      "bmw"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "BMW X2",
+    "segment": "B_SUV",
+    "aliases": [
+      "BMW X2",
+      "X2"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 3,
+      "parts_cost_index_1_5": 4,
+      "service_network_index_1_5": 4,
+      "resale_liquidity_score_1_5": 4
+    },
+    "tags": [
+      "premium_german",
+      "dct",
+      "awd",
+      "bmw"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "BMW 7 Serisi",
+    "segment": "E_SEGMENT",
+    "aliases": [
+      "BMW 7 Series",
+      "740i",
+      "730d",
+      "7 Serisi"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 1,
+      "parts_cost_index_1_5": 5,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "tags": [
+      "lux",
+      "premium_german",
+      "bmw"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Mercedes-Benz B Serisi",
+    "segment": "C_HATCH",
+    "aliases": [
+      "B-Class",
+      "W246",
+      "W247",
+      "B Serisi"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 3,
+      "parts_cost_index_1_5": 4,
+      "service_network_index_1_5": 4,
+      "resale_liquidity_score_1_5": 4
+    },
+    "tags": [
+      "premium_german",
+      "dct",
+      "mercedes"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Mercedes-Benz S Serisi",
+    "segment": "E_SEGMENT",
+    "aliases": [
+      "S-Class",
+      "W222",
+      "W223",
+      "S Serisi"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 1,
+      "parts_cost_index_1_5": 5,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "tags": [
+      "lux",
+      "premium_german",
+      "mercedes"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Mercedes-Benz GLE",
+    "segment": "D_SUV",
+    "aliases": [
+      "GLE"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 2,
+      "parts_cost_index_1_5": 5,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "tags": [
+      "lux",
+      "premium_german",
+      "awd",
+      "mercedes"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Audi A1",
+    "segment": "B_HATCH",
+    "aliases": [
+      "A1"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 3,
+      "parts_cost_index_1_5": 3,
+      "service_network_index_1_5": 4,
+      "resale_liquidity_score_1_5": 4
+    },
+    "tags": [
+      "premium_german",
+      "tsi",
+      "dsg",
+      "audi"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Audi A5",
+    "segment": "PREMIUM_D",
+    "aliases": [
+      "A5"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 2,
+      "parts_cost_index_1_5": 5,
+      "service_network_index_1_5": 4,
+      "resale_liquidity_score_1_5": 4
+    },
+    "tags": [
+      "premium_german",
+      "tfsi",
+      "dsg",
+      "audi"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Audi Q2",
+    "segment": "B_SUV",
+    "aliases": [
+      "Q2"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 3,
+      "parts_cost_index_1_5": 4,
+      "service_network_index_1_5": 4,
+      "resale_liquidity_score_1_5": 4
+    },
+    "tags": [
+      "premium_german",
+      "dsg",
+      "audi"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Audi Q7",
+    "segment": "D_SUV",
+    "aliases": [
+      "Q7"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 2,
+      "parts_cost_index_1_5": 5,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "tags": [
+      "lux",
+      "premium_german",
+      "awd",
+      "audi"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Volvo XC90",
+    "segment": "D_SUV",
+    "aliases": [
+      "XC90"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 2,
+      "parts_cost_index_1_5": 5,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "tags": [
+      "lux",
+      "premium_swedish",
+      "awd",
+      "hybrid",
+      "volvo"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Land Rover Range Rover Evoque",
+    "segment": "C_SUV",
+    "aliases": [
+      "Evoque",
+      "Range Rover Evoque"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 2,
+      "parts_cost_index_1_5": 5,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "tags": [
+      "lux",
+      "awd",
+      "land_rover"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Land Rover Discovery Sport",
+    "segment": "D_SUV",
+    "aliases": [
+      "Discovery Sport"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 2,
+      "parts_cost_index_1_5": 5,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "tags": [
+      "lux",
+      "awd",
+      "land_rover"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Porsche Macan",
+    "segment": "D_SUV",
+    "aliases": [
+      "Macan"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 2,
+      "parts_cost_index_1_5": 5,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "tags": [
+      "lux",
+      "awd",
+      "porsche"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Porsche Cayenne",
+    "segment": "D_SUV",
+    "aliases": [
+      "Cayenne"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 2,
+      "parts_cost_index_1_5": 5,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "tags": [
+      "lux",
+      "awd",
+      "porsche"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Jeep Renegade",
+    "segment": "B_SUV",
+    "aliases": [
+      "Renegade"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 3,
+      "parts_cost_index_1_5": 3,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "tags": [
+      "awd",
+      "jeep"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Jeep Compass",
+    "segment": "C_SUV",
+    "aliases": [
+      "Compass"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 3,
+      "parts_cost_index_1_5": 3,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "tags": [
+      "awd",
+      "jeep"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Jeep Grand Cherokee",
+    "segment": "D_SUV",
+    "aliases": [
+      "Grand Cherokee"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 2,
+      "parts_cost_index_1_5": 5,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "tags": [
+      "lux",
+      "awd",
+      "jeep"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "BMW i3",
+    "segment": "B_HATCH",
+    "aliases": [
+      "i3"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 3,
+      "parts_cost_index_1_5": 3,
+      "service_network_index_1_5": 4,
+      "resale_liquidity_score_1_5": 4
+    },
+    "tags": [
+      "electric",
+      "ev",
+      "bmw"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Volkswagen ID.4",
+    "segment": "C_SUV",
+    "aliases": [
+      "ID4",
+      "ID.4"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 3,
+      "parts_cost_index_1_5": 4,
+      "service_network_index_1_5": 4,
+      "resale_liquidity_score_1_5": 4
+    },
+    "tags": [
+      "electric",
+      "ev",
+      "vw"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Volkswagen ID.3",
+    "segment": "C_HATCH",
+    "aliases": [
+      "ID3",
+      "ID.3"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 3,
+      "parts_cost_index_1_5": 4,
+      "service_network_index_1_5": 4,
+      "resale_liquidity_score_1_5": 4
+    },
+    "tags": [
+      "electric",
+      "ev",
+      "vw"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Cupra Formentor",
+    "segment": "C_SUV",
+    "aliases": [
+      "Formentor"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 3,
+      "parts_cost_index_1_5": 4,
+      "service_network_index_1_5": 4,
+      "resale_liquidity_score_1_5": 4
+    },
+    "tags": [
+      "premium",
+      "tsi",
+      "dsg",
+      "cupra"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Cupra Leon",
+    "segment": "C_HATCH",
+    "aliases": [
+      "Cupra Leon",
+      "Leon"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 3,
+      "parts_cost_index_1_5": 4,
+      "service_network_index_1_5": 4,
+      "resale_liquidity_score_1_5": 4
+    },
+    "tags": [
+      "premium",
+      "tsi",
+      "dsg",
+      "cupra"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Skoda Enyaq",
+    "segment": "C_SUV",
+    "aliases": [
+      "Enyaq iV",
+      "Enyaq"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 3,
+      "parts_cost_index_1_5": 4,
+      "service_network_index_1_5": 4,
+      "resale_liquidity_score_1_5": 4
+    },
+    "tags": [
+      "electric",
+      "ev",
+      "skoda"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Hyundai Ioniq 5",
+    "segment": "C_SUV",
+    "aliases": [
+      "IONIQ 5"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 3,
+      "parts_cost_index_1_5": 4,
+      "service_network_index_1_5": 4,
+      "resale_liquidity_score_1_5": 4
+    },
+    "tags": [
+      "electric",
+      "ev",
+      "hyundai"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Hyundai Ioniq",
+    "segment": "C_HATCH",
+    "aliases": [
+      "Ioniq Hybrid",
+      "Ioniq Electric",
+      "Ioniq"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 3,
+      "parts_cost_index_1_5": 3,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "tags": [
+      "hybrid",
+      "electric",
+      "hyundai"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Kia EV6",
+    "segment": "D_SUV",
+    "aliases": [
+      "EV6"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 3,
+      "parts_cost_index_1_5": 5,
+      "service_network_index_1_5": 4,
+      "resale_liquidity_score_1_5": 4
+    },
+    "tags": [
+      "electric",
+      "ev",
+      "kia"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Kia EV9",
+    "segment": "D_SUV",
+    "aliases": [
+      "EV9"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 2,
+      "parts_cost_index_1_5": 5,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "tags": [
+      "electric",
+      "ev",
+      "lux",
+      "kia"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Renault Zoe",
+    "segment": "B_HATCH",
+    "aliases": [
+      "Zoe"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 4,
+      "parts_cost_index_1_5": 2,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "tags": [
+      "electric",
+      "ev",
+      "renault"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Renault Megane E-Tech",
+    "segment": "C_HATCH",
+    "aliases": [
+      "Megane E-Tech Electric",
+      "Megane E-Tech"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 4,
+      "parts_cost_index_1_5": 3,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "tags": [
+      "electric",
+      "ev",
+      "renault"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Volkswagen Caddy",
+    "segment": "LCV",
+    "aliases": [
+      "Caddy"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 4,
+      "parts_cost_index_1_5": 3,
+      "service_network_index_1_5": 4,
+      "resale_liquidity_score_1_5": 4
+    },
+    "tags": [
+      "tdi",
+      "lcv",
+      "vw"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Mercedes-Benz Vito",
+    "segment": "LCV",
+    "aliases": [
+      "Vito"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 3,
+      "parts_cost_index_1_5": 4,
+      "service_network_index_1_5": 4,
+      "resale_liquidity_score_1_5": 4
+    },
+    "tags": [
+      "diesel",
+      "lcv",
+      "premium_german",
+      "mercedes"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Mercedes-Benz Sprinter",
+    "segment": "LCV",
+    "aliases": [
+      "Sprinter"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 3,
+      "parts_cost_index_1_5": 4,
+      "service_network_index_1_5": 4,
+      "resale_liquidity_score_1_5": 4
+    },
+    "tags": [
+      "diesel",
+      "lcv",
+      "premium_german",
+      "mercedes"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Toyota Proace City",
+    "segment": "LCV",
+    "aliases": [
+      "Proace City"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 4,
+      "parts_cost_index_1_5": 3,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "tags": [
+      "diesel",
+      "lcv",
+      "toyota"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Peugeot Rifter",
+    "segment": "LCV",
+    "aliases": [
+      "Rifter"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 4,
+      "parts_cost_index_1_5": 3,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "tags": [
+      "diesel",
+      "lcv",
+      "peugeot"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Opel Combo",
+    "segment": "LCV",
+    "aliases": [
+      "Combo"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 4,
+      "parts_cost_index_1_5": 3,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "tags": [
+      "diesel",
+      "lcv",
+      "opel"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Citroen Jumpy",
+    "segment": "LCV",
+    "aliases": [
+      "Jumpy"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 4,
+      "parts_cost_index_1_5": 3,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "tags": [
+      "diesel",
+      "lcv",
+      "citroen"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Renault Master",
+    "segment": "LCV",
+    "aliases": [
+      "Master"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 4,
+      "parts_cost_index_1_5": 3,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "tags": [
+      "diesel",
+      "lcv",
+      "renault"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Fiat Ducato",
+    "segment": "LCV",
+    "aliases": [
+      "Ducato"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 4,
+      "parts_cost_index_1_5": 3,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "tags": [
+      "diesel",
+      "lcv",
+      "fiat"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Isuzu D-Max",
+    "segment": "PICKUP",
+    "aliases": [
+      "D-Max",
+      "D Max"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 4,
+      "parts_cost_index_1_5": 3,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 4
+    },
+    "tags": [
+      "diesel",
+      "pickup",
+      "isuzu"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Hyundai Santa Fe",
+    "segment": "D_SUV",
+    "aliases": [
+      "Santa Fe"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 3,
+      "parts_cost_index_1_5": 4,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "tags": [
+      "diesel",
+      "awd",
+      "hybrid",
+      "hyundai"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Kia Seltos",
+    "segment": "B_SUV",
+    "aliases": [
+      "Seltos"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 3,
+      "parts_cost_index_1_5": 3,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "tags": [
+      "turbo_small",
+      "kia"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Kia XCeed",
+    "segment": "C_HATCH",
+    "aliases": [
+      "XCeed",
+      "X Ceed"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 3,
+      "parts_cost_index_1_5": 3,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "tags": [
+      "turbo_small",
+      "kia"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Peugeot 508 SW",
+    "segment": "D_SEDAN",
+    "aliases": [
+      "508 SW"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 3,
+      "parts_cost_index_1_5": 3,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "tags": [
+      "eat8",
+      "peugeot"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Citroen C3 Aircross",
+    "segment": "B_SUV",
+    "aliases": [
+      "C3 Aircross"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 4,
+      "parts_cost_index_1_5": 3,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "tags": [
+      "turbo_small",
+      "citroen"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Opel Zafira Life",
+    "segment": "LCV",
+    "aliases": [
+      "Zafira Life"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 3,
+      "parts_cost_index_1_5": 3,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "tags": [
+      "diesel",
+      "lcv",
+      "opel"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Ford EcoSport",
+    "segment": "B_SUV",
+    "aliases": [
+      "EcoSport"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 3,
+      "parts_cost_index_1_5": 3,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "tags": [
+      "ecoboost",
+      "turbo_small",
+      "ford"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Ford Explorer",
+    "segment": "D_SUV",
+    "aliases": [
+      "Explorer"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 2,
+      "parts_cost_index_1_5": 5,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "tags": [
+      "hybrid",
+      "awd",
+      "lux",
+      "ford"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "BMW 4 Serisi",
+    "segment": "PREMIUM_D",
+    "aliases": [
+      "BMW 4 Series",
+      "420i",
+      "430i",
+      "4 Serisi"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 2,
+      "parts_cost_index_1_5": 5,
+      "service_network_index_1_5": 4,
+      "resale_liquidity_score_1_5": 4
+    },
+    "tags": [
+      "premium_german",
+      "zf8",
+      "bmw"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "BMW X4",
+    "segment": "D_SUV",
+    "aliases": [
+      "BMW X4",
+      "X4"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 3,
+      "parts_cost_index_1_5": 5,
+      "service_network_index_1_5": 4,
+      "resale_liquidity_score_1_5": 4
+    },
+    "tags": [
+      "premium_german",
+      "awd",
+      "zf8",
+      "bmw"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Mercedes-Benz G Serisi",
+    "segment": "D_SUV",
+    "aliases": [
+      "G-Class",
+      "G Wagen",
+      "G Serisi"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 2,
+      "parts_cost_index_1_5": 5,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "tags": [
+      "lux",
+      "premium_german",
+      "awd",
+      "mercedes"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Audi A7",
+    "segment": "E_SEGMENT",
+    "aliases": [
+      "A7"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 1,
+      "parts_cost_index_1_5": 5,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "tags": [
+      "lux",
+      "premium_german",
+      "dsg",
+      "audi"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Audi Q8",
+    "segment": "D_SUV",
+    "aliases": [
+      "Q8"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 2,
+      "parts_cost_index_1_5": 5,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "tags": [
+      "lux",
+      "premium_german",
+      "awd",
+      "audi"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Volvo V60",
+    "segment": "PREMIUM_D",
+    "aliases": [
+      "V60"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 2,
+      "parts_cost_index_1_5": 5,
+      "service_network_index_1_5": 4,
+      "resale_liquidity_score_1_5": 4
+    },
+    "tags": [
+      "premium_swedish",
+      "volvo"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Volvo V90",
+    "segment": "E_SEGMENT",
+    "aliases": [
+      "V90"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 2,
+      "parts_cost_index_1_5": 5,
+      "service_network_index_1_5": 4,
+      "resale_liquidity_score_1_5": 4
+    },
+    "tags": [
+      "premium_swedish",
+      "volvo"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Lexus UX",
+    "segment": "B_SUV",
+    "aliases": [
+      "UX Hybrid",
+      "UX"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 3,
+      "parts_cost_index_1_5": 4,
+      "service_network_index_1_5": 4,
+      "resale_liquidity_score_1_5": 4
+    },
+    "tags": [
+      "hybrid",
+      "toyota_hybrid",
+      "premium",
+      "lexus"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Tesla Model S",
+    "segment": "E_SEGMENT",
+    "aliases": [
+      "Model S"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 1,
+      "parts_cost_index_1_5": 5,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "tags": [
+      "electric",
+      "ev",
+      "lux",
+      "tesla"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Tesla Model X",
+    "segment": "D_SUV",
+    "aliases": [
+      "Model X"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 2,
+      "parts_cost_index_1_5": 5,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "tags": [
+      "electric",
+      "ev",
+      "lux",
+      "awd",
+      "tesla"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Skoda Rapid",
+    "segment": "B_SEDAN",
+    "aliases": [
+      "Rapid"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 4,
+      "parts_cost_index_1_5": 2,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "tags": [
+      "tsi",
+      "skoda"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Skoda Roomster",
+    "segment": "LCV",
+    "aliases": [
+      "Roomster"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 3,
+      "parts_cost_index_1_5": 3,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "tags": [
+      "tdi",
+      "lcv",
+      "skoda"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Volkswagen Scirocco",
+    "segment": "C_HATCH",
+    "aliases": [
+      "Scirocco"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 3,
+      "parts_cost_index_1_5": 3,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "tags": [
+      "tsi",
+      "dsg",
+      "vw"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  },
+  {
+    "key": "Volkswagen Touareg",
+    "segment": "D_SUV",
+    "aliases": [
+      "Touareg"
+    ],
+    "indices": {
+      "parts_availability_score_1_5": 2,
+      "parts_cost_index_1_5": 5,
+      "service_network_index_1_5": 3,
+      "resale_liquidity_score_1_5": 3
+    },
+    "tags": [
+      "lux",
+      "premium_german",
+      "awd",
+      "vw"
+    ],
+    "risk_patterns": [],
+    "big_maintenance_watchlist": [],
+    "inspection_checklist": [],
+    "disclaimer": "Bu profil; segment/marka sınıfı ve yaygın aktarma/teknoloji kalıplarına göre oluşturulmuş heuristik (tahmini) bir şablondur. Kesin arıza/masraf garantisi vermez; ekspertiz ve servis geçmişiyle doğrulayın."
+  }
+]

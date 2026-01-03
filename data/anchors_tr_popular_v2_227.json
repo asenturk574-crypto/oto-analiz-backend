@@ -1,0 +1,3086 @@
+[
+  {
+    "key": "Renault Clio",
+    "segment": "B_HATCH",
+    "aliases": [
+      "Clio IV",
+      "Clio 4",
+      "Clio V",
+      "Clio 5",
+      "Clio"
+    ],
+    "tags": [
+      "turbo_small",
+      "tce",
+      "dci",
+      "renault"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Renault Megane",
+    "segment": "C_HATCH",
+    "aliases": [
+      "Megane Sedan",
+      "Megane 4",
+      "Megane IV",
+      "Megane"
+    ],
+    "tags": [
+      "turbo_small",
+      "tce",
+      "dci",
+      "renault"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Renault Symbol",
+    "segment": "B_SEDAN",
+    "aliases": [
+      "Symbol Joy",
+      "Symbol Touch",
+      "Symbol"
+    ],
+    "tags": [
+      "dci",
+      "lpg_common",
+      "renault"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Renault Fluence",
+    "segment": "C_SEDAN",
+    "aliases": [
+      "Fluence 1.5 dCi",
+      "Fluence"
+    ],
+    "tags": [
+      "dci",
+      "renault"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Renault Taliant",
+    "segment": "B_SEDAN",
+    "aliases": [
+      "Taliant 1.0 TCe",
+      "Taliant"
+    ],
+    "tags": [
+      "turbo_small",
+      "tce",
+      "renault"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Renault Captur",
+    "segment": "B_SUV",
+    "aliases": [
+      "Captur E-Tech",
+      "Captur"
+    ],
+    "tags": [
+      "turbo_small",
+      "tce",
+      "hybrid",
+      "renault"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Renault Kadjar",
+    "segment": "C_SUV",
+    "aliases": [
+      "Kadjar 1.3 TCe",
+      "Kadjar"
+    ],
+    "tags": [
+      "turbo_small",
+      "tce",
+      "renault"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Renault Austral",
+    "segment": "C_SUV",
+    "aliases": [
+      "Austral E-Tech",
+      "Austral"
+    ],
+    "tags": [
+      "hybrid",
+      "renault"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Renault Talisman",
+    "segment": "D_SEDAN",
+    "aliases": [
+      "Talisman 1.6 dCi",
+      "Talisman"
+    ],
+    "tags": [
+      "dci",
+      "dct",
+      "renault"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Fiat Egea",
+    "segment": "C_SEDAN",
+    "aliases": [
+      "Egea Sedan",
+      "Tipo",
+      "Tipo Sedan",
+      "Egea"
+    ],
+    "tags": [
+      "multijet",
+      "lpg_common",
+      "fiat"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Fiat Egea Cross",
+    "segment": "B_SUV",
+    "aliases": [
+      "Egea Cross",
+      "Tipo Cross"
+    ],
+    "tags": [
+      "multijet",
+      "fiat"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Fiat Linea",
+    "segment": "B_SEDAN",
+    "aliases": [
+      "Linea 1.3 Multijet",
+      "Linea"
+    ],
+    "tags": [
+      "multijet",
+      "fiat"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Fiat Punto",
+    "segment": "B_HATCH",
+    "aliases": [
+      "Grande Punto",
+      "Punto"
+    ],
+    "tags": [
+      "multijet",
+      "fiat"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Fiat 500",
+    "segment": "A_HATCH",
+    "aliases": [
+      "Fiat 500e",
+      "500"
+    ],
+    "tags": [
+      "electric",
+      "fiat"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Fiat Doblo",
+    "segment": "LCV",
+    "aliases": [
+      "Doblo Combi",
+      "Doblo Cargo",
+      "Doblo"
+    ],
+    "tags": [
+      "multijet",
+      "fiat"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Fiat Fiorino",
+    "segment": "LCV",
+    "aliases": [
+      "Fiorino Combi",
+      "Fiorino Cargo",
+      "Fiorino"
+    ],
+    "tags": [
+      "multijet",
+      "fiat"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Toyota Corolla",
+    "segment": "C_SEDAN",
+    "aliases": [
+      "Corolla Hybrid",
+      "Corolla 1.6",
+      "Corolla"
+    ],
+    "tags": [
+      "toyota",
+      "toyota_hybrid",
+      "hybrid"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Toyota Yaris",
+    "segment": "B_HATCH",
+    "aliases": [
+      "Yaris Hybrid",
+      "Yaris"
+    ],
+    "tags": [
+      "hybrid",
+      "toyota_hybrid",
+      "toyota"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Toyota C-HR",
+    "segment": "C_SUV",
+    "aliases": [
+      "CHR",
+      "C HR",
+      "C-HR"
+    ],
+    "tags": [
+      "hybrid",
+      "toyota_hybrid",
+      "toyota"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Toyota RAV4",
+    "segment": "D_SUV",
+    "aliases": [
+      "RAV4 Hybrid",
+      "RAV4"
+    ],
+    "tags": [
+      "hybrid",
+      "toyota_hybrid",
+      "awd",
+      "toyota"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Toyota Auris",
+    "segment": "C_HATCH",
+    "aliases": [
+      "Auris Hybrid",
+      "Auris"
+    ],
+    "tags": [
+      "hybrid",
+      "toyota_hybrid",
+      "toyota"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Toyota Camry",
+    "segment": "D_SEDAN",
+    "aliases": [
+      "Camry Hybrid",
+      "Camry"
+    ],
+    "tags": [
+      "hybrid",
+      "toyota_hybrid",
+      "toyota"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Toyota Hilux",
+    "segment": "PICKUP",
+    "aliases": [
+      "Hilux 2.4 D-4D",
+      "Hilux"
+    ],
+    "tags": [
+      "diesel",
+      "pickup",
+      "toyota"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Hyundai i10",
+    "segment": "A_HATCH",
+    "aliases": [
+      "i10"
+    ],
+    "tags": [
+      "lpg_common",
+      "hyundai"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Hyundai i20",
+    "segment": "B_HATCH",
+    "aliases": [
+      "i20"
+    ],
+    "tags": [
+      "turbo_small",
+      "hyundai"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Hyundai Bayon",
+    "segment": "B_SUV",
+    "aliases": [
+      "Bayon"
+    ],
+    "tags": [
+      "turbo_small",
+      "hyundai"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Hyundai Elantra",
+    "segment": "C_SEDAN",
+    "aliases": [
+      "Elantra"
+    ],
+    "tags": [
+      "hyundai"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Hyundai Tucson",
+    "segment": "C_SUV",
+    "aliases": [
+      "Tucson Hybrid",
+      "Tucson"
+    ],
+    "tags": [
+      "hybrid",
+      "hyundai"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Hyundai Kona",
+    "segment": "B_SUV",
+    "aliases": [
+      "Kona Electric",
+      "Kona EV",
+      "Kona"
+    ],
+    "tags": [
+      "electric",
+      "hyundai"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Kia Picanto",
+    "segment": "A_HATCH",
+    "aliases": [
+      "Picanto"
+    ],
+    "tags": [
+      "kia"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Kia Rio",
+    "segment": "B_HATCH",
+    "aliases": [
+      "Rio"
+    ],
+    "tags": [
+      "kia"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Kia Stonic",
+    "segment": "B_SUV",
+    "aliases": [
+      "Stonic"
+    ],
+    "tags": [
+      "turbo_small",
+      "kia"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Kia Ceed",
+    "segment": "C_HATCH",
+    "aliases": [
+      "Ceed",
+      "Ceed SW"
+    ],
+    "tags": [
+      "turbo_small",
+      "kia"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Kia Sportage",
+    "segment": "C_SUV",
+    "aliases": [
+      "Sportage Hybrid",
+      "Sportage"
+    ],
+    "tags": [
+      "hybrid",
+      "kia"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Kia Niro",
+    "segment": "B_SUV",
+    "aliases": [
+      "Niro Hybrid",
+      "Niro EV",
+      "Niro"
+    ],
+    "tags": [
+      "hybrid",
+      "electric",
+      "kia"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Ford Fiesta",
+    "segment": "B_HATCH",
+    "aliases": [
+      "Fiesta"
+    ],
+    "tags": [
+      "ecoboost",
+      "turbo_small",
+      "ford"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Ford Focus",
+    "segment": "C_HATCH",
+    "aliases": [
+      "Focus Sedan",
+      "Focus"
+    ],
+    "tags": [
+      "ecoboost",
+      "turbo_small",
+      "ford"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Ford Puma",
+    "segment": "B_SUV",
+    "aliases": [
+      "Puma"
+    ],
+    "tags": [
+      "ecoboost",
+      "turbo_small",
+      "ford"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Ford Kuga",
+    "segment": "C_SUV",
+    "aliases": [
+      "Kuga Hybrid",
+      "Kuga"
+    ],
+    "tags": [
+      "hybrid",
+      "ford"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Ford Mondeo",
+    "segment": "D_SEDAN",
+    "aliases": [
+      "Mondeo"
+    ],
+    "tags": [
+      "diesel",
+      "ford"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Ford Ranger",
+    "segment": "PICKUP",
+    "aliases": [
+      "Ranger"
+    ],
+    "tags": [
+      "diesel",
+      "pickup",
+      "ford"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Volkswagen Polo",
+    "segment": "B_HATCH",
+    "aliases": [
+      "Polo"
+    ],
+    "tags": [
+      "tsi",
+      "vw"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Volkswagen Golf",
+    "segment": "C_HATCH",
+    "aliases": [
+      "Golf",
+      "Golf VII",
+      "Golf 7",
+      "Golf VIII",
+      "Golf 8"
+    ],
+    "tags": [
+      "tsi",
+      "dsg",
+      "vw"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Volkswagen Jetta",
+    "segment": "C_SEDAN",
+    "aliases": [
+      "Jetta"
+    ],
+    "tags": [
+      "tsi",
+      "vw"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Volkswagen Passat",
+    "segment": "D_SEDAN",
+    "aliases": [
+      "Passat"
+    ],
+    "tags": [
+      "tsi",
+      "tdi",
+      "dsg",
+      "vw"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Volkswagen Tiguan",
+    "segment": "C_SUV",
+    "aliases": [
+      "Tiguan"
+    ],
+    "tags": [
+      "tsi",
+      "dsg",
+      "vw"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Volkswagen T-Roc",
+    "segment": "B_SUV",
+    "aliases": [
+      "T Roc",
+      "T-Roc"
+    ],
+    "tags": [
+      "tsi",
+      "dsg",
+      "vw"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Volkswagen Taigo",
+    "segment": "B_SUV",
+    "aliases": [
+      "Taigo"
+    ],
+    "tags": [
+      "tsi",
+      "vw"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Skoda Fabia",
+    "segment": "B_HATCH",
+    "aliases": [
+      "Fabia"
+    ],
+    "tags": [
+      "tsi",
+      "skoda"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Skoda Scala",
+    "segment": "C_HATCH",
+    "aliases": [
+      "Scala"
+    ],
+    "tags": [
+      "tsi",
+      "skoda"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Skoda Octavia",
+    "segment": "C_SEDAN",
+    "aliases": [
+      "Octavia"
+    ],
+    "tags": [
+      "tsi",
+      "tdi",
+      "dsg",
+      "skoda"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Skoda Superb",
+    "segment": "D_SEDAN",
+    "aliases": [
+      "Superb"
+    ],
+    "tags": [
+      "tsi",
+      "tdi",
+      "dsg",
+      "skoda"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Skoda Kamiq",
+    "segment": "B_SUV",
+    "aliases": [
+      "Kamiq"
+    ],
+    "tags": [
+      "tsi",
+      "skoda"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Skoda Karoq",
+    "segment": "C_SUV",
+    "aliases": [
+      "Karoq"
+    ],
+    "tags": [
+      "tsi",
+      "dsg",
+      "skoda"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Skoda Kodiaq",
+    "segment": "D_SUV",
+    "aliases": [
+      "Kodiaq"
+    ],
+    "tags": [
+      "tsi",
+      "dsg",
+      "awd",
+      "skoda"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "SEAT Ibiza",
+    "segment": "B_HATCH",
+    "aliases": [
+      "Ibiza"
+    ],
+    "tags": [
+      "tsi",
+      "seat"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "SEAT Leon",
+    "segment": "C_HATCH",
+    "aliases": [
+      "Leon"
+    ],
+    "tags": [
+      "tsi",
+      "dsg",
+      "seat"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "SEAT Arona",
+    "segment": "B_SUV",
+    "aliases": [
+      "Arona"
+    ],
+    "tags": [
+      "tsi",
+      "seat"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "SEAT Ateca",
+    "segment": "C_SUV",
+    "aliases": [
+      "Ateca"
+    ],
+    "tags": [
+      "tsi",
+      "dsg",
+      "seat"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Opel Corsa",
+    "segment": "B_HATCH",
+    "aliases": [
+      "Corsa"
+    ],
+    "tags": [
+      "turbo_small",
+      "opel"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Opel Astra",
+    "segment": "C_HATCH",
+    "aliases": [
+      "Astra Sedan",
+      "Astra"
+    ],
+    "tags": [
+      "turbo_small",
+      "opel"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Opel Insignia",
+    "segment": "D_SEDAN",
+    "aliases": [
+      "Insignia"
+    ],
+    "tags": [
+      "diesel",
+      "opel"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Opel Mokka",
+    "segment": "B_SUV",
+    "aliases": [
+      "Mokka"
+    ],
+    "tags": [
+      "turbo_small",
+      "opel"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Opel Crossland",
+    "segment": "B_SUV",
+    "aliases": [
+      "Crossland"
+    ],
+    "tags": [
+      "turbo_small",
+      "opel"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Opel Grandland",
+    "segment": "C_SUV",
+    "aliases": [
+      "Grandland"
+    ],
+    "tags": [
+      "turbo_small",
+      "opel"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Peugeot 208",
+    "segment": "B_HATCH",
+    "aliases": [
+      "208"
+    ],
+    "tags": [
+      "turbo_small",
+      "puretech",
+      "peugeot"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Peugeot 308",
+    "segment": "C_HATCH",
+    "aliases": [
+      "308"
+    ],
+    "tags": [
+      "turbo_small",
+      "puretech",
+      "eat8",
+      "peugeot"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Peugeot 2008",
+    "segment": "B_SUV",
+    "aliases": [
+      "2008"
+    ],
+    "tags": [
+      "turbo_small",
+      "puretech",
+      "eat8",
+      "peugeot"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Peugeot 3008",
+    "segment": "C_SUV",
+    "aliases": [
+      "3008"
+    ],
+    "tags": [
+      "turbo_small",
+      "puretech",
+      "eat8",
+      "peugeot"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Peugeot 5008",
+    "segment": "D_SUV",
+    "aliases": [
+      "5008"
+    ],
+    "tags": [
+      "turbo_small",
+      "puretech",
+      "eat8",
+      "peugeot"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Peugeot 508",
+    "segment": "D_SEDAN",
+    "aliases": [
+      "508"
+    ],
+    "tags": [
+      "eat8",
+      "peugeot"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Citroen C3",
+    "segment": "B_HATCH",
+    "aliases": [
+      "C3"
+    ],
+    "tags": [
+      "turbo_small",
+      "citroen"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Citroen C4",
+    "segment": "C_HATCH",
+    "aliases": [
+      "C4"
+    ],
+    "tags": [
+      "turbo_small",
+      "citroen"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Citroen C-Elysee",
+    "segment": "B_SEDAN",
+    "aliases": [
+      "C Elysee",
+      "C-Elysee"
+    ],
+    "tags": [
+      "diesel",
+      "lpg_common",
+      "citroen"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Citroen C5 Aircross",
+    "segment": "C_SUV",
+    "aliases": [
+      "C5 Aircross"
+    ],
+    "tags": [
+      "eat8",
+      "citroen"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Dacia Sandero",
+    "segment": "B_HATCH",
+    "aliases": [
+      "Sandero Stepway",
+      "Sandero"
+    ],
+    "tags": [
+      "lpg_common",
+      "dacia"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Dacia Logan",
+    "segment": "B_SEDAN",
+    "aliases": [
+      "Logan"
+    ],
+    "tags": [
+      "lpg_common",
+      "dacia"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Dacia Duster",
+    "segment": "C_SUV",
+    "aliases": [
+      "Duster"
+    ],
+    "tags": [
+      "lpg_common",
+      "awd",
+      "dacia"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Dacia Jogger",
+    "segment": "C_SUV",
+    "aliases": [
+      "Jogger"
+    ],
+    "tags": [
+      "lpg_common",
+      "dacia"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Nissan Micra",
+    "segment": "B_HATCH",
+    "aliases": [
+      "Micra"
+    ],
+    "tags": [
+      "turbo_small",
+      "nissan"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Nissan Juke",
+    "segment": "B_SUV",
+    "aliases": [
+      "Juke"
+    ],
+    "tags": [
+      "turbo_small",
+      "nissan"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Nissan Qashqai",
+    "segment": "C_SUV",
+    "aliases": [
+      "Qashqai"
+    ],
+    "tags": [
+      "cvt",
+      "nissan"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Nissan X-Trail",
+    "segment": "D_SUV",
+    "aliases": [
+      "X Trail",
+      "X-Trail"
+    ],
+    "tags": [
+      "cvt",
+      "awd",
+      "nissan"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Honda Civic",
+    "segment": "C_SEDAN",
+    "aliases": [
+      "Civic FC5",
+      "Civic FE",
+      "Civic 1.6 i-VTEC",
+      "Civic"
+    ],
+    "tags": [
+      "ivtec",
+      "lpg_common",
+      "honda"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Honda Jazz",
+    "segment": "B_HATCH",
+    "aliases": [
+      "Jazz"
+    ],
+    "tags": [
+      "cvt",
+      "hybrid",
+      "honda"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Honda HR-V",
+    "segment": "B_SUV",
+    "aliases": [
+      "HRV",
+      "HR-V"
+    ],
+    "tags": [
+      "cvt",
+      "honda"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Honda CR-V",
+    "segment": "D_SUV",
+    "aliases": [
+      "CRV",
+      "CR-V"
+    ],
+    "tags": [
+      "cvt",
+      "awd",
+      "hybrid",
+      "honda"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Mazda 3",
+    "segment": "C_HATCH",
+    "aliases": [
+      "Mazda3",
+      "3"
+    ],
+    "tags": [
+      "skyactiv",
+      "mazda"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Mazda 6",
+    "segment": "D_SEDAN",
+    "aliases": [
+      "Mazda6",
+      "6"
+    ],
+    "tags": [
+      "skyactiv",
+      "mazda"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Mazda CX-3",
+    "segment": "B_SUV",
+    "aliases": [
+      "CX3",
+      "CX-3"
+    ],
+    "tags": [
+      "skyactiv",
+      "mazda"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Mazda CX-5",
+    "segment": "C_SUV",
+    "aliases": [
+      "CX5",
+      "CX-5"
+    ],
+    "tags": [
+      "skyactiv",
+      "awd",
+      "mazda"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Suzuki Swift",
+    "segment": "B_HATCH",
+    "aliases": [
+      "Swift"
+    ],
+    "tags": [
+      "suzuki"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Suzuki Vitara",
+    "segment": "B_SUV",
+    "aliases": [
+      "Vitara"
+    ],
+    "tags": [
+      "awd",
+      "suzuki"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Suzuki S-Cross",
+    "segment": "B_SUV",
+    "aliases": [
+      "S Cross",
+      "S-Cross"
+    ],
+    "tags": [
+      "suzuki"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Mitsubishi Lancer",
+    "segment": "C_SEDAN",
+    "aliases": [
+      "Lancer"
+    ],
+    "tags": [
+      "mitsubishi"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Mitsubishi ASX",
+    "segment": "B_SUV",
+    "aliases": [
+      "ASX"
+    ],
+    "tags": [
+      "mitsubishi"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Mitsubishi Outlander",
+    "segment": "D_SUV",
+    "aliases": [
+      "Outlander PHEV",
+      "Outlander"
+    ],
+    "tags": [
+      "hybrid",
+      "awd",
+      "mitsubishi"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Chevrolet Cruze",
+    "segment": "C_SEDAN",
+    "aliases": [
+      "Cruze"
+    ],
+    "tags": [
+      "chevrolet"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Chevrolet Aveo",
+    "segment": "B_HATCH",
+    "aliases": [
+      "Aveo"
+    ],
+    "tags": [
+      "lpg_common",
+      "chevrolet"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Chevrolet Captiva",
+    "segment": "D_SUV",
+    "aliases": [
+      "Captiva"
+    ],
+    "tags": [
+      "diesel",
+      "awd",
+      "chevrolet"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "BMW 1 Serisi",
+    "segment": "C_HATCH",
+    "aliases": [
+      "BMW 1 Series",
+      "F20",
+      "F40",
+      "1 Serisi"
+    ],
+    "tags": [
+      "premium_german",
+      "turbo_small",
+      "zf8",
+      "bmw"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "BMW 3 Serisi",
+    "segment": "PREMIUM_D",
+    "aliases": [
+      "BMW 3 Series",
+      "320i",
+      "320d",
+      "F30",
+      "G20",
+      "3 Serisi"
+    ],
+    "tags": [
+      "premium_german",
+      "zf8",
+      "diesel",
+      "bmw"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "BMW 5 Serisi",
+    "segment": "E_SEGMENT",
+    "aliases": [
+      "BMW 5 Series",
+      "520i",
+      "520d",
+      "F10",
+      "G30",
+      "5 Serisi"
+    ],
+    "tags": [
+      "premium_german",
+      "zf8",
+      "diesel",
+      "bmw"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "BMW X1",
+    "segment": "C_SUV",
+    "aliases": [
+      "BMW X1",
+      "F48",
+      "U11",
+      "X1"
+    ],
+    "tags": [
+      "premium_german",
+      "awd",
+      "dct",
+      "bmw"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "BMW X3",
+    "segment": "D_SUV",
+    "aliases": [
+      "BMW X3",
+      "F25",
+      "G01",
+      "X3"
+    ],
+    "tags": [
+      "premium_german",
+      "awd",
+      "zf8",
+      "bmw"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "BMW X5",
+    "segment": "D_SUV",
+    "aliases": [
+      "BMW X5",
+      "F15",
+      "G05",
+      "X5"
+    ],
+    "tags": [
+      "premium_german",
+      "awd",
+      "zf8",
+      "bmw"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Mercedes-Benz A Serisi",
+    "segment": "C_HATCH",
+    "aliases": [
+      "A-Class",
+      "W176",
+      "W177",
+      "A Serisi"
+    ],
+    "tags": [
+      "premium_german",
+      "turbo_small",
+      "dct",
+      "mercedes"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Mercedes-Benz C Serisi",
+    "segment": "PREMIUM_D",
+    "aliases": [
+      "C-Class",
+      "W204",
+      "W205",
+      "W206",
+      "C Serisi"
+    ],
+    "tags": [
+      "premium_german",
+      "diesel",
+      "auto",
+      "mercedes"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Mercedes-Benz E Serisi",
+    "segment": "E_SEGMENT",
+    "aliases": [
+      "E-Class",
+      "W212",
+      "W213",
+      "E Serisi"
+    ],
+    "tags": [
+      "premium_german",
+      "diesel",
+      "auto",
+      "mercedes"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Mercedes-Benz CLA",
+    "segment": "C_HATCH",
+    "aliases": [
+      "CLA",
+      "C117",
+      "C118"
+    ],
+    "tags": [
+      "premium_german",
+      "dct",
+      "turbo_small",
+      "mercedes"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Mercedes-Benz GLA",
+    "segment": "B_SUV",
+    "aliases": [
+      "GLA",
+      "X156",
+      "H247"
+    ],
+    "tags": [
+      "premium_german",
+      "dct",
+      "awd",
+      "mercedes"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Mercedes-Benz GLC",
+    "segment": "C_SUV",
+    "aliases": [
+      "GLC",
+      "X253",
+      "X254"
+    ],
+    "tags": [
+      "premium_german",
+      "awd",
+      "auto",
+      "mercedes"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Audi A3",
+    "segment": "C_HATCH",
+    "aliases": [
+      "A3 Sedan",
+      "8V",
+      "8Y",
+      "A3"
+    ],
+    "tags": [
+      "premium_german",
+      "tsi",
+      "dsg",
+      "audi"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Audi A4",
+    "segment": "PREMIUM_D",
+    "aliases": [
+      "A4",
+      "B8",
+      "B9"
+    ],
+    "tags": [
+      "premium_german",
+      "tfsi",
+      "tdi",
+      "dsg",
+      "audi"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Audi A6",
+    "segment": "E_SEGMENT",
+    "aliases": [
+      "A6",
+      "C7",
+      "C8"
+    ],
+    "tags": [
+      "premium_german",
+      "tfsi",
+      "tdi",
+      "dsg",
+      "audi"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Audi Q3",
+    "segment": "B_SUV",
+    "aliases": [
+      "Q3"
+    ],
+    "tags": [
+      "premium_german",
+      "dsg",
+      "awd",
+      "audi"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Audi Q5",
+    "segment": "C_SUV",
+    "aliases": [
+      "Q5"
+    ],
+    "tags": [
+      "premium_german",
+      "dsg",
+      "awd",
+      "audi"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Volvo XC40",
+    "segment": "C_SUV",
+    "aliases": [
+      "XC40 Recharge",
+      "XC40"
+    ],
+    "tags": [
+      "premium_swedish",
+      "hybrid",
+      "electric",
+      "volvo"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Volvo XC60",
+    "segment": "D_SUV",
+    "aliases": [
+      "XC60"
+    ],
+    "tags": [
+      "premium_swedish",
+      "awd",
+      "hybrid",
+      "volvo"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Volvo S60",
+    "segment": "PREMIUM_D",
+    "aliases": [
+      "S60"
+    ],
+    "tags": [
+      "premium_swedish",
+      "turbo_small",
+      "volvo"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Volvo S90",
+    "segment": "E_SEGMENT",
+    "aliases": [
+      "S90"
+    ],
+    "tags": [
+      "premium_swedish",
+      "volvo"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Lexus NX",
+    "segment": "C_SUV",
+    "aliases": [
+      "NX Hybrid",
+      "NX"
+    ],
+    "tags": [
+      "hybrid",
+      "toyota_hybrid",
+      "premium",
+      "lexus"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Lexus RX",
+    "segment": "D_SUV",
+    "aliases": [
+      "RX Hybrid",
+      "RX"
+    ],
+    "tags": [
+      "hybrid",
+      "toyota_hybrid",
+      "premium",
+      "awd",
+      "lexus"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Lexus ES",
+    "segment": "E_SEGMENT",
+    "aliases": [
+      "ES Hybrid",
+      "ES"
+    ],
+    "tags": [
+      "hybrid",
+      "toyota_hybrid",
+      "premium",
+      "lexus"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Tesla Model 3",
+    "segment": "C_SEDAN",
+    "aliases": [
+      "Model3",
+      "Model 3"
+    ],
+    "tags": [
+      "electric",
+      "ev",
+      "tesla"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Tesla Model Y",
+    "segment": "C_SUV",
+    "aliases": [
+      "ModelY",
+      "Model Y"
+    ],
+    "tags": [
+      "electric",
+      "ev",
+      "tesla"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "TOGG T10X",
+    "segment": "C_SUV",
+    "aliases": [
+      "Togg T10X",
+      "T10 X",
+      "T10X"
+    ],
+    "tags": [
+      "electric",
+      "ev",
+      "domestic_tr",
+      "togg"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "MG MG4",
+    "segment": "C_HATCH",
+    "aliases": [
+      "MG4 Electric",
+      "MG4"
+    ],
+    "tags": [
+      "electric",
+      "ev",
+      "mg"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "MG ZS",
+    "segment": "B_SUV",
+    "aliases": [
+      "MG ZS EV",
+      "ZS"
+    ],
+    "tags": [
+      "electric",
+      "ev",
+      "mg"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "BYD ATTO 3",
+    "segment": "C_SUV",
+    "aliases": [
+      "Atto3",
+      "ATTO 3"
+    ],
+    "tags": [
+      "electric",
+      "ev",
+      "byd"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "BYD DOLPHIN",
+    "segment": "B_HATCH",
+    "aliases": [
+      "Dolphin"
+    ],
+    "tags": [
+      "electric",
+      "ev",
+      "byd"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Chery Tiggo 7 Pro",
+    "segment": "C_SUV",
+    "aliases": [
+      "Tiggo7",
+      "Tiggo 7",
+      "Tiggo 7 Pro"
+    ],
+    "tags": [
+      "turbo_small",
+      "chery"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Chery Tiggo 8 Pro",
+    "segment": "D_SUV",
+    "aliases": [
+      "Tiggo8",
+      "Tiggo 8",
+      "Tiggo 8 Pro"
+    ],
+    "tags": [
+      "turbo_small",
+      "awd",
+      "chery"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Volkswagen Transporter",
+    "segment": "LCV",
+    "aliases": [
+      "Caravelle",
+      "Multivan",
+      "Transporter"
+    ],
+    "tags": [
+      "tdi",
+      "lcv",
+      "vw"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Ford Transit",
+    "segment": "LCV",
+    "aliases": [
+      "Transit Custom",
+      "Connect",
+      "Transit"
+    ],
+    "tags": [
+      "diesel",
+      "lcv",
+      "ford"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Renault Kangoo",
+    "segment": "LCV",
+    "aliases": [
+      "Kangoo",
+      "Kangoo Multix"
+    ],
+    "tags": [
+      "diesel",
+      "lcv",
+      "renault"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Peugeot Partner",
+    "segment": "LCV",
+    "aliases": [
+      "Partner Tepee",
+      "Partner"
+    ],
+    "tags": [
+      "diesel",
+      "lcv",
+      "peugeot"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Citroen Berlingo",
+    "segment": "LCV",
+    "aliases": [
+      "Berlingo"
+    ],
+    "tags": [
+      "diesel",
+      "lcv",
+      "citroen"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Renault Scenic",
+    "segment": "C_SUV",
+    "aliases": [
+      "Scenic",
+      "Grand Scenic"
+    ],
+    "tags": [
+      "dci",
+      "renault"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Renault Laguna",
+    "segment": "D_SEDAN",
+    "aliases": [
+      "Laguna"
+    ],
+    "tags": [
+      "diesel",
+      "renault"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Fiat Panda",
+    "segment": "A_HATCH",
+    "aliases": [
+      "Panda"
+    ],
+    "tags": [
+      "fiat"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Fiat Freemont",
+    "segment": "D_SUV",
+    "aliases": [
+      "Freemont"
+    ],
+    "tags": [
+      "diesel",
+      "awd",
+      "fiat"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Toyota Prius",
+    "segment": "C_HATCH",
+    "aliases": [
+      "Prius Hybrid",
+      "Prius"
+    ],
+    "tags": [
+      "hybrid",
+      "toyota_hybrid",
+      "toyota"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Toyota Yaris Cross",
+    "segment": "B_SUV",
+    "aliases": [
+      "Yaris Cross Hybrid",
+      "Yaris Cross"
+    ],
+    "tags": [
+      "hybrid",
+      "toyota_hybrid",
+      "toyota"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Hyundai Accent Blue",
+    "segment": "B_SEDAN",
+    "aliases": [
+      "Accent Blue",
+      "Accent"
+    ],
+    "tags": [
+      "diesel",
+      "lpg_common",
+      "hyundai"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Hyundai Getz",
+    "segment": "B_HATCH",
+    "aliases": [
+      "Getz"
+    ],
+    "tags": [
+      "lpg_common",
+      "hyundai"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Kia Cerato",
+    "segment": "C_SEDAN",
+    "aliases": [
+      "Cerato"
+    ],
+    "tags": [
+      "kia"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Kia Sorento",
+    "segment": "D_SUV",
+    "aliases": [
+      "Sorento"
+    ],
+    "tags": [
+      "diesel",
+      "awd",
+      "kia"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Ford Tourneo Courier",
+    "segment": "LCV",
+    "aliases": [
+      "Tourneo Courier"
+    ],
+    "tags": [
+      "diesel",
+      "lcv",
+      "ford"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Ford Tourneo Connect",
+    "segment": "LCV",
+    "aliases": [
+      "Tourneo Connect"
+    ],
+    "tags": [
+      "diesel",
+      "lcv",
+      "ford"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Opel Vectra",
+    "segment": "D_SEDAN",
+    "aliases": [
+      "Vectra"
+    ],
+    "tags": [
+      "lpg_common",
+      "opel"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Opel Zafira",
+    "segment": "LCV",
+    "aliases": [
+      "Zafira"
+    ],
+    "tags": [
+      "lpg_common",
+      "opel"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Peugeot 206",
+    "segment": "B_HATCH",
+    "aliases": [
+      "206"
+    ],
+    "tags": [
+      "lpg_common",
+      "peugeot"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Peugeot 207",
+    "segment": "B_HATCH",
+    "aliases": [
+      "207"
+    ],
+    "tags": [
+      "lpg_common",
+      "peugeot"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Peugeot 301",
+    "segment": "B_SEDAN",
+    "aliases": [
+      "301"
+    ],
+    "tags": [
+      "diesel",
+      "lpg_common",
+      "peugeot"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Citroen C4 Picasso",
+    "segment": "C_SUV",
+    "aliases": [
+      "C4 Picasso",
+      "Grand Picasso"
+    ],
+    "tags": [
+      "diesel",
+      "citroen"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Nissan Almera",
+    "segment": "B_SEDAN",
+    "aliases": [
+      "Almera"
+    ],
+    "tags": [
+      "lpg_common",
+      "nissan"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Nissan Note",
+    "segment": "B_HATCH",
+    "aliases": [
+      "Note"
+    ],
+    "tags": [
+      "nissan"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Honda Accord",
+    "segment": "D_SEDAN",
+    "aliases": [
+      "Accord"
+    ],
+    "tags": [
+      "auto",
+      "honda"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Honda City",
+    "segment": "B_SEDAN",
+    "aliases": [
+      "City"
+    ],
+    "tags": [
+      "auto",
+      "honda"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Mazda CX-30",
+    "segment": "C_SUV",
+    "aliases": [
+      "CX30",
+      "CX-30"
+    ],
+    "tags": [
+      "skyactiv",
+      "mazda"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Suzuki Jimny",
+    "segment": "B_SUV",
+    "aliases": [
+      "Jimny"
+    ],
+    "tags": [
+      "awd",
+      "suzuki"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Mini Cooper",
+    "segment": "B_HATCH",
+    "aliases": [
+      "Mini Cooper",
+      "Cooper"
+    ],
+    "tags": [
+      "premium",
+      "turbo_small",
+      "mini"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Alfa Romeo Giulietta",
+    "segment": "C_HATCH",
+    "aliases": [
+      "Giulietta"
+    ],
+    "tags": [
+      "turbo_small",
+      "alfa_romeo"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Alfa Romeo Giulia",
+    "segment": "PREMIUM_D",
+    "aliases": [
+      "Giulia"
+    ],
+    "tags": [
+      "turbo_small",
+      "alfa_romeo"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "BMW 2 Serisi",
+    "segment": "C_HATCH",
+    "aliases": [
+      "BMW 2 Series",
+      "F22",
+      "G42",
+      "2 Serisi"
+    ],
+    "tags": [
+      "premium_german",
+      "zf8",
+      "bmw"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "BMW X2",
+    "segment": "B_SUV",
+    "aliases": [
+      "BMW X2",
+      "X2"
+    ],
+    "tags": [
+      "premium_german",
+      "dct",
+      "awd",
+      "bmw"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "BMW 7 Serisi",
+    "segment": "E_SEGMENT",
+    "aliases": [
+      "BMW 7 Series",
+      "740i",
+      "730d",
+      "7 Serisi"
+    ],
+    "tags": [
+      "lux",
+      "premium_german",
+      "bmw"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Mercedes-Benz B Serisi",
+    "segment": "C_HATCH",
+    "aliases": [
+      "B-Class",
+      "W246",
+      "W247",
+      "B Serisi"
+    ],
+    "tags": [
+      "premium_german",
+      "dct",
+      "mercedes"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Mercedes-Benz S Serisi",
+    "segment": "E_SEGMENT",
+    "aliases": [
+      "S-Class",
+      "W222",
+      "W223",
+      "S Serisi"
+    ],
+    "tags": [
+      "lux",
+      "premium_german",
+      "mercedes"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Mercedes-Benz GLE",
+    "segment": "D_SUV",
+    "aliases": [
+      "GLE"
+    ],
+    "tags": [
+      "lux",
+      "premium_german",
+      "awd",
+      "mercedes"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Audi A1",
+    "segment": "B_HATCH",
+    "aliases": [
+      "A1"
+    ],
+    "tags": [
+      "premium_german",
+      "tsi",
+      "dsg",
+      "audi"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Audi A5",
+    "segment": "PREMIUM_D",
+    "aliases": [
+      "A5"
+    ],
+    "tags": [
+      "premium_german",
+      "tfsi",
+      "dsg",
+      "audi"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Audi Q2",
+    "segment": "B_SUV",
+    "aliases": [
+      "Q2"
+    ],
+    "tags": [
+      "premium_german",
+      "dsg",
+      "audi"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Audi Q7",
+    "segment": "D_SUV",
+    "aliases": [
+      "Q7"
+    ],
+    "tags": [
+      "lux",
+      "premium_german",
+      "awd",
+      "audi"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Volvo XC90",
+    "segment": "D_SUV",
+    "aliases": [
+      "XC90"
+    ],
+    "tags": [
+      "lux",
+      "premium_swedish",
+      "awd",
+      "hybrid",
+      "volvo"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Land Rover Range Rover Evoque",
+    "segment": "C_SUV",
+    "aliases": [
+      "Evoque",
+      "Range Rover Evoque"
+    ],
+    "tags": [
+      "lux",
+      "awd",
+      "land_rover"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Land Rover Discovery Sport",
+    "segment": "D_SUV",
+    "aliases": [
+      "Discovery Sport"
+    ],
+    "tags": [
+      "lux",
+      "awd",
+      "land_rover"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Porsche Macan",
+    "segment": "D_SUV",
+    "aliases": [
+      "Macan"
+    ],
+    "tags": [
+      "lux",
+      "awd",
+      "porsche"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Porsche Cayenne",
+    "segment": "D_SUV",
+    "aliases": [
+      "Cayenne"
+    ],
+    "tags": [
+      "lux",
+      "awd",
+      "porsche"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Jeep Renegade",
+    "segment": "B_SUV",
+    "aliases": [
+      "Renegade"
+    ],
+    "tags": [
+      "awd",
+      "jeep"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Jeep Compass",
+    "segment": "C_SUV",
+    "aliases": [
+      "Compass"
+    ],
+    "tags": [
+      "awd",
+      "jeep"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Jeep Grand Cherokee",
+    "segment": "D_SUV",
+    "aliases": [
+      "Grand Cherokee"
+    ],
+    "tags": [
+      "lux",
+      "awd",
+      "jeep"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "BMW i3",
+    "segment": "B_HATCH",
+    "aliases": [
+      "i3"
+    ],
+    "tags": [
+      "electric",
+      "ev",
+      "bmw"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Volkswagen ID.4",
+    "segment": "C_SUV",
+    "aliases": [
+      "ID4",
+      "ID.4"
+    ],
+    "tags": [
+      "electric",
+      "ev",
+      "vw"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Volkswagen ID.3",
+    "segment": "C_HATCH",
+    "aliases": [
+      "ID3",
+      "ID.3"
+    ],
+    "tags": [
+      "electric",
+      "ev",
+      "vw"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Cupra Formentor",
+    "segment": "C_SUV",
+    "aliases": [
+      "Formentor"
+    ],
+    "tags": [
+      "premium",
+      "tsi",
+      "dsg",
+      "cupra"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Cupra Leon",
+    "segment": "C_HATCH",
+    "aliases": [
+      "Cupra Leon",
+      "Leon"
+    ],
+    "tags": [
+      "premium",
+      "tsi",
+      "dsg",
+      "cupra"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Skoda Enyaq",
+    "segment": "C_SUV",
+    "aliases": [
+      "Enyaq iV",
+      "Enyaq"
+    ],
+    "tags": [
+      "electric",
+      "ev",
+      "skoda"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Hyundai Ioniq 5",
+    "segment": "C_SUV",
+    "aliases": [
+      "IONIQ 5"
+    ],
+    "tags": [
+      "electric",
+      "ev",
+      "hyundai"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Hyundai Ioniq",
+    "segment": "C_HATCH",
+    "aliases": [
+      "Ioniq Hybrid",
+      "Ioniq Electric",
+      "Ioniq"
+    ],
+    "tags": [
+      "hybrid",
+      "electric",
+      "hyundai"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Kia EV6",
+    "segment": "D_SUV",
+    "aliases": [
+      "EV6"
+    ],
+    "tags": [
+      "electric",
+      "ev",
+      "kia"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Kia EV9",
+    "segment": "D_SUV",
+    "aliases": [
+      "EV9"
+    ],
+    "tags": [
+      "electric",
+      "ev",
+      "lux",
+      "kia"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Renault Zoe",
+    "segment": "B_HATCH",
+    "aliases": [
+      "Zoe"
+    ],
+    "tags": [
+      "electric",
+      "ev",
+      "renault"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Renault Megane E-Tech",
+    "segment": "C_HATCH",
+    "aliases": [
+      "Megane E-Tech Electric",
+      "Megane E-Tech"
+    ],
+    "tags": [
+      "electric",
+      "ev",
+      "renault"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Volkswagen Caddy",
+    "segment": "LCV",
+    "aliases": [
+      "Caddy"
+    ],
+    "tags": [
+      "tdi",
+      "lcv",
+      "vw"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Mercedes-Benz Vito",
+    "segment": "LCV",
+    "aliases": [
+      "Vito"
+    ],
+    "tags": [
+      "diesel",
+      "lcv",
+      "premium_german",
+      "mercedes"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Mercedes-Benz Sprinter",
+    "segment": "LCV",
+    "aliases": [
+      "Sprinter"
+    ],
+    "tags": [
+      "diesel",
+      "lcv",
+      "premium_german",
+      "mercedes"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Toyota Proace City",
+    "segment": "LCV",
+    "aliases": [
+      "Proace City"
+    ],
+    "tags": [
+      "diesel",
+      "lcv",
+      "toyota"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Peugeot Rifter",
+    "segment": "LCV",
+    "aliases": [
+      "Rifter"
+    ],
+    "tags": [
+      "diesel",
+      "lcv",
+      "peugeot"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Opel Combo",
+    "segment": "LCV",
+    "aliases": [
+      "Combo"
+    ],
+    "tags": [
+      "diesel",
+      "lcv",
+      "opel"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Citroen Jumpy",
+    "segment": "LCV",
+    "aliases": [
+      "Jumpy"
+    ],
+    "tags": [
+      "diesel",
+      "lcv",
+      "citroen"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Renault Master",
+    "segment": "LCV",
+    "aliases": [
+      "Master"
+    ],
+    "tags": [
+      "diesel",
+      "lcv",
+      "renault"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Fiat Ducato",
+    "segment": "LCV",
+    "aliases": [
+      "Ducato"
+    ],
+    "tags": [
+      "diesel",
+      "lcv",
+      "fiat"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Isuzu D-Max",
+    "segment": "PICKUP",
+    "aliases": [
+      "D-Max",
+      "D Max"
+    ],
+    "tags": [
+      "diesel",
+      "pickup",
+      "isuzu"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Hyundai Santa Fe",
+    "segment": "D_SUV",
+    "aliases": [
+      "Santa Fe"
+    ],
+    "tags": [
+      "diesel",
+      "awd",
+      "hybrid",
+      "hyundai"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Kia Seltos",
+    "segment": "B_SUV",
+    "aliases": [
+      "Seltos"
+    ],
+    "tags": [
+      "turbo_small",
+      "kia"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Kia XCeed",
+    "segment": "C_HATCH",
+    "aliases": [
+      "XCeed",
+      "X Ceed"
+    ],
+    "tags": [
+      "turbo_small",
+      "kia"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Peugeot 508 SW",
+    "segment": "D_SEDAN",
+    "aliases": [
+      "508 SW"
+    ],
+    "tags": [
+      "eat8",
+      "peugeot"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Citroen C3 Aircross",
+    "segment": "B_SUV",
+    "aliases": [
+      "C3 Aircross"
+    ],
+    "tags": [
+      "turbo_small",
+      "citroen"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Opel Zafira Life",
+    "segment": "LCV",
+    "aliases": [
+      "Zafira Life"
+    ],
+    "tags": [
+      "diesel",
+      "lcv",
+      "opel"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Ford EcoSport",
+    "segment": "B_SUV",
+    "aliases": [
+      "EcoSport"
+    ],
+    "tags": [
+      "ecoboost",
+      "turbo_small",
+      "ford"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Ford Explorer",
+    "segment": "D_SUV",
+    "aliases": [
+      "Explorer"
+    ],
+    "tags": [
+      "hybrid",
+      "awd",
+      "lux",
+      "ford"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "BMW 4 Serisi",
+    "segment": "PREMIUM_D",
+    "aliases": [
+      "BMW 4 Series",
+      "420i",
+      "430i",
+      "4 Serisi"
+    ],
+    "tags": [
+      "premium_german",
+      "zf8",
+      "bmw"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "BMW X4",
+    "segment": "D_SUV",
+    "aliases": [
+      "BMW X4",
+      "X4"
+    ],
+    "tags": [
+      "premium_german",
+      "awd",
+      "zf8",
+      "bmw"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Mercedes-Benz G Serisi",
+    "segment": "D_SUV",
+    "aliases": [
+      "G-Class",
+      "G Wagen",
+      "G Serisi"
+    ],
+    "tags": [
+      "lux",
+      "premium_german",
+      "awd",
+      "mercedes"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Audi A7",
+    "segment": "E_SEGMENT",
+    "aliases": [
+      "A7"
+    ],
+    "tags": [
+      "lux",
+      "premium_german",
+      "dsg",
+      "audi"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Audi Q8",
+    "segment": "D_SUV",
+    "aliases": [
+      "Q8"
+    ],
+    "tags": [
+      "lux",
+      "premium_german",
+      "awd",
+      "audi"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Volvo V60",
+    "segment": "PREMIUM_D",
+    "aliases": [
+      "V60"
+    ],
+    "tags": [
+      "premium_swedish",
+      "volvo"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Volvo V90",
+    "segment": "E_SEGMENT",
+    "aliases": [
+      "V90"
+    ],
+    "tags": [
+      "premium_swedish",
+      "volvo"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Lexus UX",
+    "segment": "B_SUV",
+    "aliases": [
+      "UX Hybrid",
+      "UX"
+    ],
+    "tags": [
+      "hybrid",
+      "toyota_hybrid",
+      "premium",
+      "lexus"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Tesla Model S",
+    "segment": "E_SEGMENT",
+    "aliases": [
+      "Model S"
+    ],
+    "tags": [
+      "electric",
+      "ev",
+      "lux",
+      "tesla"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Tesla Model X",
+    "segment": "D_SUV",
+    "aliases": [
+      "Model X"
+    ],
+    "tags": [
+      "electric",
+      "ev",
+      "lux",
+      "awd",
+      "tesla"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Skoda Rapid",
+    "segment": "B_SEDAN",
+    "aliases": [
+      "Rapid"
+    ],
+    "tags": [
+      "tsi",
+      "skoda"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Skoda Roomster",
+    "segment": "LCV",
+    "aliases": [
+      "Roomster"
+    ],
+    "tags": [
+      "tdi",
+      "lcv",
+      "skoda"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Volkswagen Scirocco",
+    "segment": "C_HATCH",
+    "aliases": [
+      "Scirocco"
+    ],
+    "tags": [
+      "tsi",
+      "dsg",
+      "vw"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  },
+  {
+    "key": "Volkswagen Touareg",
+    "segment": "D_SUV",
+    "aliases": [
+      "Touareg"
+    ],
+    "tags": [
+      "lux",
+      "premium_german",
+      "awd",
+      "vw"
+    ],
+    "notes": "TR odaklı popüler model profili (heuristik)."
+  }
+]
