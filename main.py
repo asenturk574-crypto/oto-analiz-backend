@@ -1911,19 +1911,31 @@ def build_premium_template(req: AnalyzeRequest, enriched: Dict[str, Any]) -> Dic
     lines.append(f"**Bilgi seviyesi:** {iq.get('level','-')} (eksikler: {missing_preview})")
     lines.append("")
 
-    lines.append("---")
-    lines.append("### 0) Skor & Neden (tek bakış)")
-    lines.append(f"- Genel skor: **{overall}/100**")
-    lines.append(f"- Neden {overall}? {score_reason.get('because','Skor mevcut verilere göre üretildi.')}")
+    lines.append("")
+    lines.append("**Puanlama nasıl yapılır?**")
+    lines.append(
+        "- Bu skorlar; aracın **parça ve sistem karmaşıklığı**, **elektronik/yazılım modülü yoğunluğu**, "
+        "**bakım/onarım müdahale maliyeti**, **servis/uzman bağımlılığı** ve **yanlış kullanıma hassasiyet** "
+        "gibi faktörlere göre **risk ve sürdürülebilirlik odaklı** hesaplanır."
+    )
+    lines.append(
+        "- Premium/performance araçlar teknoloji olarak çok güçlü olsa bile; **yüksek karmaşıklık ve yüksek maliyet "
+        "hassasiyeti** nedeniyle daha düşük skor alabilir. Bu durum araç kalitesini değil, **uzun vadeli sahip olma "
+        "riskini ve masraf oynaklığını** yansıtır."
+    )
+    lines.append("")
+
     if critical_points:
         lines.append("- Dikkat noktaları (özet):")
         for cp in critical_points[:3]:
             lines.append(f"  - {cp}")
+
     lines.append(f"- Mekanik: **{_clamp(overall + 2, 0, 100)}/100** | Kaporta: **{_clamp(overall - 1, 0, 100)}/100**")
     lines.append(f"- Ekonomi: **{economy_100}/100** | Konfor: **{comfort_100}/100** | Aile: **{family_use_100}/100**")
     lines.append(f"- 2. el: **{resale_100}/100** | Elektronik: **{electronics_100}/100** | Uygunluk: **{personal_fit_score}/100**")
     lines.append("- Not: Skorlar **kesin teşhis** değildir; ilan+yaş+km+profil kombinasyonundan **tahmini** üretilir.")
     lines.append("---")
+
     lines.append("")
 
     lines.append("### 1) Yıllık maliyet özeti (tahmini band)")
