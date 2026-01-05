@@ -1458,8 +1458,6 @@ def build_uncertainty(enriched: Dict[str, Any]) -> Dict[str, Any]:
     }
 
 
-
-
 def infer_target_user_line(segment_label: str, make: str = "", model: str = "") -> str:
     """Short 'who is this car for?' line used in both quick and premium reports."""
     sl = (segment_label or "").lower()
@@ -1481,6 +1479,8 @@ def infer_target_user_line(segment_label: str, make: str = "", model: str = "") 
                 "düzenli bakım geçmişi kritik olur.")
 
     return ("Bu araç; dengeli kullanım isteyen, masraf toleransı orta seviyede olan kullanıcıya daha uygundur.")
+
+
 def _fit_score(req: AnalyzeRequest, enriched: Dict[str, Any]) -> int:
     prof = enriched.get("profile", {}) or {}
     seg = (enriched.get("segment", {}) or {}).get("code", "C_SEDAN")
@@ -1921,6 +1921,9 @@ def build_premium_template(req: AnalyzeRequest, enriched: Dict[str, Any]) -> Dic
     city_name = city_ctx.get("city_name") or (prof.get("city") or "-")
     usage_tr = _usage_tr(prof.get("usage", "mixed"))
 
+    # ✅ BUGFIX: segment_label tanımlı olsun (NameError/500 gider)
+    segment_label = (enriched.get("segment", {}) or {}).get("name") or (enriched.get("segment", {}) or {}).get("code") or ""
+
     lines: List[str] = []
     lines.append(f"## {title}")
     lines.append("")
@@ -2310,13 +2313,9 @@ def quick_analyze_impl(req: AnalyzeRequest) -> Dict[str, Any]:
     if uncertainty.get("level") == "yüksek":
         cons.append("Belirsizlik yüksek: tramer + servis kaydı + ekspertiz netleşmeden bandlar geniş kalır.")
 
-    # hedef kitle cümlesi (segment bazlı)
-    target_line = None
-    if seg_code in ("PREMIUM_D", "E_SEGMENT") or any(k in blob for k in perf_keys):
-        target_line = infer_target_user_line(segment_label, req.vehicle.make, req.vehicle.model)
-    else:
-        target_line = infer_target_user_line(segment_label, req.vehicle.make, req.vehicle.model)
-
+    # ✅ BUGFIX: segment_label tanımlı olsun
+    segment_label = (enriched.get("segment", {}) or {}).get("name") or (enriched.get("segment", {}) or {}).get("code") or ""
+    target_line = infer_target_user_line(segment_label, req.vehicle.make, req.vehicle.model)
 
     # skor metodolojisi (kısa)
     how_scored = [
@@ -2415,6 +2414,8 @@ async def analyze(req: AnalyzeRequest) -> Dict[str, Any]:
             req
         )
     return quick_analyze_impl(req)
+
+
 @app.post("/premium_analyze")
 async def premium_analyze(req: AnalyzeRequest) -> Dict[str, Any]:
     return premium_analyze_impl(req)
@@ -2489,4 +2490,3 @@ if __name__ == "__main__":
     # Lokal çalıştırma için:
     # uvicorn main:app --host 0.0.0.0 --port 8000 --reload
     pass
-# GIT_TEST_123
