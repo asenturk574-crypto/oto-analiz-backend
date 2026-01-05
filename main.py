@@ -1930,10 +1930,31 @@ def build_premium_template(req: AnalyzeRequest, enriched: Dict[str, Any]) -> Dic
         for cp in critical_points[:3]:
             lines.append(f"  - {cp}")
 
-    lines.append(f"- Mekanik: **{_clamp(overall + 2, 0, 100)}/100** | Kaporta: **{_clamp(overall - 1, 0, 100)}/100**")
-    lines.append(f"- Ekonomi: **{economy_100}/100** | Konfor: **{comfort_100}/100** | Aile: **{family_use_100}/100**")
-    lines.append(f"- 2. el: **{resale_100}/100** | Elektronik: **{electronics_100}/100** | Uygunluk: **{personal_fit_score}/100**")
-    lines.append("- Not: Skorlar **kesin teşhis** değildir; ilan+yaş+km+profil kombinasyonundan **tahmini** üretilir.")
+    lines.append(
+    f"- Mekanik: **{_clamp(overall + 2, 0, 100)}/100** "
+    f"(yüksek güç/torque yükü, pahalı mekanik bileşenler) | "
+    f"Kaporta: **{_clamp(overall - 1, 0, 100)}/100** "
+    f"(parça fiyatı ve onarım hassasiyeti)"
+)
+
+    lines.append(
+    f"- Ekonomi: **{economy_100}/100** "
+    f"(yakıt + bakım maliyeti dengesi) | "
+    f"Konfor: **{comfort_100}/100** "
+    f"(süspansiyon ve donanım seviyesi) | "
+    f"Aile: **{family_use_100}/100** "
+    f"(kullanım alanı ve pratiklik)"
+)
+
+    lines.append(
+    f"- 2. el: **{resale_100}/100** "
+    f"(likidite ve talep genişliği) | "
+    f"Elektronik: **{electronics_100}/100** "
+    f"(yüksek yazılım/sensör modülü yoğunluğu) | "
+    f"Uygunluk: **{personal_fit_score}/100** "
+    f"(kullanıcı profili uyumu)"
+)
+
     lines.append("---")
 
     lines.append("")
