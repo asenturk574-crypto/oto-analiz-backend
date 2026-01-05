@@ -1458,6 +1458,29 @@ def build_uncertainty(enriched: Dict[str, Any]) -> Dict[str, Any]:
     }
 
 
+
+
+def infer_target_user_line(segment_label: str, make: str = "", model: str = "") -> str:
+    """Short 'who is this car for?' line used in both quick and premium reports."""
+    sl = (segment_label or "").lower()
+    mk = (make or "").lower()
+
+    premium_brands = {
+        "audi","bmw","mercedes","porsche","lexus","jaguar","land rover",
+        "maserati","bentley","lamborghini","ferrari","rolls-royce","cadillac"
+    }
+
+    if any(k in sl for k in ("premium", "perform", "sport", "super", "lux")) or mk in premium_brands:
+        return ("Bu tip araçlar daha çok performans/konforu bir arada isteyen ve "
+                "masraf bütçesi yüksek kullanıcıya uygundur.")
+    if any(k in sl for k in ("economy", "ekonomi", "compact", "şehir", "b-segment", "b segment", "c-segment", "c segment")):
+        return ("Bu tip araçlar daha çok ekonomik/sorunsuzluk odaklı, şehir içi kullanımı yoğun "
+                "ve bütçesi kontrollü kullanıcıya uygundur.")
+    if any(k in sl for k in ("family", "aile", "suv", "crossover", "mpv", "station", "wagon")):
+        return ("Bu tip araçlar daha çok aile kullanımı, geniş iç hacim ve konfor isteyen kullanıcıya uygundur; "
+                "düzenli bakım geçmişi kritik olur.")
+
+    return ("Bu araç; dengeli kullanım isteyen, masraf toleransı orta seviyede olan kullanıcıya daha uygundur.")
 def _fit_score(req: AnalyzeRequest, enriched: Dict[str, Any]) -> int:
     prof = enriched.get("profile", {}) or {}
     seg = (enriched.get("segment", {}) or {}).get("code", "C_SEDAN")
@@ -1994,6 +2017,7 @@ def build_premium_template(req: AnalyzeRequest, enriched: Dict[str, Any]) -> Dic
     for cl in city_fit_lines:
         lines.append(cl)
     lines.append("- Bu bölüm; yıllık km ve kullanım tipine göre yakıt/segment mantığını yorumlar (kesin hüküm değil).")
+    lines.append(f"- **Kime daha uygun?** {infer_target_user_line(segment_label, req.vehicle.make, req.vehicle.model)}")
     lines.append("")
 
     lines.append("### 5) Değer & pazarlık (hukuki güvenli, kesin hüküm yok)")
@@ -2227,7 +2251,7 @@ def quick_analyze_impl(req: AnalyzeRequest) -> Dict[str, Any]:
     # premium / çok karmaşık modeller için tavanı biraz kıs
     seg_code = (enriched.get("segment", {}) or {}).get("code", "C_SEDAN")
     blob = _norm(f"{v.make} {v.model} {(req.ad_description or '')}")
-    perf_keys = ["rs", "amg", "m5", "m3", "m4", "c63", "e63", "s63", "g63", "m2", "m8", "911", "gtr", "gt-r", "supra", "sti", "type r", "type-r"]
+    perf_keys = ["rs", "amg", "m5", "m3", "m4", "m8", "c63", "e63", "911", "gtr", "gt-r", "supra", "sti", "type r", "type-r", "cupra"]
     if seg_code in ("PREMIUM_D", "E_SEGMENT") or any(k in blob for k in perf_keys):
         overall = min(overall, 88)
 
@@ -2289,9 +2313,9 @@ def quick_analyze_impl(req: AnalyzeRequest) -> Dict[str, Any]:
     # hedef kitle cümlesi (segment bazlı)
     target_line = None
     if seg_code in ("PREMIUM_D", "E_SEGMENT") or any(k in blob for k in perf_keys):
-        target_line = "Bu tip araçlar daha çok **performans/konfor** önceliği olan ve **masraf bütçesi yüksek** kullanıcıya uygundur."
+        target_line = infer_target_user_line(segment_label, req.vehicle.make, req.vehicle.model)
     else:
-        target_line = "Bu tip araçlar genelde **ekonomi/ailesel kullanım** önceliği olan kullanıcılar için daha uygun olur (temiz geçmiş + doğru bakım şart)."
+        target_line = infer_target_user_line(segment_label, req.vehicle.make, req.vehicle.model)
 
 
     # skor metodolojisi (kısa)
@@ -2303,18 +2327,22 @@ def quick_analyze_impl(req: AnalyzeRequest) -> Dict[str, Any]:
         "- **Belirsizlik:** İlan bilgisi azsa (tramer/bakım yoksa) skor daha temkinli verilir.",
     ]
 
-    short_comment = f"Genel skor **{overall}/100**. Parça-servis **{parts_service_100}/100**, kişiye uygunluk **{fit_100}/100** (tahmini)."
-
+    short_comment = (f"Genel skor **{overall}/100**. Parça/servis geneli **{parts_service_100}/100**, "
+                    f"kişiye uygunluk **{fit_100}/100** (tahmini).")
 
     result_lines: List[str] = []
     result_lines.append(f"## {title}")
+    result_lines.append(short_comment)
     result_lines.append("")
+    result_lines.append("## Skorlar")
     result_lines.append(f"- Genel skor: **{overall}/100**")
     result_lines.append(f"- Parça/servis geneli: **{parts_service_100}/100**")
     result_lines.append(f"- Kişiye uygunluk: **{fit_100}/100**")
-    if total_mid is not None and total_min is not None and total_max is not None:
-        result_lines.append(f"- Yıllık toplam (bakım+yakıt) tahmini: **{_fmt_try(total_min)} – {_fmt_try(total_max)} TL** (orta: ~{_fmt_try(total_mid)} TL)")
     result_lines.append("")
+    if total_mid is not None and total_min is not None and total_max is not None:
+        result_lines.append("## Yıllık maliyet (bakım + yakıt)")
+        result_lines.append(f"- Tahmini band: **{_fmt_try(total_min)} – {_fmt_try(total_max)} TL** (orta: ~{_fmt_try(total_mid)} TL)")
+        result_lines.append("")
     result_lines.append("### Bu skor neye göre verildi?")
     result_lines.extend(how_scored)
     result_lines.append("")
@@ -2461,3 +2489,4 @@ if __name__ == "__main__":
     # Lokal çalıştırma için:
     # uvicorn main:app --host 0.0.0.0 --port 8000 --reload
     pass
+# GIT_TEST_123
