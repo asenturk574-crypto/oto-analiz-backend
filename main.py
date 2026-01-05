@@ -201,13 +201,13 @@ def _infer_engine_cc_from_text(text: str) -> Optional[int]:
     if not text:
         return None
     t = text.lower().replace(",", ".")
-    m = re.search(r"(?<!\d)(0\.\d|1\.\d|2\.\d|3\.\d|4\.\d)(?!\d)", t)
+    m = re.search(r"(?<!\d)(0\.\d|1\.\d|2\.\d|3\.\d|4\.\d|5\.\d|6\.\d)(?!\d)", t)
     if not m:
         return None
     try:
         liters = float(m.group(1))
         cc = int(round(liters * 1000))
-        if 600 <= cc <= 6000:
+        if 600 <= cc <= 6500:
             return cc
     except:
         pass
@@ -231,10 +231,14 @@ def _guess_tags(req: AnalyzeRequest) -> List[str]:
         tags.append("hybrid")
     if "electric" in t or "ev" in t or "elektrik" in t:
         tags.append("ev")
-    if "4x4" in t or "awd" in t or "quattro" in t:
+    if "4x4" in t or "awd" in t or "quattro" in t or "xdrive" in t or "4matic" in t:
         tags.append("awd_optional")
     if "turbo" in t or "tce" in t or "tsi" in t or "ecoboost" in t:
         tags.append("turbo_small")
+
+    # Performance cues
+    if re.search(r"\brs\d\b", t) or "rs " in t or "amg" in t or re.search(r"\bc ?63\b", t) or re.search(r"\bm\d\b", t):
+        tags.append("performance")
 
     f = (req.vehicle.fuel or req.profile.fuel_preference or "").lower().strip()
     if f == "diesel":
@@ -384,7 +388,7 @@ SEGMENT_STATS = _build_segment_stats(VEHICLE_PROFILES)
 
 
 # =========================================================
-# CITY + TRANSMISSION HELPERS (✅ yeni)
+# CITY + TRANSMISSION HELPERS
 # =========================================================
 def _zfill_plate(code: Any) -> Optional[str]:
     if code is None:
@@ -463,7 +467,7 @@ def _infer_transmission(req: AnalyzeRequest) -> Optional[str]:
     for k in ("transmission", "vites", "gearbox", "sanziman"):
         if ctx.get(k):
             t = _norm(str(ctx.get(k)))
-            if "otom" in t or "auto" in t or "dsg" in t or "cvt" in t or "dct" in t:
+            if "otom" in t or "auto" in t or "dsg" in t or "cvt" in t or "dct" in t or "ptronic" in t or "tiptronic" in t:
                 return "automatic"
             if "man" in t:
                 return "manual"
@@ -471,7 +475,7 @@ def _infer_transmission(req: AnalyzeRequest) -> Optional[str]:
     # 3) metin tarama
     blob = f"{req.ad_description or ''} {json.dumps(ctx, ensure_ascii=False)} {req.vehicle.make} {req.vehicle.model}"
     t = _norm(blob)
-    if any(x in t for x in ["otomatik", "automatic", "dsg", "s tronic", "s-tronic", "cvt", "dct", "edc", "powershift"]):
+    if any(x in t for x in ["otomatik", "automatic", "dsg", "s tronic", "s-tronic", "cvt", "dct", "edc", "powershift", "tiptronic", "ptronic", "zf"]):
         return "automatic"
     if any(x in t for x in ["manuel", "manual"]):
         return "manual"
@@ -626,6 +630,26 @@ SEGMENT_PROFILES: Dict[str, Dict[str, Any]] = {
             "Elektronik/donanım arızaları yaşla birlikte daha sık görülebilir.",
         ],
     },
+    # ✅ Yeni: RS / AMG / M / S / Turbo performans sınıfı
+    "LUX_PERFORMANCE": {
+        "name": "Lüks performans (RS / AMG / M / S / V)",
+        "maintenance_yearly_range": (65000, 190000),
+        "insurance_level": "çok yüksek",
+        "notes": [
+            "Bu sınıfta masrafın ana farkı: yüksek performanslı fren/lastik, karmaşık elektronik, pahalı işçilik ve yüksek kasko primi.",
+            "Yaş/km arttıkça turbo/soğutma/şanzıman ve diferansiyel gibi kalemlerin maliyet etkisi büyür.",
+        ],
+    },
+    # ✅ Yeni: Ferrari / Lamborghini / McLaren gibi supersport
+    "SUPER_SPORT": {
+        "name": "Supercar / supersport",
+        "maintenance_yearly_range": (120000, 450000),
+        "insurance_level": "çok yüksek (özel)",
+        "notes": [
+            "Parça temini, işçilik ve sarf kalemleri çok pahalı olabilir; servis/uzman erişimi sınırlı kalabilir.",
+            "Bu sınıfta belirsizlik doğal olarak daha yüksek; geçmiş/servis kaydı ve kapsamlı kontrol kritik.",
+        ],
+    },
     "E_SEGMENT": {
         "name": "E segment / üst sınıf",
         "maintenance_yearly_range": (45000, 120000),
@@ -638,14 +662,56 @@ SEGMENT_PROFILES: Dict[str, Dict[str, Any]] = {
 
 
 # =========================================================
-# SEGMENT DETECTION
+# SEGMENT DETECTION (✅ güçlendirildi)
 # =========================================================
+def _is_supersport(s: str) -> bool:
+    # Markalar + açık supersport ipuçları
+    if any(k in s for k in ["ferrari", "lamborghini", "mclaren", "koenigsegg", "bugatti", "pagani", "aston martin valkyrie"]):
+        return True
+    if any(k in s for k in ["huracan", "aventador", "sf90", "488", "812", "f8", "roma", "portofino", "720s", "765lt", "p1", "senna", "chiron", "veyron"]):
+        return True
+    return False
+
+
+def _is_lux_performance(s: str) -> bool:
+    # Audi RS, BMW M, Mercedes AMG (özellikle 63), Porsche (911/GT), vb.
+    if re.search(r"\brs\s?\d\b", s) or re.search(r"\brs\d\b", s):
+        return True
+    if re.search(r"\bm\s?\d\b", s) or re.search(r"\bm\d\b", s):  # m5, m3, m2...
+        return True
+    if "amg" in s:
+        return True
+    if re.search(r"\bc\s?63\b", s) or re.search(r"\be\s?63\b", s) or re.search(r"\bs\s?63\b", s):
+        return True
+    if any(k in s for k in ["c63", "e63", "s63", "cla45", "a45", "g63"]):
+        return True
+    if any(k in s for k in ["rs7", "rs6", "rs5", "rs3", "rsq8", "rsq3", "rs4"]):
+        return True
+    if any(k in s for k in ["m5", "m3", "m4", "m2", "x5m", "x6m", "m8"]):
+        return True
+    if any(k in s for k in ["porsche 911", "911", "gt3", "gt2", "turbo s", "taycan turbo", "panamera turbo"]):
+        return True
+    if any(k in s for k in ["bmw alpina", "alpina", "audi s8", "audi s6", "audi s7", "audi s5", "mercedes s500", "s580", "e53", "c43"]):
+        return True
+    return False
+
+
 def detect_segment(make: str, model: str) -> str:
     s = _norm(f"{make} {model}")
 
-    if any(k in s for k in ["bmw", "mercedes", "audi", "volvo", "lexus", "range rover", "land rover"]):
+    # 1) supersport
+    if _is_supersport(s):
+        return "SUPER_SPORT"
+
+    # 2) lüks performans
+    if _is_lux_performance(s):
+        return "LUX_PERFORMANCE"
+
+    # 3) premium markalar (normal premium)
+    if any(k in s for k in ["bmw", "mercedes", "audi", "volvo", "lexus", "range rover", "land rover", "porsche"]):
         return "PREMIUM_D"
 
+    # 4) yaygın segment heuristics
     if any(k in s for k in ["clio", "polo", "i20", "corsa", "yaris", "fiesta", "fabia", "ibiza"]):
         return "B_HATCH"
     if any(k in s for k in ["corolla", "civic", "megane", "astra", "focus", "egea", "tipo", "elantra", "i30"]):
@@ -674,8 +740,8 @@ def find_anchor_matches(make: str, model: str, segment: str, limit: int = 3) -> 
             if _norm(al) in target:
                 score += 8
 
-        if any(m in target for m in ["bmw", "mercedes", "audi", "volvo"]) and \
-           any(m in key for m in ["bmw", "mercedes", "audi", "volvo"]):
+        if any(m in target for m in ["bmw", "mercedes", "audi", "volvo", "porsche"]) and \
+           any(m in key for m in ["bmw", "mercedes", "audi", "volvo", "porsche"]):
             score += 2
 
         if score > 0:
@@ -849,6 +915,8 @@ def estimate_mtv(req: AnalyzeRequest, tax_year: Optional[int] = None) -> Dict[st
             "C_SUV": (1301, 2000),
             "D_SEDAN": (1601, 2000),
             "PREMIUM_D": (1601, 3000),
+            "LUX_PERFORMANCE": (2501, 5000),
+            "SUPER_SPORT": (3501, 6500),
             "E_SEGMENT": (2001, 99999),
         }.get(segment, (0, 2000))
         cc_candidates = [seg_cc_band[0], seg_cc_band[1]]
@@ -995,25 +1063,27 @@ def estimate_kasko(req: AnalyzeRequest, segment_code: str, age: Optional[int], m
         "C_SUV": (0.025, 0.055),
         "D_SEDAN": (0.028, 0.065),
         "PREMIUM_D": (0.030, 0.080),
+        "LUX_PERFORMANCE": (0.040, 0.110),
+        "SUPER_SPORT": (0.060, 0.160),
         "E_SEGMENT": (0.035, 0.095),
     }.get(segment_code, (0.022, 0.055))
 
     age_mult = 1.0
     if age is not None:
         if age >= 15:
-            age_mult = 1.35
+            age_mult = 1.45
         elif age >= 10:
-            age_mult = 1.22
+            age_mult = 1.28
         elif age >= 6:
-            age_mult = 1.10
+            age_mult = 1.12
 
     km_mult = 1.0
     if mileage_km >= 250_000:
-        km_mult = 1.25
+        km_mult = 1.30
     elif mileage_km >= 180_000:
-        km_mult = 1.15
+        km_mult = 1.18
     elif mileage_km >= 120_000:
-        km_mult = 1.08
+        km_mult = 1.10
 
     rmin = base[0] * age_mult * km_mult
     rmax = base[1] * age_mult * km_mult
@@ -1021,7 +1091,14 @@ def estimate_kasko(req: AnalyzeRequest, segment_code: str, age: Optional[int], m
     kmin = int(listed_price * rmin)
     kmax = int(listed_price * rmax)
 
-    kmax = min(kmax, int(listed_price * 0.12))
+    # caps by segment
+    max_cap_ratio = 0.12
+    if segment_code == "LUX_PERFORMANCE":
+        max_cap_ratio = 0.16
+    if segment_code == "SUPER_SPORT":
+        max_cap_ratio = 0.22
+
+    kmax = min(kmax, int(listed_price * max_cap_ratio))
     kmin = max(kmin, int(listed_price * 0.015))
     if kmin > kmax:
         kmin = int(kmax * 0.75)
@@ -1057,23 +1134,23 @@ def estimate_costs(req: AnalyzeRequest) -> Dict[str, Any]:
     age_mult = 1.0
     if age is not None:
         if age >= 15:
-            age_mult = 1.8
+            age_mult = 2.1 if segment_code in ("LUX_PERFORMANCE", "SUPER_SPORT") else 1.8
         elif age >= 10:
-            age_mult = 1.4
+            age_mult = 1.55 if segment_code in ("LUX_PERFORMANCE", "SUPER_SPORT") else 1.4
         elif age >= 6:
-            age_mult = 1.15
+            age_mult = 1.20 if segment_code in ("LUX_PERFORMANCE", "SUPER_SPORT") else 1.15
 
     km_mult = 1.0
     if mileage >= 250_000:
-        km_mult = 1.8
+        km_mult = 2.0 if segment_code in ("LUX_PERFORMANCE", "SUPER_SPORT") else 1.8
     elif mileage >= 180_000:
-        km_mult = 1.4
+        km_mult = 1.6 if segment_code in ("LUX_PERFORMANCE", "SUPER_SPORT") else 1.4
     elif mileage >= 120_000:
-        km_mult = 1.2
+        km_mult = 1.25 if segment_code in ("LUX_PERFORMANCE", "SUPER_SPORT") else 1.2
 
     usage_mult = 1.0
     if p.usage == "city":
-        usage_mult = 1.15
+        usage_mult = 1.18 if segment_code in ("LUX_PERFORMANCE", "SUPER_SPORT") else 1.15
     elif p.usage == "highway":
         usage_mult = 0.95
 
@@ -1102,6 +1179,8 @@ def estimate_costs(req: AnalyzeRequest) -> Dict[str, Any]:
             "C_SUV": (0.02, 0.08),
             "D_SEDAN": (0.02, 0.085),
             "PREMIUM_D": (0.025, 0.09),
+            "LUX_PERFORMANCE": (0.030, 0.14),
+            "SUPER_SPORT": (0.040, 0.20),
             "E_SEGMENT": (0.03, 0.10),
         }
         r_min, r_max = ratio_map.get(segment_code, (0.015, 0.07))
@@ -1116,6 +1195,8 @@ def estimate_costs(req: AnalyzeRequest) -> Dict[str, Any]:
             "C_SUV": 75_000,
             "D_SEDAN": 85_000,
             "PREMIUM_D": 130_000,
+            "LUX_PERFORMANCE": 240_000,
+            "SUPER_SPORT": 520_000,
             "E_SEGMENT": 160_000,
         }
         cap = caps.get(segment_code, 60_000)
@@ -1125,7 +1206,7 @@ def estimate_costs(req: AnalyzeRequest) -> Dict[str, Any]:
             maint_min = int(maint_max * 0.7)
 
     mid_maint = int((maint_min + maint_max) / 2) if maint_max else maint_min
-    routine_est = int(mid_maint * 0.65)
+    routine_est = int(mid_maint * 0.62) if segment_code in ("LUX_PERFORMANCE", "SUPER_SPORT") else int(mid_maint * 0.65)
     risk_reserve_est = max(0, mid_maint - routine_est)
 
     km_year = max(0, int(p.yearly_km or 15_000))
@@ -1138,6 +1219,8 @@ def estimate_costs(req: AnalyzeRequest) -> Dict[str, Any]:
         "C_SUV": (26_000, 48_000),
         "D_SEDAN": (27_000, 52_000),
         "PREMIUM_D": (32_000, 65_000),
+        "LUX_PERFORMANCE": (42_000, 105_000),
+        "SUPER_SPORT": (65_000, 180_000),
         "E_SEGMENT": (38_000, 80_000),
     }.get(segment_code, (22_000, 42_000))
 
@@ -1173,8 +1256,11 @@ def estimate_costs(req: AnalyzeRequest) -> Dict[str, Any]:
     if "yüksek" in fuel_risk:
         risk_level = "yüksek"
 
-    if segment_code in ("PREMIUM_D", "E_SEGMENT") and ((age and age > 10) or mileage > 180_000):
-        risk_notes.append("Premium sınıfta yaşlı/yüksek km araçların büyük masraf kalemleri pahalı olabilir.")
+    if segment_code in ("PREMIUM_D", "E_SEGMENT", "LUX_PERFORMANCE", "SUPER_SPORT") and ((age and age > 10) or mileage > 180_000):
+        risk_notes.append("Premium/performance sınıfta yaşlı/yüksek km araçların büyük masraf kalemleri pahalı olabilir.")
+
+    if segment_code in ("LUX_PERFORMANCE", "SUPER_SPORT"):
+        risk_notes.append("Performans sınıfta fren/lastik/soğutma/şanzıman gibi kalemler daha pahalı ve daha kritik olabilir.")
 
     traffic = estimate_traffic_insurance(req)
     kasko = estimate_kasko(req, segment_code=segment_code, age=age, mileage_km=mileage)
@@ -1207,6 +1293,8 @@ def estimate_costs(req: AnalyzeRequest) -> Dict[str, Any]:
             "C_SUV": (7.5, 11.0),
             "D_SEDAN": (7.5, 11.0),
             "PREMIUM_D": (8.0, 12.5),
+            "LUX_PERFORMANCE": (10.5, 18.0),
+            "SUPER_SPORT": (12.0, 22.0),
             "E_SEGMENT": (9.0, 15.0),
         }.get(segment_code, (6.5, 9.5)),
         "taxes": {"mtv": mtv},
@@ -1385,8 +1473,8 @@ def _fit_score(req: AnalyzeRequest, enriched: Dict[str, Any]) -> int:
             score += 5
         score += 2
 
-    if seg in ("PREMIUM_D", "E_SEGMENT") and prof.get("yearly_km_band") == "düşük":
-        score -= 6
+    if seg in ("PREMIUM_D", "E_SEGMENT", "LUX_PERFORMANCE", "SUPER_SPORT") and prof.get("yearly_km_band") == "düşük":
+        score -= 8 if seg in ("LUX_PERFORMANCE", "SUPER_SPORT") else 6
 
     if seg in ("C_SEDAN", "C_SUV", "D_SEDAN"):
         score += 3
@@ -1402,6 +1490,8 @@ def _electronics_score(enriched: Dict[str, Any]) -> int:
     score = 74
     if seg in ("PREMIUM_D", "E_SEGMENT"):
         score -= 5
+    if seg in ("LUX_PERFORMANCE", "SUPER_SPORT"):
+        score -= 9
     if age >= 10:
         score -= 6
     if age >= 15:
@@ -1444,8 +1534,8 @@ def build_score_because(req: AnalyzeRequest, enriched: Dict[str, Any], overall: 
     # Segment yaygınlık / parça
     if parts_av >= 4 and seg_code in ("B_HATCH", "C_SEDAN", "C_SUV", "D_SEDAN"):
         plus.append("segment/parça-usta erişimi görece rahat")
-    elif seg_code in ("PREMIUM_D", "E_SEGMENT"):
-        critical.append("premium/üst sınıfta parça-işçilik maliyeti daha yüksek eğilimli")
+    elif seg_code in ("PREMIUM_D", "E_SEGMENT", "LUX_PERFORMANCE", "SUPER_SPORT"):
+        critical.append("premium/performance sınıfta parça-işçilik maliyeti daha yüksek eğilimli")
 
     # 2.el
     if resale_liq >= 4:
@@ -1466,11 +1556,13 @@ def build_score_because(req: AnalyzeRequest, enriched: Dict[str, Any], overall: 
     if match == "segment_estimate":
         critical.append("bu model için direkt profil yok; emsal segmentten tahmin kullanıldı")
 
-    # temizle / sınırla
+    # Performance özel kritik
+    if seg_code in ("LUX_PERFORMANCE", "SUPER_SPORT"):
+        critical.append("performans sınıfta fren/lastik/soğutma/şanzıman gibi kalemler pahalı; ekspertiz daha kritik")
+
     plus = [p for p in plus if p]
     critical = [c for c in critical if c]
 
-    # kısa cümle
     because_parts = []
     if plus:
         because_parts.append(", ".join(plus[:3]))
@@ -1493,8 +1585,8 @@ def explain_indices(enriched: Dict[str, Any]) -> Dict[str, Dict[str, Any]]:
         reasons = []
         if match == "segment_estimate":
             reasons.append("Bu puanlar bu modelin direkt verisi değil; aynı segment emsallerinin ortalamasından tahmini türetildi.")
-        if seg in ("PREMIUM_D", "E_SEGMENT"):
-            reasons.append("Premium/üst sınıfta OEM parça ve işçilik maliyeti genelde daha yüksek olur; bazı parçalarda termin etkilenebilir.")
+        if seg in ("PREMIUM_D", "E_SEGMENT", "LUX_PERFORMANCE", "SUPER_SPORT"):
+            reasons.append("Premium/performance sınıfta OEM parça ve işçilik maliyeti genelde daha yüksek olur; stok/termin etkilenebilir.")
         else:
             reasons.append("Yaygın segmentlerde muadil parça/usta ağı daha güçlü olma eğilimindedir.")
         return reasons
@@ -1576,16 +1668,25 @@ def build_value_and_negotiation(enriched: Dict[str, Any]) -> Dict[str, Any]:
             ],
         }
 
-    if listed < 500_000:
-        label = "Uygun"
-    elif listed < 1_200_000:
-        label = "Normal"
+    # performans sınıfta etiket daha temkinli
+    if segment_code in ("LUX_PERFORMANCE", "SUPER_SPORT"):
+        if listed < 1_500_000:
+            label = "Normal"
+        elif listed < 3_000_000:
+            label = "Yüksek"
+        else:
+            label = "Yüksek"
     else:
-        label = "Yüksek"
+        if listed < 500_000:
+            label = "Uygun"
+        elif listed < 1_200_000:
+            label = "Normal"
+        else:
+            label = "Yüksek"
 
     comment = "Değer yorumu; segment, yaş/km ve ilan detay düzeyine göre *yaklaşık* konumlandırma sağlar. Kesin piyasa fiyatı değildir."
-    if segment_code in ("PREMIUM_D", "E_SEGMENT"):
-        comment += " Premium/üst sınıfta aynı fiyat bandında bile masraf/riske bağlı değer algısı çok değişebilir."
+    if segment_code in ("PREMIUM_D", "E_SEGMENT", "LUX_PERFORMANCE", "SUPER_SPORT"):
+        comment += " Premium/performance sınıfta aynı fiyat bandında bile masraf/riske bağlı değer algısı çok değişebilir."
     if "ilan_aciklamasi_kisa" in missing:
         comment += " İlan açıklaması kısa olduğu için pazarlık argümanları daha çok ekspertiz sonucuna dayanmalı."
 
@@ -1594,6 +1695,9 @@ def build_value_and_negotiation(enriched: Dict[str, Any]) -> Dict[str, Any]:
         "Bakım kayıtları ve faturalar yoksa: yakın vadeli bakım bütçesini (yağ/filtre/sıvılar) argümanlaştır.",
         "Tramer toplamı + parça değişimi bilgilerini (şasi/podye kontrolüyle birlikte) teyit edip belirsizliği pazarlıkta kullan.",
     ]
+    if segment_code in ("LUX_PERFORMANCE", "SUPER_SPORT"):
+        args.insert(0, "Performans sınıfta fren/lastik seti, disk-balata ve soğutma kalemlerinin fiyatını netleştirip pazarlığa çevir.")
+
     return {
         "ok": True,
         "label": label,
@@ -1603,9 +1707,6 @@ def build_value_and_negotiation(enriched: Dict[str, Any]) -> Dict[str, Any]:
     }
 
 
-# =========================================================
-# PERSONALIZED WARNINGS + CHECKLIST
-# =========================================================
 def build_personalized_warnings(enriched: Dict[str, Any], req: Optional[AnalyzeRequest] = None) -> List[str]:
     risk = enriched.get("risk", {}) or {}
     profile = enriched.get("profile", {}) or {}
@@ -1649,6 +1750,11 @@ def build_personalized_warnings(enriched: Dict[str, Any], req: Optional[AnalyzeR
         warnings.append("LPG'li araçta montaj kalitesi ve subap durumu kritik; kompresyon testi ve egzoz değerleri kontrol edilmeli.")
     elif "hybrid" in f or "electric" in f:
         warnings.append("Hibrit/EV araçlarda batarya sağlığı ve servis desteği uzun vadeli maliyeti belirler.")
+
+    seg_code = (enriched.get("segment", {}) or {}).get("code")
+    if seg_code in ("LUX_PERFORMANCE", "SUPER_SPORT"):
+        warnings.append("Performans sınıfta fren/lastik ve soğutma sistemi kondisyonu (kaçak, radyatör, pompa, termostat) özellikle kritik.")
+        warnings.append("Yük altında test sürüşü ve OBD/log kontrolü (misfire, knock, boost, sıcaklık) raporu çok değerli olur.")
 
     base_notes = risk.get("risk_notes") or []
     for r in base_notes:
@@ -1701,6 +1807,11 @@ def build_buy_checklist(enriched: Dict[str, Any], req: Optional[AnalyzeRequest] 
         checklist.append("Dizel: DPF/EGR durumu, enjektör kaçak testi ve turbo basıncını kontrol ettir.")
     elif "lpg" in f:
         checklist.append("LPG: sistemin ruhsata işli olması, montaj/proje belgeleri ve subap kontrolü.")
+
+    seg_code = (enriched.get("segment", {}) or {}).get("code")
+    if seg_code in ("LUX_PERFORMANCE", "SUPER_SPORT"):
+        checklist.insert(0, "Performans sınıf: fren disk/balata, lastik seti, soğutma ve turbo/boost kaçak kontrolü yaptır.")
+        checklist.insert(1, "OBD/diagnostic: misfire, knock, sıcaklık değerleri ve şanzıman adaptasyon kayıtlarına baktır.")
 
     for item in base_list:
         if len(checklist) >= max_items:
@@ -1759,7 +1870,7 @@ def build_premium_template(req: AnalyzeRequest, enriched: Dict[str, Any]) -> Dic
     electronics_100 = _electronics_score(enriched)
 
     economy_100 = _clamp(78 - int(parts_cost * 2), 0, 100)
-    comfort_100 = _clamp(72 if enriched["segment"]["code"] in ("D_SEDAN", "PREMIUM_D", "E_SEGMENT") else 66, 0, 100)
+    comfort_100 = _clamp(72 if enriched["segment"]["code"] in ("D_SEDAN", "PREMIUM_D", "E_SEGMENT", "LUX_PERFORMANCE", "SUPER_SPORT") else 66, 0, 100)
     family_use_100 = _clamp(74 if enriched["segment"]["code"] in ("C_SEDAN", "C_SUV", "D_SEDAN") else 66, 0, 100)
     resale_100 = _clamp(int(resale_liq * 18), 0, 100)
 
@@ -1786,11 +1897,7 @@ def build_premium_template(req: AnalyzeRequest, enriched: Dict[str, Any]) -> Dic
     city_ctx = get_city_congestion_context(req)
     city_name = city_ctx.get("city_name") or (prof.get("city") or "-")
     usage_tr = _usage_tr(prof.get("usage", "mixed"))
-    fuel_pref_tr = _fuel_tr(prof.get("fuel_preference", ""))
 
-    # =========================================================
-    # RESULT TEXT
-    # =========================================================
     lines: List[str] = []
     lines.append(f"## {title}")
     lines.append("")
@@ -1883,16 +1990,10 @@ def build_premium_template(req: AnalyzeRequest, enriched: Dict[str, Any]) -> Dic
         f"- Profil: yıllık **{prof['yearly_km']} km** ({prof['yearly_km_band']}), "
         f"kullanım: **{_usage_tr(prof['usage'])}**, yakıt tercihi: **{_fuel_tr(prof['fuel_preference'])}**"
     )
-
     city_fit_lines = build_city_fit_lines(req, enriched)
     for cl in city_fit_lines:
         lines.append(cl)
-
     lines.append("- Bu bölüm; yıllık km ve kullanım tipine göre yakıt/segment mantığını yorumlar (kesin hüküm değil).")
-    if prof["yearly_km_band"] == "düşük":
-        lines.append("- Yıllık km düşükse, yüksek masraf potansiyelli seçeneklerde “gereksiz masraf” riski artabilir; bakım disiplini belirleyicidir.")
-    if prof["yearly_km_band"] == "yüksek":
-        lines.append("- Yıllık km yüksekse yakıt ekonomisi ve düzenli bakım en kritik iki değişkendir.")
     lines.append("")
 
     lines.append("### 5) Değer & pazarlık (hukuki güvenli, kesin hüküm yok)")
