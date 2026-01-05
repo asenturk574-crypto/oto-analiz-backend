@@ -1911,52 +1911,19 @@ def build_premium_template(req: AnalyzeRequest, enriched: Dict[str, Any]) -> Dic
     lines.append(f"**Bilgi seviyesi:** {iq.get('level','-')} (eksikler: {missing_preview})")
     lines.append("")
 
-    lines.append("")
-    lines.append("**Puanlama nasıl yapılır?**")
-    lines.append(
-        "- Bu skorlar; aracın **parça ve sistem karmaşıklığı**, **elektronik/yazılım modülü yoğunluğu**, "
-        "**bakım/onarım müdahale maliyeti**, **servis/uzman bağımlılığı** ve **yanlış kullanıma hassasiyet** "
-        "gibi faktörlere göre **risk ve sürdürülebilirlik odaklı** hesaplanır."
-    )
-    lines.append(
-        "- Premium/performance araçlar teknoloji olarak çok güçlü olsa bile; **yüksek karmaşıklık ve yüksek maliyet "
-        "hassasiyeti** nedeniyle daha düşük skor alabilir. Bu durum araç kalitesini değil, **uzun vadeli sahip olma "
-        "riskini ve masraf oynaklığını** yansıtır."
-    )
-    lines.append("")
-
+    lines.append("---")
+    lines.append("### 0) Skor & Neden (tek bakış)")
+    lines.append(f"- Genel skor: **{overall}/100**")
+    lines.append(f"- Neden {overall}? {score_reason.get('because','Skor mevcut verilere göre üretildi.')}")
     if critical_points:
         lines.append("- Dikkat noktaları (özet):")
         for cp in critical_points[:3]:
             lines.append(f"  - {cp}")
-
-    lines.append(
-    f"- Mekanik: **{_clamp(overall + 2, 0, 100)}/100** "
-    f"(yüksek güç/torque yükü, pahalı mekanik bileşenler) | "
-    f"Kaporta: **{_clamp(overall - 1, 0, 100)}/100** "
-    f"(parça fiyatı ve onarım hassasiyeti)"
-)
-
-    lines.append(
-    f"- Ekonomi: **{economy_100}/100** "
-    f"(yakıt + bakım maliyeti dengesi) | "
-    f"Konfor: **{comfort_100}/100** "
-    f"(süspansiyon ve donanım seviyesi) | "
-    f"Aile: **{family_use_100}/100** "
-    f"(kullanım alanı ve pratiklik)"
-)
-
-    lines.append(
-    f"- 2. el: **{resale_100}/100** "
-    f"(likidite ve talep genişliği) | "
-    f"Elektronik: **{electronics_100}/100** "
-    f"(yüksek yazılım/sensör modülü yoğunluğu) | "
-    f"Uygunluk: **{personal_fit_score}/100** "
-    f"(kullanıcı profili uyumu)"
-)
-
+    lines.append(f"- Mekanik: **{_clamp(overall + 2, 0, 100)}/100** | Kaporta: **{_clamp(overall - 1, 0, 100)}/100**")
+    lines.append(f"- Ekonomi: **{economy_100}/100** | Konfor: **{comfort_100}/100** | Aile: **{family_use_100}/100**")
+    lines.append(f"- 2. el: **{resale_100}/100** | Elektronik: **{electronics_100}/100** | Uygunluk: **{personal_fit_score}/100**")
+    lines.append("- Not: Skorlar **kesin teşhis** değildir; ilan+yaş+km+profil kombinasyonundan **tahmini** üretilir.")
     lines.append("---")
-
     lines.append("")
 
     lines.append("### 1) Yıllık maliyet özeti (tahmini band)")
@@ -2216,6 +2183,169 @@ def fallback_normal(req: AnalyzeRequest) -> Dict[str, Any]:
     }
 
 
+# =========================================================
+# QUICK (NORMAL) ANALYZE (deterministic, no LLM)  ✅ yeni
+# =========================================================
+def _to_100_from_1_5(x: int) -> int:
+    try:
+        x = int(x)
+    except:
+        x = 3
+    x = _clamp(x, 1, 5)
+    return int(round((x - 1) * 25))  # 1->0, 5->100
+
+
+def quick_analyze_impl(req: AnalyzeRequest) -> Dict[str, Any]:
+    """
+    'Hızlı Analiz' = Normal analiz.
+    - Tek bir genel skor (overall) odaklıdır.
+    - Maliyet/Endeks/Profil uyumu kısa ve özet gelir.
+    - Puanlamanın ne üzerinden yapıldığını net yazar (kafa karışmasın).
+    """
+    enriched = build_enriched_context(req)
+
+    v = req.vehicle
+    title = f"{v.year or ''} {v.make} {v.model}".strip() or "Hızlı Analiz"
+
+    # temel veriler
+    costs = enriched.get("costs", {}) or {}
+    risk = enriched.get("risk", {}) or {}
+    market = enriched.get("market", {}) or {}
+    prof = enriched.get("profile", {}) or {}
+    idx = (market.get("indices") or {})
+
+    base_risk = (risk.get("baseline_risk_level") or "orta").strip().lower()
+    overall = _score_from_risk(base_risk)
+
+    # belirsizlik -> genel skoru biraz aşağı çekebilir
+    uncertainty = build_uncertainty(enriched)
+    if uncertainty.get("level") == "yüksek":
+        overall = _clamp(overall - 4, 0, 100)
+    elif uncertainty.get("level") == "orta":
+        overall = _clamp(overall - 2, 0, 100)
+
+    # premium / çok karmaşık modeller için tavanı biraz kıs
+    seg_code = (enriched.get("segment", {}) or {}).get("code", "C_SEDAN")
+    blob = _norm(f"{v.make} {v.model} {(req.ad_description or '')}")
+    perf_keys = ["rs", "amg", "m5", "m3", "m4", "c63", "e63", "s63", "g63", "m2", "m8", "911", "gtr", "gt-r", "supra", "sti", "type r", "type-r"]
+    if seg_code in ("PREMIUM_D", "E_SEGMENT") or any(k in blob for k in perf_keys):
+        overall = min(overall, 88)
+
+    # fiyat etiketi (çok kaba)
+    listed = costs.get("listed_price_try")
+    price_tag = None
+    if isinstance(listed, int):
+        if listed < 500_000:
+            price_tag = "Uygun"
+        elif listed < 1_200_000:
+            price_tag = "Normal"
+        else:
+            price_tag = "Yüksek"
+
+    # genel parça-servis puanı
+    parts_av = int(idx.get("parts_availability_score_1_5", 3))
+    parts_cost = int(idx.get("parts_cost_index_1_5", 3))
+    service_net = int(idx.get("service_network_index_1_5", 3))
+
+    availability_100 = _to_100_from_1_5(parts_av)
+    service_100 = _to_100_from_1_5(service_net)
+    # maliyette 1 iyi, 5 kötü -> tersle
+    cost_100 = 100 - _to_100_from_1_5(parts_cost)
+
+    parts_service_100 = int(round((availability_100 + service_100 + cost_100) / 3))
+
+    # kişiye uygunluk (profil)
+    fit_100 = _fit_score(req, enriched)
+
+    # yıllık toplam (özet)
+    maint_min = int(costs.get("maintenance_yearly_try_min") or 0)
+    maint_max = int(costs.get("maintenance_yearly_try_max") or 0)
+    fuel_min = int(costs.get("yearly_fuel_tr_min") or 0)
+    fuel_max = int(costs.get("yearly_fuel_tr_max") or 0)
+
+    total_min = maint_min + fuel_min if maint_min and fuel_min else None
+    total_max = maint_max + fuel_max if maint_max and fuel_max else None
+    total_mid = None
+    if total_min is not None and total_max is not None:
+        total_mid = int((total_min + total_max) / 2)
+
+    # kısa artı/eksi
+    pros: List[str] = []
+    cons: List[str] = []
+
+    if parts_service_100 >= 70:
+        pros.append("Parça/usta erişimi ve servis ağı tarafı genel olarak rahat.")
+    else:
+        cons.append("Parça/servis maliyet ve erişim tarafı daha dikkatli plan gerektirebilir (özellikle premium sınıfta).")
+
+    if fit_100 >= 78:
+        pros.append("Kullanım profiline göre uyumlu bir tablo.")
+    elif fit_100 <= 60:
+        cons.append("Kullanım profiline göre masraf/uyum riski daha yüksek olabilir (yakıt/şehir içi/segment etkisi).")
+
+    if uncertainty.get("level") == "yüksek":
+        cons.append("Belirsizlik yüksek: tramer + servis kaydı + ekspertiz netleşmeden bandlar geniş kalır.")
+
+    # hedef kitle cümlesi (segment bazlı)
+    target_line = None
+    if seg_code in ("PREMIUM_D", "E_SEGMENT") or any(k in blob for k in perf_keys):
+        target_line = "Bu tip araçlar daha çok **performans/konfor** önceliği olan ve **masraf bütçesi yüksek** kullanıcıya uygundur."
+    else:
+        target_line = "Bu tip araçlar genelde **ekonomi/ailesel kullanım** önceliği olan kullanıcılar için daha uygun olur (temiz geçmiş + doğru bakım şart)."
+
+
+    # skor metodolojisi (kısa)
+    how_scored = [
+        "- **Segment & karmaşıklık:** Premium/performans sınıfında parça-işçilik ve elektronik yoğunluğu skor tavanını düşürür.",
+        "- **Yaş & km:** Yaş/km arttıkça büyük bakım riski artar; skor aşağı iner.",
+        "- **Yakıt & kullanım:** Şehir içi + dizel + düşük km gibi kombinasyonlar risk artırabilir.",
+        "- **Parça/servis & 2.el endeksleri:** Bulunurluk, maliyet ve servis ağı genel puanı etkiler.",
+        "- **Belirsizlik:** İlan bilgisi azsa (tramer/bakım yoksa) skor daha temkinli verilir.",
+    ]
+
+    short_comment = f"Genel skor **{overall}/100**. Parça-servis **{parts_service_100}/100**, kişiye uygunluk **{fit_100}/100** (tahmini)."
+
+
+    result_lines: List[str] = []
+    result_lines.append(f"## {title}")
+    result_lines.append("")
+    result_lines.append(f"- Genel skor: **{overall}/100**")
+    result_lines.append(f"- Parça/servis geneli: **{parts_service_100}/100**")
+    result_lines.append(f"- Kişiye uygunluk: **{fit_100}/100**")
+    if total_mid is not None and total_min is not None and total_max is not None:
+        result_lines.append(f"- Yıllık toplam (bakım+yakıt) tahmini: **{_fmt_try(total_min)} – {_fmt_try(total_max)} TL** (orta: ~{_fmt_try(total_mid)} TL)")
+    result_lines.append("")
+    result_lines.append("### Bu skor neye göre verildi?")
+    result_lines.extend(how_scored)
+    result_lines.append("")
+    result_lines.append("### Kime daha uygun?")
+    result_lines.append(f"- {target_line}")
+    result_lines.append("")
+    result_lines.append("### Hızlı kontrol (en kritik 3)")
+    result_lines.append("- Tramer/hasar + şasi/podye kontrolü")
+    result_lines.append("- Servis/bakım geçmişi (fatura/kayıt)")
+    result_lines.append("- Test sürüşü + OBD taraması")
+    result = "\n".join(result_lines)
+
+    # Normal endpoint şemasını koru (UI kırılmasın)
+    return {
+        "scores": {"overall_100": overall, "mechanical_100": overall, "body_100": overall, "economy_100": parts_service_100},
+        "summary": {
+            "short_comment": short_comment,
+            "pros": pros[:3],
+            "cons": cons[:3],
+            "estimated_risk_level": base_risk if base_risk in ("düşük","orta","orta-yüksek","yüksek") else "orta",
+        },
+        "preview": {
+            "title": title,
+            "price_tag": price_tag,
+            "spoiler": "Genel skor, yıllık toplam band, parça/servis genel puanı ve profil uyumu",
+            "bullets": ["Genel skor + kısa gerekçe", "Yıllık toplam (bakım+yakıt) bandı", "Parça/servis geneli", "Kime uygun?"],
+        },
+        "result": result,
+    }
+
+
 def call_llm_or_fallback(model_name: str, system_prompt: str, user_content: str, fallback_fn, req_obj):
     out = call_llm_json(model_name, system_prompt, user_content)
     if isinstance(out, dict):
@@ -2236,25 +2366,27 @@ async def root() -> Dict[str, Any]:
 # =========================================================
 @app.post("/analyze")
 async def analyze(req: AnalyzeRequest) -> Dict[str, Any]:
-    v = req.vehicle
-    p = req.profile
-    user_content = {
-        "mode": "normal",
-        "vehicle": v.dict(),
-        "profile": p.dict(),
-        "listed_price_try": _parse_listed_price(req),
-        "ad_description": req.ad_description or "",
-        "hint": "Ekspertiz, tramer, bakım geçmişi ve kullanım profiline göre dengeli, tekrar etmeyen bir değerlendirme üret."
-    }
-    return call_llm_or_fallback(
-        OPENAI_MODEL_NORMAL,
-        SYSTEM_PROMPT_NORMAL,
-        json.dumps(user_content, ensure_ascii=False),
-        fallback_normal,
-        req
-    )
-
-
+    # Normal = Hızlı Analiz (default: deterministic, hızlı, ucuz)
+    use_llm = (os.getenv("USE_LLM_NORMAL", "0").strip().lower() in ("1", "true", "yes", "y"))
+    if use_llm:
+        v = req.vehicle
+        p = req.profile
+        user_content = {
+            "mode": "normal",
+            "vehicle": v.dict(),
+            "profile": p.dict(),
+            "listed_price_try": _parse_listed_price(req),
+            "ad_description": req.ad_description or "",
+            "hint": "Ekspertiz, tramer, bakım geçmişi ve kullanım profiline göre dengeli, tekrar etmeyen bir değerlendirme üret."
+        }
+        return call_llm_or_fallback(
+            OPENAI_MODEL_NORMAL,
+            SYSTEM_PROMPT_NORMAL,
+            json.dumps(user_content, ensure_ascii=False),
+            fallback_normal,
+            req
+        )
+    return quick_analyze_impl(req)
 @app.post("/premium_analyze")
 async def premium_analyze(req: AnalyzeRequest) -> Dict[str, Any]:
     return premium_analyze_impl(req)
