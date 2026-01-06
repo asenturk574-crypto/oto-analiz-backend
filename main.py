@@ -110,6 +110,7 @@ class CompareRequest(BaseModel):
     left: CompareSide
     right: CompareSide
     profile: Optional[Profile] = None
+    analysis_mode: Optional[str] = Field(None, description="quick|premium")
 
     class Config:
         extra = "allow"
@@ -2445,29 +2446,165 @@ async def manual_analyze(req: AnalyzeRequest) -> Dict[str, Any]:
 
 @app.post("/compare_analyze")
 async def compare_analyze(req: CompareRequest) -> Dict[str, Any]:
+    """
+    Compare endpoint now supports **mode switching**:
+    - quick/fast/normal  -> uses quick_analyze_impl (Hızlı Analiz)
+    - premium           -> uses premium_analyze_impl (Detaylı Premium)
+    Flutter tarafında switch ile şu alanlardan birini göndermen yeterli:
+      - req.analysis_mode = "quick" | "premium"
+      - veya profile içinde: {"analysis_mode":"premium"} / {"mode":"premium"} / {"is_premium": true}
+    """
+    # -------------------------
+    # Resolve mode
+    # -------------------------
+    mode = None
+    try:
+        mode = getattr(req, "analysis_mode", None)
+    except:
+        mode = None
+
+    prof_obj = req.profile or Profile()
+    try:
+        # profile extra fields also supported (Config extra=allow)
+        mode = mode or getattr(prof_obj, "analysis_mode", None) or getattr(prof_obj, "mode", None)
+        is_premium = getattr(prof_obj, "is_premium", None)
+        if mode is None and isinstance(is_premium, bool):
+            mode = "premium" if is_premium else "quick"
+    except:
+        pass
+
+    mode_s = str(mode or "quick").strip().lower()
+    if mode_s in ("premium", "pro", "detailed"):
+        mode_s = "premium"
+    elif mode_s in ("quick", "fast", "normal", "hizli", "hızlı"):
+        mode_s = "quick"
+    else:
+        mode_s = "quick"
+
+    # -------------------------
+    # Build per-side AnalyzeRequest
+    # -------------------------
+    left_req = AnalyzeRequest(
+        profile=prof_obj,
+        vehicle=req.left.vehicle,
+        ad_description=req.left.ad_description,
+        screenshots_base64=req.left.screenshots_base64,
+        context={"compare_side": "left"},
+    )
+    right_req = AnalyzeRequest(
+        profile=prof_obj,
+        vehicle=req.right.vehicle,
+        ad_description=req.right.ad_description,
+        screenshots_base64=req.right.screenshots_base64,
+        context={"compare_side": "right"},
+    )
+
+    # -------------------------
+    # Produce reports
+    # -------------------------
+    if mode_s == "premium":
+        left_report = premium_analyze_impl(left_req)
+        right_report = premium_analyze_impl(right_req)
+    else:
+        left_report = quick_analyze_impl(left_req)
+        right_report = quick_analyze_impl(right_req)
+
+    def _overall(rep: Dict[str, Any]) -> int:
+        try:
+            return int(((rep.get("scores") or {}).get("overall_100")) or 0)
+        except:
+            return 0
+
+    left_overall = _overall(left_report)
+    right_overall = _overall(right_report)
+
+    # tie-breaker: personal_fit if exists (premium), else economy_100 (quick uses economy_100=parts_service_100)
+    def _tiebreak(rep: Dict[str, Any]) -> int:
+        sc = rep.get("scores") or {}
+        for k in ("personal_fit_100", "economy_100", "mechanical_100", "body_100"):
+            v = sc.get(k)
+            if isinstance(v, int):
+                return v
+        return 0
+
+    if left_overall > right_overall:
+        better = "left"
+    elif right_overall > left_overall:
+        better = "right"
+    else:
+        better = "left" if _tiebreak(left_report) >= _tiebreak(right_report) else "right"
+
+    # -------------------------
+    # Optional LLM compare summary (keeps old behavior, but now includes reports)
+    # -------------------------
     left_v = req.left.vehicle
     right_v = req.right.vehicle
+
     payload = {
-        "left": {"vehicle": left_v.dict(), "ad_description": req.left.ad_description or ""},
-        "right": {"vehicle": right_v.dict(), "ad_description": req.right.ad_description or ""},
-        "profile": req.profile.dict() if req.profile else None,
+        "mode": mode_s,
+        "left": {
+            "vehicle": left_v.dict(),
+            "ad_description": req.left.ad_description or "",
+            "scores": left_report.get("scores", {}),
+            "summary": left_report.get("summary", {}),
+        },
+        "right": {
+            "vehicle": right_v.dict(),
+            "ad_description": req.right.ad_description or "",
+            "scores": right_report.get("scores", {}),
+            "summary": right_report.get("summary", {}),
+        },
+        "profile": prof_obj.dict(),
+        "rule": "Bütçe/kullanım amacı/şehir içi-uzun yol gibi profil verilerini dikkate al; kesin hüküm verme; Türkçe ve net yaz."
     }
+
     out = call_llm_json(OPENAI_MODEL_COMPARE, SYSTEM_PROMPT_COMPARE, json.dumps(payload, ensure_ascii=False))
+
     if isinstance(out, dict):
+        # ensure winner aligns with deterministic scores if model returns something else
+        out["better_overall"] = out.get("better_overall") or better
+        out["mode"] = mode_s
+        out["left_report"] = left_report
+        out["right_report"] = right_report
+        out["left_overall_100"] = left_overall
+        out["right_overall_100"] = right_overall
         return out
 
+    # deterministic fallback (no LLM)
+    left_title = f"{left_v.year or ''} {left_v.make} {left_v.model}".strip()
+    right_title = f"{right_v.year or ''} {right_v.make} {right_v.model}".strip()
+
+    def _short(rep: Dict[str, Any]) -> str:
+        s = rep.get("summary") or {}
+        if isinstance(s, dict):
+            return (s.get("short_comment") or "").strip()
+        return ""
+
+    summary = (
+        f"Karşılaştırma modu: **{('Premium' if mode_s=='premium' else 'Hızlı')}**. "
+        f"Genel skor: Sol **{left_overall}/100**, Sağ **{right_overall}/100**. "
+        f"Öneri (genel): **{('Sol' if better=='left' else 'Sağ')}** taraf daha dengeli görünüyor."
+    )
+
     return {
-        "better_overall": "left",
-        "summary": "İki araç için de ekspertiz ve tramer şart. Sol taraf varsayılan olarak daha dengeli kabul edildi.",
-        "left_pros": ["Genel masraf/likidite dengesi daha öngörülebilir olabilir."],
-        "left_cons": ["Kesin sonuç için ekspertiz + tramer gerekli."],
-        "right_pros": ["Doğru bakım geçmişiyle mantıklı bir alternatif olabilir."],
-        "right_cons": ["Masraf/risk tarafında daha dikkatli inceleme gerektirebilir."],
+        "mode": mode_s,
+        "better_overall": better,
+        "summary": summary,
+        "left_pros": (left_report.get("summary", {}) or {}).get("pros", []) if isinstance(left_report.get("summary"), dict) else [],
+        "left_cons": (left_report.get("summary", {}) or {}).get("cons", []) if isinstance(left_report.get("summary"), dict) else [],
+        "right_pros": (right_report.get("summary", {}) or {}).get("pros", []) if isinstance(right_report.get("summary"), dict) else [],
+        "right_cons": (right_report.get("summary", {}) or {}).get("cons", []) if isinstance(right_report.get("summary"), dict) else [],
         "use_cases": {
-            "family_use": "Aile kullanımı için sol taraf varsayımsal olarak daha avantajlı kabul edildi.",
-            "long_distance": "Her iki araç da düzenli bakım ile uzun yolda kullanılabilir.",
-            "city_use": "Şehir içinde şanzıman tipi ve tüketim belirleyici olur."
-        }
+            "family_use": "Aile kullanımı için iç hacim/konfor ve masraf bandı birlikte düşünülmeli.",
+            "long_distance": "Uzun yolda tüketim + bakım disiplini belirleyicidir; test sürüşü ve servis kaydı kritik.",
+            "city_use": "Şehir içinde vites tipi ve yakıt tercihi (özellikle dizel/DPF) daha kritik hale gelir.",
+        },
+        "left_report": left_report,
+        "right_report": right_report,
+        "left_overall_100": left_overall,
+        "right_overall_100": right_overall,
+        "left_title": left_title,
+        "right_title": right_title,
     }
 
 
