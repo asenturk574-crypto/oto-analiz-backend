@@ -2490,3 +2490,79 @@ if __name__ == "__main__":
     # Lokal çalıştırma için:
     # uvicorn main:app --host 0.0.0.0 --port 8000 --reload
     pass
+
+# =========================
+# Compare Analyze (Quick / Premium Switch)
+# =========================
+@app.post("/compare_analyze")
+async def compare_analyze(req: CompareRequest) -> Dict[str, Any]:
+    # switch: quick | premium (Flutter'dan profile içine gelebilir)
+    analysis_type = None
+    try:
+        if req.profile:
+            analysis_type = req.profile.dict().get("analysis_type")
+    except Exception:
+        analysis_type = None
+    analysis_type = (analysis_type or "quick").lower().strip()
+
+    profile = req.profile or Profile()
+
+    left_req = AnalyzeRequest(
+        profile=profile,
+        vehicle=req.left.vehicle,
+        ad_description=getattr(req.left, "ad_description", None),
+        screenshots_base64=getattr(req.left, "screenshots_base64", None),
+    )
+
+    right_req = AnalyzeRequest(
+        profile=profile,
+        vehicle=req.right.vehicle,
+        ad_description=getattr(req.right, "ad_description", None),
+        screenshots_base64=getattr(req.right, "screenshots_base64", None),
+    )
+
+    if analysis_type == "premium":
+        left_result = premium_analyze_impl(left_req)
+        right_result = premium_analyze_impl(right_req)
+
+        left_score = left_result["scores"]["overall_100"]
+        right_score = right_result["scores"]["overall_100"]
+        left_fit = left_result["scores"].get("personal_fit_100", left_score)
+        right_fit = right_result["scores"].get("personal_fit_100", right_score)
+    else:
+        left_result = quick_analyze_impl(left_req)
+        right_result = quick_analyze_impl(right_req)
+
+        left_score = left_result["scores"]["overall_100"]
+        right_score = right_result["scores"]["overall_100"]
+        left_fit = _fit_score(left_req, build_enriched_context(left_req))
+        right_fit = _fit_score(right_req, build_enriched_context(right_req))
+
+    final_left = int((left_score * 0.6) + (left_fit * 0.4))
+    final_right = int((right_score * 0.6) + (right_fit * 0.4))
+
+    better = "left" if final_left >= final_right else "right"
+
+    summary = (
+        f"Kullanım profiline göre "
+        f"{'sol' if better=='left' else 'sağ'} araç daha uygun görünüyor. "
+        f"(Genel skor + kişiye uygunluk birlikte değerlendirildi)"
+    )
+
+    return {
+        "analysis_type": analysis_type,
+        "better_overall": better,
+        "scores": {
+            "left": {
+                "overall_100": left_score,
+                "personal_fit_100": final_left,
+            },
+            "right": {
+                "overall_100": right_score,
+                "personal_fit_100": final_right,
+            },
+        },
+        "left": left_result,
+        "right": right_result,
+        "summary": summary,
+    }
