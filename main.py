@@ -446,6 +446,59 @@ def _resolve_plate_city_code(req: AnalyzeRequest) -> str:
 
     # 2) profile.city_code
     p = req.profile or Profile()
+
+    # -------------------------
+    # Human-friendly TR mappings (UI readability)
+    # -------------------------
+    def _tr_usage(u: str) -> str:
+        u0 = (u or "").strip().lower()
+        if u0 in ("city", "şehir", "sehir", "şehir içi", "sehir ici"):
+            return "Şehir içi"
+        if u0 in ("highway", "uzun yol", "long", "longtrip"):
+            return "Uzun yol"
+        if u0 in ("mixed", "karma", "karışık"):
+            return "Karma"
+        return (u or "Karma").strip()
+
+    def _tr_trans_pref(t: str) -> str:
+        t0 = (t or "").strip().lower()
+        if t0 in ("any", "farketmez", "fark etmez", ""):
+            return "Fark etmez"
+        if t0 in ("auto", "automatic", "otomatik"):
+            return "Otomatik"
+        if t0 in ("manual", "man", "manuel"):
+            return "Manuel"
+        return (t or "Fark etmez").strip()
+
+    def _clean_kronik_items(items: List[str]) -> List[str]:
+        """Yakıt/vites ile çelişen maddeleri ayıkla (DPF/EGR sadece dizel gibi)."""
+        out: List[str] = []
+        for it in (items or []):
+            s = (it or "").lower()
+            if not s.strip():
+                continue
+            # yakıt çelişkileri
+            if (not is_diesel) and ("dpf" in s or "egr" in s or "dizel" in s):
+                continue
+            if (v.fuel or "").lower() != "lpg" and "lpg" in s:
+                continue
+            # şanzıman çelişkileri
+            if is_manual and ("dsg" in s or "otomatik" in s or "tork" in s or "cvt" in s):
+                continue
+            if is_auto and ("debriyaj" in s or "volan" in s or "baskı" in s):
+                continue
+            out.append(_one_line(it))
+        # tekrarları kırp
+        dedup: List[str] = []
+        seen = set()
+        for x in out:
+            k = x.lower()
+            if k in seen:
+                continue
+            seen.add(k)
+            dedup.append(x)
+        return dedup
+
     code = _zfill_plate(getattr(p, "city_code", None))
     if code:
         return code
@@ -2149,6 +2202,7 @@ def build_premium_template(req: AnalyzeRequest, enriched: Dict[str, Any]) -> Dic
     mech_expl = []
     mech_expl.append("**Mekanik:**")
     mech_expl.append("Bu skor, motor/aktarma + kilometre bandı + bakım disiplini varsayımıyla hesaplanır.")
+    mech_expl.append("İlanda **bakım kaydı netse** (yağ değişim aralığı, ağır bakım/filtreler), skor pratikte yukarı taşınır; kayıt yoksa aynı araçta skor aşağı iner.")
     if v.mileage_km:
         mech_expl.append(f"Mevcut kilometre: **{_fmt_int(v.mileage_km)} km** — bu bantta kararın kaderi *geçmiş kayıtlar* ve *expertiz* olur.")
     if triggers:
@@ -2238,7 +2292,7 @@ def build_premium_template(req: AnalyzeRequest, enriched: Dict[str, Any]) -> Dic
         pass
 
     sec2.append("")
-    sec2.append(f"Bu band; **{_fmt_int(yearly_km) if yearly_km else 'varsayılan'} km/yıl**, kullanım: **{p.usage}** varsayımıyla hesaplanır.")
+    sec2.append(f"Bu band; **{_fmt_int(yearly_km) if yearly_km else 'varsayılan'} km/yıl**, kullanım: **{_tr_usage(p.usage)}** varsayımıyla hesaplanır.")
 
     # 3) Risk
     sec3 = []
@@ -2249,6 +2303,29 @@ def build_premium_template(req: AnalyzeRequest, enriched: Dict[str, Any]) -> Dic
     for rl in risk_lines[:4]:
         sec3.append(f"- {rl}")
 
+    # Araç özel 'kronik' / hassasiyet listesi (varsa)
+    kronikler = _clean_kronik_items(risk.get("risk_patterns") or [])
+    if kronikler:
+        sec3.append("")
+        sec3.append("Kronik / bilinen hassasiyetler (tahmini):")
+        for k in kronikler[:6]:
+            sec3.append(f"- {k}")
+    buyuk_bakim = _clean_kronik_items(risk.get("maintenance_watchlist") or [])
+    if buyuk_bakim:
+        sec3.append("")
+        sec3.append("Büyük bakım kalemleri (yaklaşık, planla):")
+        for b in buyuk_bakim[:6]:
+            sec3.append(f"- {b}")
+
+    # Mini: kullanım senaryosu etkisi (2 satır)
+    sec3.append("")
+    sec3.append("✅ Kullanım senaryosu etkisi (mini):")
+    if is_diesel and usage_s in ("city", "şehir", "sehir"):
+        sec3.append("Şehir içi kısa mesafe arttıkça DPF/EGR hassasiyeti yükselir; uzun yol oranı arttıkça bu risk belirgin şekilde rahatlar.")
+    elif is_manual and (city_name or "").lower().startswith("istan"):
+        sec3.append("Yoğun trafikte manuel vites yorgunluk maliyetini büyütür; kullanımın uzun yol tarafı güçlendikçe bu etki azalır.")
+    else:
+        sec3.append("Kullanım profili 'karma/uzun yol'a yaklaştıkça ısıl yük ve kurumlanma baskısı azalır; şehir içi oranı yükseldikçe küçük sorunlar daha görünür olur.")
     # 4) Parts/service & market as scored table
     sec4 = []
     sec4.append("\n4) Parça, Servis & Piyasa Durumu")
@@ -2267,9 +2344,9 @@ def build_premium_template(req: AnalyzeRequest, enriched: Dict[str, Any]) -> Dic
     sec5.append(f"- Yıllık km: **{_fmt_int(yearly_km)}**")
     if city_name:
         sec5.append(f"- Şehir: **{city_name}**")
-    sec5.append(f"- Kullanım: **{p.usage}**")
+    sec5.append(f"- Kullanım: **{_tr_usage(p.usage)}**")
     sec5.append(f"- Yakıt tercihi: **{p.fuel_preference}**")
-    sec5.append(f"- Vites tercihi: **{p.transmission_preference or 'any'}**")
+    sec5.append(f"- Vites tercihi: **{_tr_trans_pref(p.transmission_preference or 'any')}**")
     sec5.append("")
     sec5.append(f"Uygunluk değerlendirmesi: **{('Yüksek' if personal_fit_score>=80 else 'Orta' if personal_fit_score>=60 else 'Düşük')}** ({personal_fit_score}/100)")
     sec5.append("")
@@ -2333,17 +2410,18 @@ def build_premium_template(req: AnalyzeRequest, enriched: Dict[str, Any]) -> Dic
         if level:
             header.append(f"Bilgi Seviyesi: {level}")
     result_parts.append("\n".join(header))
-    result_parts.append("\n0) Genel Karar Özeti (tek bakış)")
+    result_parts.append("\n---\n")
+    result_parts.append("0) Genel Karar Özeti (tek bakış)")
     result_parts.extend(snapshot_lines)
     result_parts.append("\n" + _one_line("Bu araç; ilan bilgileri + segment verileri + kullanıcı profili birlikte değerlendirilerek konumlandırılmıştır."))
-    result_parts.append("\n" + "\n".join(sec1))
-    result_parts.append("\n" + "\n".join(sec2))
-    result_parts.append("\n" + "\n".join(sec3))
-    result_parts.append("\n" + "\n".join(sec4))
-    result_parts.append("\n" + "\n".join(sec5))
-    result_parts.append("\n" + "\n".join(sec6))
-    result_parts.append("\n" + "\n".join(sec7))
-    result_parts.append("\n" + "\n".join(sec8))
+    result_parts.append("\n---\n" + "\n".join(sec1))
+    result_parts.append("\n---\n" + "\n".join(sec2))
+    result_parts.append("\n---\n" + "\n".join(sec3))
+    result_parts.append("\n---\n" + "\n".join(sec4))
+    result_parts.append("\n---\n" + "\n".join(sec5))
+    result_parts.append("\n---\n" + "\n".join(sec6))
+    result_parts.append("\n---\n" + "\n".join(sec7))
+    result_parts.append("\n---\n" + "\n".join(sec8))
 
     result_text = "\n".join(result_parts).strip()
 
