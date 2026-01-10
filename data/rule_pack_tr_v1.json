@@ -1,0 +1,442 @@
+{
+  "meta": {
+    "name": "tr_rule_pack_v1",
+    "created_date": "2026-01-09",
+    "purpose": "Heuristic rules to improve premium analysis consistency without scraping. Designed for Turkish market context.",
+    "notes": [
+      "Rules are optional enrichments; they should never override explicit listing facts.",
+      "Use triggers + confidence + allow/deny lists to avoid generic/geveleme output."
+    ]
+  },
+  "normalization": {
+    "fuel_aliases": {
+      "diesel": [
+        "dizel",
+        "diesel",
+        "d"
+      ],
+      "petrol": [
+        "benzin",
+        "petrol",
+        "gasoline",
+        "b"
+      ],
+      "lpg": [
+        "lpg",
+        "tüp",
+        "tup",
+        "otogaz"
+      ],
+      "hybrid": [
+        "hibrit",
+        "hybrid"
+      ],
+      "electric": [
+        "elektrik",
+        "electric",
+        "ev"
+      ]
+    },
+    "transmission_aliases": {
+      "manual": [
+        "manuel",
+        "manual",
+        "m"
+      ],
+      "auto_torque_converter": [
+        "tork konvertör",
+        "torque converter",
+        "tc"
+      ],
+      "dsg": [
+        "dsg",
+        "dq200",
+        "dq250",
+        "s tronic",
+        "s-tronic",
+        "stronic"
+      ],
+      "cvt": [
+        "cvt"
+      ],
+      "powershift": [
+        "powershift"
+      ],
+      "amt": [
+        "robot",
+        "robotize",
+        "amt",
+        "mmt",
+        "easytronic",
+        "dualogue"
+      ]
+    }
+  },
+  "guardrails": {
+    "forbidden_suggestions": [
+      {
+        "id": "no_lpg_for_diesel",
+        "when": {
+          "fuel": [
+            "diesel"
+          ]
+        },
+        "forbid_contains": [
+          "lpg",
+          "tüp",
+          "tup",
+          "otogaz"
+        ],
+        "replacement_note": "Dizel motorlarda LPG dönüşümü standart/uyumlu bir çözüm değildir; bunun yerine DPF/EGR/turbo/enjektör ve kısa mesafe kullanım risklerine odaklan."
+      },
+      {
+        "id": "no_fuel_tips_for_ev",
+        "when": {
+          "fuel": [
+            "electric"
+          ]
+        },
+        "forbid_contains": [
+          "yakıt",
+          "dizel",
+          "benzin",
+          "lpg",
+          "tüp",
+          "otogaz"
+        ],
+        "replacement_note": "Elektrikli araçlarda yakıt yerine batarya sağlığı/menzil/şarj altyapısı ve garanti koşullarına odaklan."
+      }
+    ],
+    "anti_geveleme": {
+      "only_write_if_triggered": true,
+      "max_generic_advice_items": 3,
+      "require_reason_tag_per_advice": true
+    }
+  },
+  "market_liquidity": {
+    "levels": [
+      "fast",
+      "medium",
+      "slow"
+    ],
+    "rules": [
+      {
+        "id": "fast_mass_market",
+        "if": {
+          "brand_in": [
+            "fiat",
+            "renault",
+            "toyota",
+            "hyundai",
+            "ford",
+            "volkswagen",
+            "opel",
+            "peugeot",
+            "citroen"
+          ],
+          "segment_in": [
+            "B",
+            "C"
+          ],
+          "engine_displacement_lte": 1.6
+        },
+        "then": {
+          "liquidity": "fast",
+          "confidence": 0.7
+        },
+        "reason": "Yaygın marka + B/C segment + küçük motor kombinasyonları Türkiye'de genelde daha hızlı alıcı bulur."
+      },
+      {
+        "id": "medium_premium",
+        "if": {
+          "brand_in": [
+            "bmw",
+            "mercedes",
+            "audi",
+            "volvo",
+            "mini"
+          ],
+          "segment_in": [
+            "C",
+            "D",
+            "E"
+          ]
+        },
+        "then": {
+          "liquidity": "medium",
+          "confidence": 0.65
+        },
+        "reason": "Premium araçlarda alıcı daha seçici; fiyat/ekspertiz doğruysa satış hızı artar."
+      },
+      {
+        "id": "slow_niche_or_large_engine",
+        "if": {
+          "engine_displacement_gte": 2.0,
+          "segment_in": [
+            "D",
+            "E",
+            "SUV_LARGE",
+            "MPV_LARGE"
+          ]
+        },
+        "then": {
+          "liquidity": "slow",
+          "confidence": 0.6
+        },
+        "reason": "Büyük motor/vergiler ve masraf algısı satış hızını düşürür."
+      }
+    ],
+    "fallback": {
+      "liquidity": "medium",
+      "confidence": 0.4,
+      "reason": "Yeterli sinyal yok; nötr varsayım."
+    }
+  },
+  "parts_availability": {
+    "levels": [
+      "very_easy",
+      "easy",
+      "medium",
+      "hard"
+    ],
+    "brand_baseline": {
+      "fiat": "very_easy",
+      "renault": "very_easy",
+      "toyota": "easy",
+      "hyundai": "easy",
+      "volkswagen": "easy",
+      "ford": "easy",
+      "opel": "easy",
+      "peugeot": "easy",
+      "citroen": "easy",
+      "honda": "medium",
+      "mazda": "medium",
+      "bmw": "medium",
+      "mercedes": "medium",
+      "audi": "medium",
+      "volvo": "medium",
+      "jaguar": "hard",
+      "land_rover": "hard",
+      "subaru": "hard",
+      "alfa_romeo": "hard"
+    },
+    "adjustments": [
+      {
+        "id": "older_vehicle_harder_parts",
+        "if": {
+          "vehicle_age_gte": 12
+        },
+        "then": {
+          "delta_level": 1,
+          "confidence": 0.55
+        },
+        "reason": "Yaş arttıkça bazı parçaların tedariki ve muadil kalitesi değişebilir."
+      }
+    ],
+    "fallback": {
+      "level": "medium",
+      "confidence": 0.4,
+      "reason": "Marka bilinmiyor veya eşleşmedi."
+    }
+  },
+  "chronic_issues": {
+    "issue_library": {
+      "diesel_city_short_use": {
+        "title": "DPF/EGR birikimi riski",
+        "triggers": {
+          "fuel": [
+            "diesel"
+          ],
+          "usage_city_ratio_gte": 0.6,
+          "annual_km_lte": 15000
+        },
+        "risk_level": "medium",
+        "cost_band_try": {
+          "min": 10000,
+          "likely": 25000,
+          "max": 60000
+        },
+        "checks": [
+          "OBD hata kodu taraması",
+          "DPF doluluk/regen geçmişi",
+          "çekiş/duman kontrolü"
+        ],
+        "notes": [
+          "Kısa mesafe ve sık dur-kalk kullanımında risk artar."
+        ]
+      },
+      "dsg_clutch": {
+        "title": "DSG kavrama/mekatronik hassasiyeti",
+        "triggers": {
+          "transmission": [
+            "dsg"
+          ]
+        },
+        "risk_level": "medium",
+        "cost_band_try": {
+          "min": 15000,
+          "likely": 35000,
+          "max": 90000
+        },
+        "checks": [
+          "kalkış titreme",
+          "vites geçiş vuruntu",
+          "OBD/TCU hata kodları",
+          "yağ bakım geçmişi"
+        ]
+      },
+      "cvt_belt_oil": {
+        "title": "CVT yağ/bant-kayış hassasiyeti",
+        "triggers": {
+          "transmission": [
+            "cvt"
+          ]
+        },
+        "risk_level": "medium",
+        "cost_band_try": {
+          "min": 12000,
+          "likely": 30000,
+          "max": 80000
+        },
+        "checks": [
+          "yokuşta kayma",
+          "devir dalgalanması",
+          "yağ değişim geçmişi"
+        ]
+      },
+      "powershift_clutch": {
+        "title": "Powershift kavrama hassasiyeti",
+        "triggers": {
+          "transmission": [
+            "powershift"
+          ]
+        },
+        "risk_level": "high",
+        "cost_band_try": {
+          "min": 20000,
+          "likely": 45000,
+          "max": 120000
+        },
+        "checks": [
+          "kalkış titreme",
+          "vites geçişlerinde vuruntu",
+          "arıza kaydı",
+          "yağ/kalibrasyon geçmişi"
+        ]
+      }
+    },
+    "policy": {
+      "max_issues_to_show": 4,
+      "prefer_high_risk_first": true,
+      "suppress_if_no_trigger": true,
+      "show_confidence": true
+    }
+  },
+  "service_reality_notes": {
+    "rules": [
+      {
+        "id": "premium_requires_specialist",
+        "if": {
+          "brand_in": [
+            "bmw",
+            "mercedes",
+            "audi",
+            "volvo",
+            "mini",
+            "jaguar",
+            "land_rover"
+          ]
+        },
+        "then": {
+          "note": "Premium sınıfta doğru usta/servis seçimi maliyeti ve arıza tekrarını ciddi etkiler.",
+          "confidence": 0.65
+        }
+      },
+      {
+        "id": "rare_brand_wait_time",
+        "if": {
+          "brand_in": [
+            "jaguar",
+            "land_rover",
+            "subaru",
+            "alfa_romeo"
+          ]
+        },
+        "then": {
+          "note": "Nispeten nadir markalarda parça bekleme ve servis randevu süreleri uzayabilir.",
+          "confidence": 0.6
+        }
+      }
+    ]
+  },
+  "scoring": {
+    "calibration": {
+      "base_score_by_segment": {
+        "A": 74,
+        "B": 77,
+        "C": 78,
+        "D": 79,
+        "E": 80,
+        "SUV_SMALL": 78,
+        "SUV_MEDIUM": 79,
+        "SUV_LARGE": 78
+      },
+      "clamp_min": 30,
+      "clamp_max": 92
+    },
+    "adjustments": [
+      {
+        "id": "parts_very_easy",
+        "if": {
+          "parts_level": "very_easy"
+        },
+        "delta": 4
+      },
+      {
+        "id": "parts_easy",
+        "if": {
+          "parts_level": "easy"
+        },
+        "delta": 2
+      },
+      {
+        "id": "parts_hard",
+        "if": {
+          "parts_level": "hard"
+        },
+        "delta": -4
+      },
+      {
+        "id": "market_fast",
+        "if": {
+          "market_liquidity": "fast"
+        },
+        "delta": 3
+      },
+      {
+        "id": "market_slow",
+        "if": {
+          "market_liquidity": "slow"
+        },
+        "delta": -3
+      },
+      {
+        "id": "high_risk_issue_present",
+        "if": {
+          "chronic_risk_max": "high"
+        },
+        "delta": -6
+      },
+      {
+        "id": "medium_risk_issue_present",
+        "if": {
+          "chronic_risk_max": "medium"
+        },
+        "delta": -3
+      }
+    ],
+    "explainability": {
+      "max_reasons": 6
+    }
+  }
+}
