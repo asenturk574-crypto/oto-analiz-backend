@@ -3039,10 +3039,19 @@ async def root() -> Dict[str, Any]:
 # =========================================================
 
 class CoverRequest(BaseModel):
-    brand: str = Field(..., description="e.g. Audi")
-    model: str = Field(..., description="e.g. A3")
-    body: Optional[str] = Field(None, description="optional body type")
+    brand: str = Field(..., description="e.g. Ford")
+    model: str = Field(..., description="e.g. Focus")
+    body: Optional[str] = Field(None, description="optional body type (hatchback/sedan/suv)")
     generation: Optional[str] = Field(None, description="optional generation, e.g. 2016-2020")
+
+    # ✅ İstersen cache'i araca göre değil, post/analysis'a göre sabitle:
+    # örn: analysisId'yi buraya gönder -> aynı id ile tekrar çağrılınca yeniden çizmez.
+    cache_key: Optional[str] = Field(None, description="optional stable cache key (e.g. analysisId)")
+
+    # ✅ Prompt'u biraz daha tutarlı yapmak için opsiyonel ipuçları
+    year: Optional[int] = Field(None, ge=1980, le=2035)
+    color: Optional[str] = Field(None, description="optional color hint, e.g. white/black/blue")
+
     force_regenerate: bool = Field(False, description="ignore cache and regenerate")
 
 
@@ -3052,13 +3061,21 @@ class CoverResponse(BaseModel):
     cached: bool
 
 
+def _safe_doc_id(raw: str) -> str:
+    """Firebase doc id için stabil + güvenli string."""
+    s = (raw or "").strip().lower()
+    s = re.sub(r"\s+", "-", s)
+    # izin ver: a-z 0-9 - _ |
+    s = re.sub(r"[^a-z0-9\-_|]", "", s)
+    return s or "unknown"
+
+
 def _cover_key(brand: str, model: str, body: Optional[str] = None, generation: Optional[str] = None) -> str:
     parts = [brand.strip().lower(), model.strip().lower()]
     if body:
         parts.append(body.strip().lower())
     if generation:
         parts.append(generation.strip().lower())
-    # Firebase doc id için güvenli karakter
     key = "|".join([re.sub(r"\s+", "-", p) for p in parts if p])
     key = re.sub(r"[^a-z0-9\-|_]", "", key)
     return key or "unknown"
@@ -3129,14 +3146,39 @@ def _firebase_upload_cover_bytes(cover_key: str, image_bytes: bytes, content_typ
     return url
 
 
-def _generate_vehicle_image_bytes(brand: str, model: str) -> bytes:
-    """Generates a *representative* image (no logos/badges). Falls back to a simple PIL cover if OpenAI image isn't available."""
+def _generate_vehicle_image_bytes(
+    brand: str,
+    model: str,
+    body: Optional[str] = None,
+    year: Optional[int] = None,
+    color: Optional[str] = None,
+) -> bytes:
+    """Temsili araç kapak görseli üretir (logo/badge yok).
+
+    Öncelik:
+    1) OpenAI Images (gpt-image-1.5) ile üret
+    2) OpenAI yoksa basit PIL fallback cover üret
+    """
+
+    body_hint = (body or "").strip()
+    year_hint = f" {int(year)}" if isinstance(year, int) else ""
+    color_hint = (color or "").strip()
+
+    # Daha tutarlı bir prompt: gövde tipi + yıl + renk ipucu
+    base_desc = "a compact car"
+    if body_hint:
+        # hatchback/sedan/suv gibi ifadeleri direkt kullanalım
+        base_desc = f"a {body_hint} car"
+
+    color_line = f"Primary color: {color_hint}. " if color_hint else ""
+
     # 1) Try OpenAI image API if available
     if client is not None:
         try:
             image_model = os.getenv("OPENAI_IMAGE_MODEL", "gpt-image-1.5")
             prompt = (
-                f"A photorealistic studio image of a compact car in the class of a {brand} {model}. "
+                f"A photorealistic studio image of {base_desc} in the class of a {brand} {model}{year_hint}. "
+                f"{color_line}"
                 "No visible logos, no badges, no brand text, no license plate text. "
                 "Front 3/4 angle, neutral dark background, crisp lighting, high detail."
             )
@@ -3147,32 +3189,45 @@ def _generate_vehicle_image_bytes(brand: str, model: str) -> bytes:
                 size=os.getenv("OPENAI_IMAGE_SIZE", "1024x1024"),
                 quality=os.getenv("OPENAI_IMAGE_QUALITY", "medium"),
                 output_format=os.getenv("OPENAI_IMAGE_FORMAT", "webp"),
-                output_compression=int(os.getenv("OPENAI_IMAGE_COMPRESSION", "90")),
             )
-            b64 = img.data[0].b64_json
-            return base64.b64decode(b64)
-        except Exception:
-            # fall through to PIL fallback
-            pass
 
-    # 2) PIL fallback (always works if PIL installed)
-    if Image is None or ImageDraw is None or ImageFont is None:
-        raise HTTPException(status_code=500, detail="image_generation_unavailable: install pillow or set OPENAI_API_KEY")
+            # OpenAI Python SDK: image b64 çıktı
+            b64 = None
+            try:
+                b64 = img.data[0].b64_json  # type: ignore
+            except Exception:
+                b64 = None
+
+            if b64:
+                return base64.b64decode(b64)
+        except Exception as e:
+            # continue to PIL fallback
+            print("cover image generation failed:", e)
+
+    # 2) PIL fallback (simple cover)
+    if Image is None or ImageDraw is None:
+        raise HTTPException(status_code=500, detail="PIL_not_available_for_cover_fallback")
 
     W, H = 1024, 1024
-    im = Image.new("RGB", (W, H), (14, 18, 28))
+    im = Image.new("RGB", (W, H), color=(18, 20, 26))
     draw = ImageDraw.Draw(im)
 
-    title = f"{brand} {model}".strip()
+    title = f"{brand} {model}"
+    if isinstance(year, int):
+        title = f"{brand} {model} {year}"
+
     try:
-        font = ImageFont.truetype("DejaVuSans-Bold.ttf", 96)
+        font = ImageFont.truetype("DejaVuSans-Bold.ttf", 92)
         font2 = ImageFont.truetype("DejaVuSans.ttf", 36)
     except Exception:
         font = ImageFont.load_default()
         font2 = ImageFont.load_default()
 
     draw.text((64, 120), title, font=font, fill=(240, 240, 240))
-    draw.text((64, 240), "Temsili Kapak (foto yok)", font=font2, fill=(180, 190, 210))
+    if body_hint or color_hint:
+        draw.text((64, 240), f"{(body_hint or '').upper()} {color_hint}".strip(), font=font2, fill=(180, 190, 210))
+    draw.text((64, 300), "Temsili Kapak (foto yok)", font=font2, fill=(180, 190, 210))
+
     buf = BytesIO()
     im.save(buf, format="WEBP", quality=90)
     return buf.getvalue()
@@ -3223,7 +3278,7 @@ async def get_or_create_cover(req: CoverRequest) -> Dict[str, Any]:
     if not brand or not model:
         raise HTTPException(status_code=400, detail="brand_and_model_required")
 
-    ck = _cover_key(brand, model, req.body, req.generation)
+    ck = _safe_doc_id(req.cache_key) if (getattr(req, 'cache_key', None) or '').strip() else _cover_key(brand, model, req.body, req.generation)
     doc = _firebase_cover_doc(ck)
 
     if not req.force_regenerate:
@@ -3239,7 +3294,7 @@ async def get_or_create_cover(req: CoverRequest) -> Dict[str, Any]:
             pass
 
     # Generate + watermark + upload + cache
-    raw = _generate_vehicle_image_bytes(brand, model)
+    raw = _generate_vehicle_image_bytes(brand, model, body=req.body, year=getattr(req, 'year', None), color=getattr(req, 'color', None))
     watermarked = _apply_watermark(raw, watermark_text=os.getenv("COVER_WATERMARK_TEXT", "Oto Analiz"))
 
     url = _firebase_upload_cover_bytes(ck, watermarked, content_type="image/webp")
@@ -3250,6 +3305,9 @@ async def get_or_create_cover(req: CoverRequest) -> Dict[str, Any]:
                 "model": model,
                 "body": req.body,
                 "generation": req.generation,
+                "cache_key": getattr(req, "cache_key", None),
+                "year": getattr(req, "year", None),
+                "color": getattr(req, "color", None),
                 "imageUrl": url,
                 "promptVersion": int(os.getenv("COVER_PROMPT_VERSION", "1")),
                 "watermark": os.getenv("COVER_WATERMARK_TEXT", "Oto Analiz"),
