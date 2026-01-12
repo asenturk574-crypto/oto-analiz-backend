@@ -8,6 +8,7 @@ import base64
 import uuid
 from io import BytesIO
 from urllib.parse import quote as urlquote
+import requests
 
 
 from fastapi import FastAPI, HTTPException
@@ -3039,24 +3040,17 @@ async def root() -> Dict[str, Any]:
 # =========================================================
 
 class CoverRequest(BaseModel):
-    # Required
-    brand: str = Field(..., description="e.g. BMW")
-    model: str = Field(..., description="e.g. 3 Series (F30)")
-
-    # Optional params (all optional so older clients won't break)
-    cache_key: Optional[str] = Field(
-        None,
-        description="Optional custom cache key. If provided, overrides auto-generated coverKey.",
-    )
-    body: Optional[str] = Field(None, description="Optional body type (sedan, hatchback, suv, ...)")
-    generation: Optional[str] = Field(None, description="Optional generation / year hint (e.g. 2016 or 2016-2020)")
-    year: Optional[int] = Field(None, description="Optional single model year (alias for generation)")
-    color: Optional[str] = Field(None, description="Optional color hint (black, white, silver, ...)")
-    force_regenerate: bool = Field(False, description="Ignore cache and regenerate")
+    brand: str = Field(..., description="e.g. Audi")
+    model: str = Field(..., description="e.g. A3")
+    body: Optional[str] = Field(None, description="optional body type")
+    generation: Optional[str] = Field(None, description="optional generation, e.g. 2016-2020")
+    year: Optional[int] = Field(None, description="optional model year, e.g. 2016")
+    color: Optional[str] = Field(None, description="optional color, e.g. black")
+    cache_key: Optional[str] = Field(None, description="optional custom cache key (doc id)")
+    force_regenerate: bool = Field(False, description="ignore cache and regenerate")
 
 
 class CoverResponse(BaseModel):
-
     coverKey: str
     imageUrl: str
     cached: bool
@@ -3067,26 +3061,98 @@ def _cover_key(
     model: str,
     body: Optional[str] = None,
     generation: Optional[str] = None,
+    year: Optional[int] = None,
+    color: Optional[str] = None,
     cache_key: Optional[str] = None,
 ) -> str:
-    # If client provided a cache_key, use it (sanitized) so repeated calls re-use same image.
-    if cache_key:
-        ck = cache_key.strip().lower()
-        ck = re.sub(r"\s+", "-", ck)
-        ck = re.sub(r"[^a-z0-9\-|_]", "", ck)
-        return ck or "unknown"
+    """Build a stable cache key / Firebase doc id for covers.
+
+    Priority:
+    1) If cache_key is provided, we use it (sanitized).
+    2) Otherwise we compose from brand+model+body+(generation or year)+color.
+    """
+    if cache_key and str(cache_key).strip():
+        raw = str(cache_key).strip().lower()
+        raw = re.sub(r"\s+", "-", raw)
+        raw = re.sub(r"[^a-z0-9\-_.|]", "-", raw)
+        raw = re.sub(r"-{2,}", "-", raw).strip("-")
+        return raw[:120] if len(raw) > 120 else raw
 
     parts = [brand.strip().lower(), model.strip().lower()]
     if body:
         parts.append(body.strip().lower())
-    if generation:
-        parts.append(generation.strip().lower())
 
-    # Firebase doc id için güvenli karakter
+    gen = (generation or "").strip()
+    if not gen and year:
+        gen = str(int(year))
+    if gen:
+        parts.append(gen.lower())
+
+    if color:
+        parts.append(color.strip().lower())
+
     key = "|".join([re.sub(r"\s+", "-", p) for p in parts if p])
-    key = re.sub(r"[^a-z0-9\-|_]", "", key)
-    return key or "unknown"
+    key = re.sub(r"[^a-z0-9\-|_.]", "-", key)
+    key = re.sub(r"-{2,}", "-", key).strip("-")
+    return key[:120] if len(key) > 120 else key
 
+
+def _brand_style_cues(brand: str, model: str) -> str:
+    """Return prompt cues to make the car look like the brand's design language (no logos)."""
+    b = (brand or "").strip().lower()
+
+    if b in ("bmw", "bayerische motoren werke"):
+        return (
+            "BMW-like design language: sporty executive proportions, long hood, short front overhang, "
+            "subtle twin grille outline (kidney-shape outline but WITHOUT logo/badge), "
+            "sharp shoulder line, slightly rear-biased cabin, aggressive headlight signature."
+        )
+    if b in ("mercedes", "mercedes-benz", "mercedes benz"):
+        return (
+            "Mercedes-like design language: elegant premium sedan proportions, smooth surfacing, "
+            "wide grille opening outline WITHOUT emblem, refined LED headlight signature, "
+            "upmarket stance, luxury cues."
+        )
+    if b == "audi":
+        return (
+            "Audi-like design language: sharp creases, single-frame grille outline WITHOUT logo, "
+            "precise geometric headlights, clean modern proportions."
+        )
+    if b == "volkswagen" or b == "vw":
+        return (
+            "Volkswagen-like design language: clean restrained surfaces, balanced proportions, "
+            "simple horizontal grille outline WITHOUT logo, understated headlights."
+        )
+    if b == "toyota":
+        return (
+            "Toyota-like design language: modern mainstream styling, angular grille openings, "
+            "sharp headlights; but keep it clearly Toyota, not German premium."
+        )
+    if b == "honda":
+        return (
+            "Honda-like design language: sporty compact proportions, fast headlight shape, "
+            "sleek greenhouse; avoid European premium cues."
+        )
+    if b == "ford":
+        return (
+            "Ford-like design language: dynamic mainstream styling, trapezoid grille outline WITHOUT logo, "
+            "athletic stance."
+        )
+    if b == "hyundai":
+        return (
+            "Hyundai-like design language: modern parametric shapes, bold lighting, "
+            "clean contemporary surfaces."
+        )
+    if b == "kia":
+        return (
+            "Kia-like design language: modern sporty styling, 'tiger nose' grille outline WITHOUT logo, "
+            "crisp lighting."
+        )
+    # Default: generic but premium studio photo
+    return (
+        "Make it clearly match the brand's typical design language and segment; "
+        "avoid looking generic or like a different brand."
+    )
 
 def _init_firebase_admin() -> None:
     if firebase_admin is None or fb_credentials is None or fb_firestore is None or fb_storage is None:
@@ -3153,191 +3219,140 @@ def _firebase_upload_cover_bytes(cover_key: str, image_bytes: bytes, content_typ
     return url
 
 
-def _brand_model_cues(brand: str, model: str) -> str:
-    """Return a short, *text-free* visual-cue description to improve likeness.
-
-    We avoid asking for logos/badges/text. We only describe general design cues.
-    """
-    b = (brand or "").strip().lower()
-    m = (model or "").strip().lower()
-
-    # BMW
-    if "bmw" in b and ("3" in m or "f30" in m):
-        return (
-            "Design cues: sporty compact executive sedan proportions; "
-            "dual-kidney grille *shape* (no badge); "
-            "sharp, slightly swept-back headlamp outline; "
-            "a subtle character line running along the doors; "
-            "Hofmeister kink on the rear side window; "
-            "balanced wheelbase with short overhangs."
-        )
-    if "bmw" in b:
-        return (
-            "Design cues: sporty German sedan proportions; "
-            "dual-kidney grille *shape* (no badge); "
-            "crisp shoulder line; "
-            "premium sporty stance."
-        )
-
-    # Audi
-    if "audi" in b and ("a3" in m or "8v" in m):
-        return (
-            "Design cues: compact premium hatch/sedan proportions; "
-            "wide single-frame grille *shape* (no rings/badge); "
-            "clean, minimal body lines; "
-            "sharp LED-like headlamp outline."
-        )
-
-    # Mercedes
-    if ("mercedes" in b or "benz" in b) and ("c" in m or "w205" in m):
-        return (
-            "Design cues: compact luxury sedan proportions; "
-            "elegant smooth surfacing; "
-            "horizontal grille *shape* (no emblem); "
-            "rounded premium headlamp outline."
-        )
-
-    return ""
-
-
 def _generate_placeholder_cover_bytes(
     brand: str,
     model: str,
     body: Optional[str] = None,
     generation: Optional[str] = None,
-    color: Optional[str] = None,
 ) -> bytes:
-    """A safe fallback image with NO text (so the feed never shows posters)."""
-    if Image is None or ImageDraw is None:
-        # If PIL missing, return a tiny empty webp-like byte stream is not possible; raise.
-        raise HTTPException(status_code=500, detail="pillow_missing_for_placeholder")
+    """Cheap fallback cover when image generation is unavailable.
 
-    W, H = 1024, 1024
-    im = Image.new("RGB", (W, H), (14, 18, 28))
+    Important: We deliberately avoid printing big brand/model text so users
+    don't confuse it with a real photo.
+    """
+    if Image is None or ImageDraw is None:
+        return b""
+
+    w, h = 1024, 1024
+    im = Image.new("RGB", (w, h), (10, 14, 22))
     draw = ImageDraw.Draw(im)
 
-    # simple gradient-ish background
-    for y in range(H):
-        v = int(14 + (y / H) * 20)
-        draw.line([(0, y), (W, y)], fill=(v, v + 6, v + 14))
+    # subtle vignette
+    for i in range(0, 220, 4):
+        draw.rectangle([i, i, w - i, h - i], outline=(12 + i // 25, 14 + i // 25, 24 + i // 20))
 
-    # minimalist car silhouette (no logos, no text)
-    cx, cy = W // 2, int(H * 0.58)
-    car_w, car_h = int(W * 0.70), int(H * 0.22)
-    x0, y0 = cx - car_w // 2, cy - car_h // 2
-    x1, y1 = cx + car_w // 2, cy + car_h // 2
+    title = "Temsili Kapak (foto yok)"
+    meta = " • ".join([x for x in [generation, body] if x]) or ""
 
-    # body
-    draw.rounded_rectangle([x0, y0, x1, y1], radius=60, outline=(220, 230, 245), width=6, fill=(35, 40, 55))
-    # roof
-    roof = [
-        (x0 + int(car_w * 0.18), y0),
-        (x0 + int(car_w * 0.32), y0 - int(car_h * 0.55)),
-        (x0 + int(car_w * 0.68), y0 - int(car_h * 0.55)),
-        (x0 + int(car_w * 0.82), y0),
-    ]
-    draw.polygon(roof, outline=(220, 230, 245), fill=(28, 32, 44))
-    # wheels
-    r = int(car_h * 0.38)
-    wx1 = x0 + int(car_w * 0.25)
-    wx2 = x0 + int(car_w * 0.75)
-    wy = y1 + int(r * 0.15)
-    for wx in (wx1, wx2):
-        draw.ellipse([wx - r, wy - r, wx + r, wy + r], fill=(10, 10, 14), outline=(220, 230, 245), width=5)
-        draw.ellipse([wx - int(r * 0.45), wy - int(r * 0.45), wx + int(r * 0.45), wy + int(r * 0.45)], fill=(40, 45, 60))
+    try:
+        font = ImageFont.truetype("DejaVuSans.ttf", 34)
+        font2 = ImageFont.truetype("DejaVuSans.ttf", 24)
+    except Exception:
+        font = ImageFont.load_default()
+        font2 = ImageFont.load_default()
+
+    x, y = 70, 90
+    draw.text((x, y), title, fill=(220, 220, 230), font=font)
+    if meta:
+        y += 60
+        draw.text((x, y), meta, fill=(150, 155, 170), font=font2)
 
     buf = BytesIO()
-    im.save(buf, format="WEBP", quality=85)
+    im.save(buf, format="WEBP", quality=90, method=6)
     return buf.getvalue()
-
 
 def _generate_vehicle_image_bytes(
     brand: str,
     model: str,
     body: Optional[str] = None,
     generation: Optional[str] = None,
+    year: Optional[int] = None,
     color: Optional[str] = None,
 ) -> bytes:
-    """Generate a representative vehicle cover image (no text, no logos/badges)."""
-    allow_fallback = os.getenv("COVER_ALLOW_FALLBACK", "true").lower() in ("1", "true", "yes", "y")
+    """Generate a vehicle image via OpenAI Images API (direct HTTP).
 
-    if client is None:
-        if allow_fallback:
-            return _generate_placeholder_cover_bytes(brand, model, body=body, generation=generation, color=color)
-        raise HTTPException(status_code=500, detail="openai_client_not_configured")
+    Notes:
+    - We *never* request text or posters.
+    - By default, we *do not* silently cache a placeholder. You can enable fallback with:
+        COVER_ALLOW_FALLBACK=true
+    """
+    allow_fallback = os.getenv("COVER_ALLOW_FALLBACK", "false").lower() in ("1", "true", "yes", "y")
+
+    api_key = (os.getenv("OPENAI_API_KEY") or "").strip()
+    if not api_key:
+        raise HTTPException(status_code=500, detail="OPENAI_API_KEY_missing")
 
     image_model = os.getenv("OPENAI_IMAGE_MODEL", "gpt-image-1")
     size = os.getenv("OPENAI_IMAGE_SIZE", "1024x1024")
-    quality = os.getenv("OPENAI_IMAGE_QUALITY", "medium")
 
-    cues = _brand_model_cues(brand, model)
-    parts: List[str] = []
-    if generation:
-        parts.append(f"Approximate model year/generation: {generation}.")
+    gen = (generation or "").strip()
+    if not gen and year:
+        try:
+            gen = str(int(year))
+        except Exception:
+            gen = str(year)
+
+    cues = _brand_style_cues(brand, model)
+
+    # Brand-to-brand negatives to avoid wrong family look
+    b = (brand or "").strip().lower()
+    if b == "bmw":
+        negatives = "Do NOT resemble Honda Civic, Toyota Corolla, Audi A4, Mercedes C-Class."
+    elif b in ("mercedes", "mercedes-benz", "mercedes benz"):
+        negatives = "Do NOT resemble BMW 3 Series, Audi A4, Honda Civic, Toyota Corolla."
+    elif b == "audi":
+        negatives = "Do NOT resemble BMW 3 Series, Mercedes C-Class, Honda Civic, Toyota Corolla."
+    else:
+        negatives = "Do NOT look like a generic anonymous car; match the requested brand family."
+
+    ctx_parts = []
     if body:
-        parts.append(f"Body type: {body}.")
+        ctx_parts.append(f"Body type: {body}.")
+    if gen:
+        ctx_parts.append(f"Model year approx: {gen}.")
     if color:
-        parts.append(f"Color: {color}.")
-    parts.append(f"Make/model look: {brand} {model}.")
-    if cues:
-        parts.append(cues)
-    context = " ".join(parts)
+        ctx_parts.append(f"Color: {color}.")
+    ctx = " ".join(ctx_parts)
 
     prompt = (
-        "Photorealistic studio product photo of a single passenger car on a seamless neutral background. "
-        f"{context} "
-        "Front three-quarter angle, realistic proportions, sharp focus, soft shadow, natural reflections. "
-        "No people, no scenery, no buildings, no roads, no extra objects. "
-        "ABSOLUTELY NO text, letters, numbers, badges, logos, emblems, brand marks, watermarks, UI, posters, brochures. "
-        "Do not render the brand name or model name as text anywhere. "
-        "Do not add license plates."
+        "Photorealistic studio product photo of a single car on a seamless neutral background. "
+        f"Make it clearly look like a {brand} {model} family vehicle. "
+        f"{ctx} "
+        f"{cues} "
+        "Front three-quarter angle. Premium automotive press photo lighting. "
+        "Realistic proportions, sharp focus, clean reflections, soft shadow. "
+        f"{negatives} "
+        "ABSOLUTELY NO text, letters, numbers. NO logos, NO badges, NO emblems, NO UI, NO posters, NO watermarks."
     )
 
     try:
-        # SDK compatibility: some versions accept response_format/quality, some don't.
-        try:
-            img = client.images.generate(
-                model=image_model,
-                prompt=prompt,
-                n=1,
-                size=size,
-                quality=quality,
-                response_format="b64_json",
-            )
-        except TypeError:
-            img = client.images.generate(
-                model=image_model,
-                prompt=prompt,
-                n=1,
-                size=size,
-            )
+        r = requests.post(
+            "https://api.openai.com/v1/images/generations",
+            headers={"Authorization": f"Bearer {api_key}"},
+            json={
+                "model": image_model,
+                "prompt": prompt,
+                "size": size,
+                "n": 1,
+                "response_format": "b64_json",
+            },
+            timeout=90,
+        )
+        if r.status_code >= 400:
+            raise RuntimeError(f"openai_images_error {r.status_code}: {r.text[:600]}")
 
-        b64 = getattr(img.data[0], "b64_json", None)
+        data = r.json()
+        b64 = data["data"][0].get("b64_json")
         if not b64:
-            raise RuntimeError("missing_b64_json_in_image_response")
+            raise RuntimeError("missing_b64_json_in_response")
 
-        raw = base64.b64decode(b64)
-
-        # Ensure WEBP output even if model returns png/jpg
-        if Image is not None:
-            try:
-                im = Image.open(BytesIO(raw)).convert("RGB")
-                buf = BytesIO()
-                im.save(buf, format="WEBP", quality=90, method=6)
-                raw = buf.getvalue()
-            except Exception:
-                pass
-
-        return raw
+        return base64.b64decode(b64)
 
     except Exception as e:
         print("OpenAI image generation error:", repr(e))
         if allow_fallback:
-            return _generate_placeholder_cover_bytes(brand, model, body=body, generation=generation, color=color)
-        raise HTTPException(status_code=500, detail=f"image_generation_failed: {type(e).__name__}")
-
-
-
+            return _generate_placeholder_cover_bytes(brand, model, body=body, generation=gen)
+        raise HTTPException(status_code=500, detail=f"image_generation_failed: {repr(e)}")
 
 def _apply_watermark(image_bytes: bytes, watermark_text: str = "Oto Analiz") -> bytes:
     if Image is None or ImageDraw is None or ImageFont is None:
@@ -3384,7 +3399,7 @@ async def get_or_create_cover(req: CoverRequest) -> Dict[str, Any]:
     if not brand or not model:
         raise HTTPException(status_code=400, detail="brand_and_model_required")
 
-    ck = _cover_key(brand, model, req.body, (req.generation or (str(req.year) if req.year else None)), cache_key=req.cache_key)
+    ck = _cover_key(brand, model, req.body, req.generation, req.year, req.color, req.cache_key)
     doc = _firebase_cover_doc(ck)
 
     if not req.force_regenerate:
@@ -3400,7 +3415,7 @@ async def get_or_create_cover(req: CoverRequest) -> Dict[str, Any]:
             pass
 
     # Generate + watermark + upload + cache
-    raw = _generate_vehicle_image_bytes(brand, model, body=req.body, generation=(req.generation or (str(req.year) if req.year else None)), color=req.color)
+    raw = _generate_vehicle_image_bytes(brand, model, body=req.body, generation=req.generation, year=req.year, color=req.color)
     watermarked = _apply_watermark(raw, watermark_text=os.getenv("COVER_WATERMARK_TEXT", "Oto Analiz"))
 
     url = _firebase_upload_cover_bytes(ck, watermarked, content_type="image/webp")
@@ -3411,6 +3426,9 @@ async def get_or_create_cover(req: CoverRequest) -> Dict[str, Any]:
                 "model": model,
                 "body": req.body,
                 "generation": req.generation,
+                "year": req.year,
+                "color": req.color,
+                "cache_key": req.cache_key,
                 "imageUrl": url,
                 "promptVersion": int(os.getenv("COVER_PROMPT_VERSION", "1")),
                 "watermark": os.getenv("COVER_WATERMARK_TEXT", "Oto Analiz"),
