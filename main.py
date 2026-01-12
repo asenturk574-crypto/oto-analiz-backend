@@ -4,6 +4,11 @@ import re
 import math
 from datetime import date, datetime
 from typing import Any, Dict, List, Optional, Tuple
+import base64
+import uuid
+from io import BytesIO
+from urllib.parse import quote as urlquote
+
 
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
@@ -26,6 +31,28 @@ try:
     from openai import OpenAI
 except Exception:
     OpenAI = None  # type: ignore
+
+
+# =========================================================
+# OPTIONAL DEPS (PIL + Firebase Admin)
+# =========================================================
+try:
+    from PIL import Image, ImageDraw, ImageFont
+except Exception:
+    Image = None  # type: ignore
+    ImageDraw = None  # type: ignore
+    ImageFont = None  # type: ignore
+
+try:
+    import firebase_admin
+    from firebase_admin import credentials as fb_credentials
+    from firebase_admin import firestore as fb_firestore
+    from firebase_admin import storage as fb_storage
+except Exception:
+    firebase_admin = None  # type: ignore
+    fb_credentials = None  # type: ignore
+    fb_firestore = None  # type: ignore
+    fb_storage = None  # type: ignore
 
 
 # =========================================================
@@ -3007,6 +3034,227 @@ async def root() -> Dict[str, Any]:
 # =========================================================
 # ENDPOINTS
 # =========================================================
+# =========================================================
+# VEHICLE COVER CACHE (no user photo) + WATERMARK
+# =========================================================
+
+class CoverRequest(BaseModel):
+    brand: str = Field(..., description="e.g. Audi")
+    model: str = Field(..., description="e.g. A3")
+    body: Optional[str] = Field(None, description="optional body type")
+    generation: Optional[str] = Field(None, description="optional generation, e.g. 2016-2020")
+    force_regenerate: bool = Field(False, description="ignore cache and regenerate")
+
+
+class CoverResponse(BaseModel):
+    coverKey: str
+    imageUrl: str
+    cached: bool
+
+
+def _cover_key(brand: str, model: str, body: Optional[str] = None, generation: Optional[str] = None) -> str:
+    parts = [brand.strip().lower(), model.strip().lower()]
+    if body:
+        parts.append(body.strip().lower())
+    if generation:
+        parts.append(generation.strip().lower())
+    # Firebase doc id için güvenli karakter
+    key = "|".join([re.sub(r"\s+", "-", p) for p in parts if p])
+    key = re.sub(r"[^a-z0-9\-|_]", "", key)
+    return key or "unknown"
+
+
+def _init_firebase_admin() -> None:
+    if firebase_admin is None or fb_credentials is None or fb_firestore is None or fb_storage is None:
+        raise HTTPException(status_code=500, detail="firebase_admin_not_installed")
+
+    # Already initialized?
+    try:
+        if getattr(firebase_admin, "_apps", None) and len(firebase_admin._apps) > 0:  # type: ignore
+            return
+    except Exception:
+        pass
+
+    bucket = (os.getenv("FIREBASE_STORAGE_BUCKET") or "").strip()
+    if not bucket:
+        raise HTTPException(status_code=500, detail="missing_FIREBASE_STORAGE_BUCKET")
+
+    sa = os.getenv("FIREBASE_SERVICE_ACCOUNT_JSON", "").strip()
+    if not sa:
+        # allow GOOGLE_APPLICATION_CREDENTIALS to point to a JSON file path
+        sa = os.getenv("GOOGLE_APPLICATION_CREDENTIALS", "").strip()
+
+    if not sa:
+        raise HTTPException(status_code=500, detail="missing_FIREBASE_SERVICE_ACCOUNT_JSON")
+
+    try:
+        if sa.startswith("{"):
+            cred = fb_credentials.Certificate(json.loads(sa))
+        else:
+            cred = fb_credentials.Certificate(sa)  # path
+        firebase_admin.initialize_app(cred, {"storageBucket": bucket})
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"firebase_init_failed: {e}")
+
+
+def _firebase_cover_doc(cover_key: str):
+    _init_firebase_admin()
+    db = fb_firestore.client()
+    return db.collection("vehicle_covers").document(cover_key)
+
+
+def _firebase_upload_cover_bytes(cover_key: str, image_bytes: bytes, content_type: str = "image/webp") -> str:
+    _init_firebase_admin()
+    bucket_name = os.getenv("FIREBASE_STORAGE_BUCKET", "").strip()
+    bucket = fb_storage.bucket()  # default bucket from initialize_app
+    object_path = f"vehicle_covers/{cover_key}.webp"
+
+    token = uuid.uuid4().hex
+    blob = bucket.blob(object_path)
+    blob.metadata = {"firebaseStorageDownloadTokens": token}
+    blob.upload_from_string(image_bytes, content_type=content_type)
+    blob.patch()
+
+    # Firebase download URL (token-based)
+    url = f"https://firebasestorage.googleapis.com/v0/b/{bucket_name}/o/{urlquote(object_path)}?alt=media&token={token}"
+    return url
+
+
+def _generate_vehicle_image_bytes(brand: str, model: str) -> bytes:
+    """Generates a *representative* image (no logos/badges). Falls back to a simple PIL cover if OpenAI image isn't available."""
+    # 1) Try OpenAI image API if available
+    if client is not None:
+        try:
+            image_model = os.getenv("OPENAI_IMAGE_MODEL", "gpt-image-1.5")
+            prompt = (
+                f"A photorealistic studio image of a compact car in the class of a {brand} {model}. "
+                "No visible logos, no badges, no brand text, no license plate text. "
+                "Front 3/4 angle, neutral dark background, crisp lighting, high detail."
+            )
+            img = client.images.generate(
+                model=image_model,
+                prompt=prompt,
+                n=1,
+                size=os.getenv("OPENAI_IMAGE_SIZE", "1024x1024"),
+                quality=os.getenv("OPENAI_IMAGE_QUALITY", "medium"),
+                output_format=os.getenv("OPENAI_IMAGE_FORMAT", "webp"),
+                output_compression=int(os.getenv("OPENAI_IMAGE_COMPRESSION", "90")),
+            )
+            b64 = img.data[0].b64_json
+            return base64.b64decode(b64)
+        except Exception:
+            # fall through to PIL fallback
+            pass
+
+    # 2) PIL fallback (always works if PIL installed)
+    if Image is None or ImageDraw is None or ImageFont is None:
+        raise HTTPException(status_code=500, detail="image_generation_unavailable: install pillow or set OPENAI_API_KEY")
+
+    W, H = 1024, 1024
+    im = Image.new("RGB", (W, H), (14, 18, 28))
+    draw = ImageDraw.Draw(im)
+
+    title = f"{brand} {model}".strip()
+    try:
+        font = ImageFont.truetype("DejaVuSans-Bold.ttf", 96)
+        font2 = ImageFont.truetype("DejaVuSans.ttf", 36)
+    except Exception:
+        font = ImageFont.load_default()
+        font2 = ImageFont.load_default()
+
+    draw.text((64, 120), title, font=font, fill=(240, 240, 240))
+    draw.text((64, 240), "Temsili Kapak (foto yok)", font=font2, fill=(180, 190, 210))
+    buf = BytesIO()
+    im.save(buf, format="WEBP", quality=90)
+    return buf.getvalue()
+
+
+def _apply_watermark(image_bytes: bytes, watermark_text: str = "Oto Analiz") -> bytes:
+    if Image is None or ImageDraw is None or ImageFont is None:
+        # If PIL missing, return as-is
+        return image_bytes
+
+    im = Image.open(BytesIO(image_bytes)).convert("RGBA")
+    W, H = im.size
+
+    overlay = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(overlay)
+
+    # large font relative to image
+    font_size = max(48, int(min(W, H) * 0.10))
+    try:
+        font = ImageFont.truetype("DejaVuSans-Bold.ttf", font_size)
+    except Exception:
+        font = ImageFont.load_default()
+
+    # text bbox
+    bbox = draw.textbbox((0, 0), watermark_text, font=font)
+    tw = bbox[2] - bbox[0]
+    th = bbox[3] - bbox[1]
+
+    # Center text then rotate the overlay
+    cx = (W - tw) // 2
+    cy = (H - th) // 2
+
+    # Opacity ~10%
+    draw.text((cx, cy), watermark_text, font=font, fill=(255, 255, 255, 28))
+
+    overlay = overlay.rotate(-18, resample=Image.BICUBIC, expand=0)
+    out = Image.alpha_composite(im, overlay).convert("RGB")
+
+    buf = BytesIO()
+    out.save(buf, format="WEBP", quality=90)
+    return buf.getvalue()
+
+
+@app.post("/get_or_create_cover", response_model=CoverResponse)
+async def get_or_create_cover(req: CoverRequest) -> Dict[str, Any]:
+    brand = (req.brand or "").strip()
+    model = (req.model or "").strip()
+    if not brand or not model:
+        raise HTTPException(status_code=400, detail="brand_and_model_required")
+
+    ck = _cover_key(brand, model, req.body, req.generation)
+    doc = _firebase_cover_doc(ck)
+
+    if not req.force_regenerate:
+        try:
+            snap = doc.get()
+            if snap.exists:
+                data = snap.to_dict() or {}
+                url = (data.get("imageUrl") or "").strip()
+                if url:
+                    return {"coverKey": ck, "imageUrl": url, "cached": True}
+        except Exception:
+            # ignore and regenerate
+            pass
+
+    # Generate + watermark + upload + cache
+    raw = _generate_vehicle_image_bytes(brand, model)
+    watermarked = _apply_watermark(raw, watermark_text=os.getenv("COVER_WATERMARK_TEXT", "Oto Analiz"))
+
+    url = _firebase_upload_cover_bytes(ck, watermarked, content_type="image/webp")
+    try:
+        doc.set(
+            {
+                "brand": brand,
+                "model": model,
+                "body": req.body,
+                "generation": req.generation,
+                "imageUrl": url,
+                "promptVersion": int(os.getenv("COVER_PROMPT_VERSION", "1")),
+                "watermark": os.getenv("COVER_WATERMARK_TEXT", "Oto Analiz"),
+                "updatedAt": fb_firestore.SERVER_TIMESTAMP,  # type: ignore
+            },
+            merge=True,
+        )
+    except Exception:
+        # even if Firestore write fails, return url so app can proceed
+        pass
+
+    return {"coverKey": ck, "imageUrl": url, "cached": False}
+
+
 @app.post("/analyze")
 async def analyze(req: AnalyzeRequest) -> Dict[str, Any]:
     # Normal = Hızlı Analiz (default: deterministic, hızlı, ucuz)
@@ -3242,4 +3490,3 @@ if __name__ == "__main__":
     # Lokal çalıştırma için:
     # uvicorn main:app --host 0.0.0.0 --port 8000 --reload
     pass
-
