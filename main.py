@@ -3079,19 +3079,28 @@ def _init_firebase_admin() -> None:
     if not bucket:
         raise HTTPException(status_code=500, detail="missing_FIREBASE_STORAGE_BUCKET")
 
-    sa = os.getenv("FIREBASE_SERVICE_ACCOUNT_JSON", "").strip()
-    if not sa:
-        # allow GOOGLE_APPLICATION_CREDENTIALS to point to a JSON file path
-        sa = os.getenv("GOOGLE_APPLICATION_CREDENTIALS", "").strip()
+    sa_b64 = (os.getenv("FIREBASE_SERVICE_ACCOUNT_B64") or "").strip()
+    sa_json = (os.getenv("FIREBASE_SERVICE_ACCOUNT_JSON") or "").strip()
 
-    if not sa:
-        raise HTTPException(status_code=500, detail="missing_FIREBASE_SERVICE_ACCOUNT_JSON")
+    # allow GOOGLE_APPLICATION_CREDENTIALS to point to a JSON file path (fallback)
+    if not sa_json:
+        sa_json = (os.getenv("GOOGLE_APPLICATION_CREDENTIALS") or "").strip()
+
+    if not sa_b64 and not sa_json:
+        raise HTTPException(
+            status_code=500,
+            detail="missing_FIREBASE_SERVICE_ACCOUNT_B64_and_FIREBASE_SERVICE_ACCOUNT_JSON",
+        )
 
     try:
-        if sa.startswith("{"):
-            cred = fb_credentials.Certificate(json.loads(sa))
+        if sa_b64:
+            decoded = base64.b64decode(sa_b64).decode("utf-8")
+            cred = fb_credentials.Certificate(json.loads(decoded))
         else:
-            cred = fb_credentials.Certificate(sa)  # path
+            if sa_json.startswith("{"):
+                cred = fb_credentials.Certificate(json.loads(sa_json))
+            else:
+                cred = fb_credentials.Certificate(sa_json)  # path
         firebase_admin.initialize_app(cred, {"storageBucket": bucket})
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"firebase_init_failed: {e}")
