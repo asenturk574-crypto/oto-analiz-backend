@@ -3176,11 +3176,14 @@ def _generate_vehicle_image_bytes(
     if client is not None:
         try:
             image_model = os.getenv("OPENAI_IMAGE_MODEL", "gpt-image-1.5")
+            use_brand_model = os.getenv("COVER_INCLUDE_BRAND_MODEL", "0").lower() in ("1","true","yes")
+            name_hint = f" similar to a {brand} {model}" if use_brand_model else ""
             prompt = (
-                f"A photorealistic studio image of {base_desc} in the class of a {brand} {model}{year_hint}. "
+                f"A photorealistic studio photograph of {base_desc}{name_hint}{year_hint}. "
                 f"{color_line}"
-                "No visible logos, no badges, no brand text, no license plate text. "
-                "Front 3/4 angle, neutral dark background, crisp lighting, high detail."
+                "ZERO text: no words, no letters, no labels, no UI, no poster/card layout. "
+                "No visible logos, no badges, no brand marks, no license plate, no watermark. "
+                "Front 3/4 angle, clean seamless background, crisp lighting, high detail."
             )
             img = client.images.generate(
                 model=image_model,
@@ -3234,8 +3237,15 @@ def _generate_vehicle_image_bytes(
 
 
 def _apply_watermark(image_bytes: bytes, watermark_text: str = "Oto Analiz") -> bytes:
+    """
+    İsteğe bağlı watermark.
+    - watermark_text boş ise hiç dokunmaz.
+    - Varsayılan: sağ-alt köşede küçük ve düşük opaklık.
+    """
+    if not watermark_text or not watermark_text.strip():
+        return image_bytes
+
     if Image is None or ImageDraw is None or ImageFont is None:
-        # If PIL missing, return as-is
         return image_bytes
 
     im = Image.open(BytesIO(image_bytes)).convert("RGBA")
@@ -3244,33 +3254,31 @@ def _apply_watermark(image_bytes: bytes, watermark_text: str = "Oto Analiz") -> 
     overlay = Image.new("RGBA", (W, H), (0, 0, 0, 0))
     draw = ImageDraw.Draw(overlay)
 
-    # large font relative to image
-    font_size = max(48, int(min(W, H) * 0.10))
+    # Small font relative to image
+    font_size = max(16, int(min(W, H) * 0.035))
     try:
-        font = ImageFont.truetype("DejaVuSans-Bold.ttf", font_size)
+        font = ImageFont.truetype("DejaVuSans.ttf", font_size)
     except Exception:
         font = ImageFont.load_default()
 
-    # text bbox
-    bbox = draw.textbbox((0, 0), watermark_text, font=font)
+    text = watermark_text.strip()
+
+    bbox = draw.textbbox((0, 0), text, font=font)
     tw = bbox[2] - bbox[0]
     th = bbox[3] - bbox[1]
 
-    # Center text then rotate the overlay
-    cx = (W - tw) // 2
-    cy = (H - th) // 2
+    pad = max(8, int(min(W, H) * 0.02))
+    x = W - tw - pad
+    y = H - th - pad
 
-    # Opacity ~10%
-    draw.text((cx, cy), watermark_text, font=font, fill=(255, 255, 255, 28))
+    # Opacity ~18%
+    draw.text((x, y), text, font=font, fill=(255, 255, 255, 46))
 
-    overlay = overlay.rotate(-18, resample=Image.BICUBIC, expand=0)
     out = Image.alpha_composite(im, overlay).convert("RGB")
 
     buf = BytesIO()
     out.save(buf, format="WEBP", quality=90)
     return buf.getvalue()
-
-
 @app.post("/get_or_create_cover", response_model=CoverResponse)
 async def get_or_create_cover(req: CoverRequest) -> Dict[str, Any]:
     brand = (req.brand or "").strip()
