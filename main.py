@@ -3099,7 +3099,7 @@ def _cover_key(
     else:
         parts.append(_year_bucket(year))
 
-    # color intentionally ignored for cache stability (user prefers color-agnostic covers)
+    parts.append(_norm_color(color))
 
     key = "|".join([re.sub(r"\s+", "_", p) for p in parts if p])
     key = re.sub(r"[^a-z0-9_\-|]", "", key)
@@ -3352,8 +3352,6 @@ def _generate_vehicle_image_bytes(
         "interior", "inside", "dashboard", "cockpit", "steering", "wheel close",
         "seat", "seats", "console", "gear", "engine", "detail", "close up", "rim",
         "tire", "tyre",
-        "rear", "rear view", "back view", "taillight", "tail light",
-        "vintage", "classic", "retro", "antique", "old car", "classic car",
     ]
     multi_words = ["cars", "parking", "dealership", "showroom", "traffic", "fleet", "street", "race", "rally"]
     people_words = ["people", "person", "man", "woman", "crowd"]
@@ -3384,20 +3382,6 @@ def _generate_vehicle_image_bytes(
                 if b not in ("mercedes", "vw"):
                     return False
         # If we have meaningful model tokens, require at least one in strict level 0
-        # Special handling for single-letter "* class" models (e.g., Mercedes C Class) to avoid class mixups
-        m_norm = (m or "").lower().strip()
-        m_norm = m_norm.replace("-", " ")
-        m_norm = re.sub(r"\s+", " ", m_norm)
-        if re.fullmatch(r"[a-z] class", m_norm):
-            letter = m_norm[0]
-            variants = [f"{letter} class", f"{letter}-class", f"{letter}class"]
-            # For strict/semi levels, require the exact class phrase in ALT
-            if strict_level <= 1 and not any(v in alt for v in variants):
-                return False
-            # If ALT clearly mentions another class, reject (prevents C -> S etc.)
-            for ol in ["a","b","c","e","g","s"]:
-                if ol != letter and (f"{ol} class" in alt or f"{ol}-class" in alt or f"{ol}class" in alt):
-                    return False
         if strict_level == 0 and mtoks:
             if not any(t in alt for t in mtoks):
                 return False
@@ -3414,15 +3398,6 @@ def _generate_vehicle_image_bytes(
             s += 6
         if mtoks and any(t in alt for t in mtoks):
             s += 4
-        # Prefer exterior angles that look like a "cover" (front/side/3-4), avoid rear views
-        if "front" in alt:
-            s += 10
-        if "side" in alt:
-            s += 7
-        if ("three quarter" in alt) or ("3/4" in alt) or ("3 4" in alt):
-            s += 6
-        if ("rear" in alt) or ("back view" in alt) or ("taillight" in alt) or ("tail light" in alt):
-            s -= 20
         # Penalize multi-car/dealership hints
         if any(w in alt for w in multi_words):
             s -= 6
@@ -3839,3 +3814,312 @@ if __name__ == "__main__":
     # Lokal çalıştırma için:
     # uvicorn main:app --host 0.0.0.0 --port 8000 --reload
     pass
+
+
+# ============================
+# YOL-1 FINAL OVERRIDE (FRONT/NET + MODEL-CORRECT)
+# ============================
+# NOTE: Python uses the *last* definition, so this overrides earlier helpers safely.
+
+from typing import Iterable
+from PIL import ImageFilter
+
+_FRONT_HINTS = [
+    "front", "front view", "front-angle", "frontal", "three quarter", "3/4", "three-quarter", "angle view",
+    "side", "side view",
+]
+_REAR_BAD = [
+    "rear", "back view", "back", "taillight", "tail light", "behind", "rear view",
+]
+_SCENE_BAD = [
+    "interior", "inside", "dashboard", "cockpit", "steering", "seat", "console", "gear",
+    "engine", "close up", "close-up", "detail", "rim", "tire", "tyre",
+    "showroom", "dealership", "parking", "traffic", "fleet",
+    "night", "dark", "low light", "low-light",
+    "door open", "open door", "trunk open", "boot open",
+]
+_MULTI_BAD = ["cars", "two cars", "three cars", "multiple cars", "many cars"]
+
+def _img_is_sharp_and_bright(img: "Image.Image") -> bool:
+    """
+    Cheap 'net' check:
+    - brightness: mean grayscale must be above a threshold
+    - sharpness: variance of edge map must be above a threshold
+    """
+    # downscale for speed
+    im = img.convert("L")
+    im = im.resize((320, int(320 * im.height / max(im.width, 1))), Image.Resampling.BILINEAR)
+    # brightness
+    px = list(im.getdata())
+    if not px:
+        return False
+    mean = sum(px) / len(px)
+    if mean < 55:  # too dark
+        return False
+
+    # sharpness via edge variance
+    edges = im.filter(ImageFilter.FIND_EDGES)
+    ex = list(edges.getdata())
+    if not ex:
+        return False
+    emean = sum(ex) / len(ex)
+    var = sum((v - emean) ** 2 for v in ex) / len(ex)
+    # Typical sharp photos will be well above this.
+    return var >= 120.0
+
+def _norm_brand_model_for_match(brand: str, model: str) -> Tuple[str, str, List[str], List[str]]:
+    """
+    Returns:
+      b: normalized brand token
+      m: normalized model token (cleaned)
+      must_phrases: phrases that MUST appear in alt (lowercase)
+      must_tokens: tokens any of which must appear in alt (lowercase)
+    """
+    def clean(x: str) -> str:
+        return re.sub(r"\s+", " ", re.sub(r"[^a-z0-9\s\-]", " ", (x or "").lower())).strip()
+
+    brand_alias = {
+        "mercdes": "mercedes",
+        "mercedes-benz": "mercedes",
+        "benz": "mercedes",
+        "wolkswagen": "vw",
+        "volkswagen": "vw",
+        "bmv": "bmw",
+        "hyundai ": "hyundai",
+    }
+    b = clean(brand)
+    b = brand_alias.get(b, b)
+
+    m_raw = clean(model)
+
+    must_phrases: List[str] = []
+    must_tokens: List[str] = []
+
+    # Mercedes class hard handling: "c class" is NOT the same as "s class"
+    if b in ("mercedes", "mb"):
+        # Normalize variants
+        m_raw = m_raw.replace("cclass", "c class").replace("c-class", "c class")
+        m_raw = m_raw.replace("sclass", "s class").replace("s-class", "s class")
+        m_raw = m_raw.replace("eclass", "e class").replace("e-class", "e class")
+        m_raw = m_raw.replace("aclass", "a class").replace("a-class", "a class")
+        m_raw = m_raw.replace("bclass", "b class").replace("b-class", "b class")
+
+        # If user says "C Class" or just "C"
+        if m_raw in ("c", "c class"):
+            must_phrases = ["c class", "c-class", "cclass"]
+            must_tokens = ["mercedes", "benz"]
+            return b, "c class", must_phrases, must_tokens
+        if m_raw in ("e", "e class"):
+            must_phrases = ["e class", "e-class", "eclass"]
+            must_tokens = ["mercedes", "benz"]
+            return b, "e class", must_phrases, must_tokens
+        if m_raw in ("s", "s class"):
+            must_phrases = ["s class", "s-class", "sclass"]
+            must_tokens = ["mercedes", "benz"]
+            return b, "s class", must_phrases, must_tokens
+
+    # General case:
+    toks = [t for t in re.split(r"[\s\-]+", m_raw) if t]
+    if len(m_raw) >= 3:
+        # require the full phrase if multi-token
+        if len(toks) >= 2:
+            must_phrases.append(m_raw)
+        # pick strongest tokens (avoid generic)
+        generic = {"class", "series", "model", "car", "auto"}
+        strong = [t for t in toks if t not in generic and len(t) >= 3]
+        if strong:
+            must_tokens.extend(strong[:2])
+        else:
+            must_tokens.extend([t for t in toks if len(t) >= 2][:2])
+
+    return b, m_raw, must_phrases, must_tokens
+
+def _alt_text(p: Dict[str, Any]) -> str:
+    return (p.get("alt") or "").lower().strip()
+
+def _passes_front_only(alt: str) -> bool:
+    if any(w in alt for w in _REAR_BAD):
+        return False
+    if any(w in alt for w in _SCENE_BAD):
+        return False
+    if any(w in alt for w in _MULTI_BAD):
+        return False
+    if not any(h in alt for h in _FRONT_HINTS):
+        return False
+    return True
+
+def _passes_brand_model(alt: str, b: str, must_phrases: List[str], must_tokens: List[str]) -> bool:
+    if b == "vw":
+        if "vw" not in alt and "volkswagen" not in alt:
+            return False
+    elif b == "mercedes":
+        if "mercedes" not in alt and "benz" not in alt:
+            return False
+    else:
+        if b and b not in alt:
+            return False
+
+    if must_phrases:
+        if not any(ph in alt for ph in must_phrases):
+            return False
+        # prevent C-class confusing with S/E/A/B/G
+        if any(ph in must_phrases for ph in ["c class", "c-class", "cclass"]):
+            if any(x in alt for x in [" s class", " s-class", "sclass", " e class", "eclass", " a class", "aclass", " b class", "bclass", " g class", "gclass"]):
+                return False
+    if must_tokens:
+        if not any(t in alt for t in must_tokens):
+            return False
+    return True
+
+def _search_pexels_photos(query: str, per_page: int = 40) -> List[Dict[str, Any]]:
+    key = os.getenv("PEXELS_API_KEY", "").strip()
+    if not key:
+        raise RuntimeError("missing_PEXELS_API_KEY")
+    url = "https://api.pexels.com/v1/search"
+    headers = {"Authorization": key}
+    params = {"query": query, "per_page": per_page, "orientation": "landscape"}
+    r = requests.get(url, headers=headers, params=params, timeout=20)
+    if r.status_code != 200:
+        raise RuntimeError(f"pexels_search_failed_{r.status_code}")
+    js = r.json()
+    return js.get("photos") or []
+
+def _download_best_src(p: Dict[str, Any]) -> bytes:
+    src = p.get("src") or {}
+    url = src.get("large2x") or src.get("large") or src.get("original") or src.get("medium")
+    if not url:
+        raise RuntimeError("pexels_missing_src")
+    r = requests.get(url, timeout=30)
+    r.raise_for_status()
+    return r.content
+
+def _make_placeholder_cover(brand: str, model: str) -> bytes:
+    """Guaranteed-correct fallback: clean 'front' placeholder with text."""
+    w, h = 1024, 576
+    img = Image.new("RGB", (w, h), (245, 245, 245))
+    draw = ImageDraw.Draw(img)
+
+    cx, cy = w // 2, int(h * 0.55)
+    car_w, car_h = int(w * 0.55), int(h * 0.28)
+    x0, y0 = cx - car_w // 2, cy - car_h // 2
+    x1, y1 = cx + car_w // 2, cy + car_h // 2
+    draw.rounded_rectangle([x0, y0, x1, y1], radius=28, fill=(220, 220, 220), outline=(180, 180, 180), width=4)
+
+    wx0, wy0 = cx - int(car_w * 0.22), y0 + int(car_h * 0.10)
+    wx1, wy1 = cx + int(car_w * 0.22), y0 + int(car_h * 0.42)
+    draw.rounded_rectangle([wx0, wy0, wx1, wy1], radius=18, fill=(200, 200, 200), outline=(170, 170, 170), width=3)
+
+    hw = int(car_w * 0.10)
+    hh = int(car_h * 0.18)
+    draw.rounded_rectangle([x0 + 24, y0 + int(car_h * 0.55), x0 + 24 + hw, y0 + int(car_h * 0.55) + hh], radius=12, fill=(210, 210, 210), outline=(160, 160, 160), width=2)
+    draw.rounded_rectangle([x1 - 24 - hw, y0 + int(car_h * 0.55), x1 - 24, y0 + int(car_h * 0.55) + hh], radius=12, fill=(210, 210, 210), outline=(160, 160, 160), width=2)
+
+    rr = int(car_h * 0.22)
+    draw.ellipse([x0 + int(car_w*0.18)-rr, y1 - rr, x0 + int(car_w*0.18)+rr, y1 + rr], fill=(90, 90, 90))
+    draw.ellipse([x1 - int(car_w*0.18)-rr, y1 - rr, x1 - int(car_w*0.18)+rr, y1 + rr], fill=(90, 90, 90))
+
+    title = f"{brand.strip()} {model.strip()}".strip()
+    subtitle = "OtoAnaliz Cover (fallback)"
+    try:
+        font_big = ImageFont.truetype("DejaVuSans.ttf", 54)
+        font_small = ImageFont.truetype("DejaVuSans.ttf", 26)
+        font_wm = ImageFont.truetype("DejaVuSans.ttf", 28)
+    except Exception:
+        font_big = ImageFont.load_default()
+        font_small = ImageFont.load_default()
+        font_wm = ImageFont.load_default()
+
+    tw = draw.textlength(title, font=font_big)
+    draw.text((cx - tw/2, int(h*0.12)), title, fill=(30, 30, 30), font=font_big)
+    sw = draw.textlength(subtitle, font=font_small)
+    draw.text((cx - sw/2, int(h*0.12)+70), subtitle, fill=(90, 90, 90), font=font_small)
+
+    draw.text((w-150, h-45), "otoanaliz", fill=(40, 40, 40), font=font_wm)
+
+    buf = BytesIO()
+    img.save(buf, format="WEBP", quality=80, method=6)
+    return buf.getvalue()
+
+def _generate_vehicle_image_bytes(
+    brand: str,
+    model: str,
+    body: Optional[str] = None,
+    generation: Optional[str] = None,
+    year: Optional[int] = None,
+    color: Optional[str] = None,
+) -> bytes:
+    """
+    FINAL logic:
+    - Pexels strict: brand+model MUST match, and ALT must indicate front/side view, and image must be net (sharp+bright).
+    - If not found, fallback to placeholder (always correct).
+    """
+    b, m_norm, must_phrases, must_tokens = _norm_brand_model_for_match(brand, model)
+    body_tok = _clean_token(body) if body else ""
+    q_base = f"{brand} {model} {body_tok} exterior".strip()
+
+    queries = [
+        f"{q_base} front view",
+        f"{q_base} side view",
+        f"{brand} {model} exterior front view",
+        f"{brand} {model} exterior side view",
+    ]
+
+    best_photo = None
+    best_score = -10**9
+
+    for q in queries:
+        photos = _search_pexels_photos(q, per_page=60)
+        for p in photos:
+            alt = _alt_text(p)
+            if not alt:
+                continue
+            if not _passes_front_only(alt):
+                continue
+            if not _passes_brand_model(alt, b, must_phrases, must_tokens):
+                continue
+
+            src = (p.get("src") or {})
+            thumb_url = src.get("medium") or src.get("small") or src.get("large") or src.get("original")
+            if not thumb_url:
+                continue
+            try:
+                tr = requests.get(thumb_url, timeout=20)
+                tr.raise_for_status()
+                tim = Image.open(BytesIO(tr.content)).convert("RGB")
+            except Exception:
+                continue
+
+            if not _img_is_sharp_and_bright(tim):
+                continue
+
+            s = 0
+            if "front" in alt:
+                s += 10
+            if "side" in alt:
+                s += 6
+            if any(ph in alt for ph in must_phrases):
+                s += 8
+            if any(t in alt for t in must_tokens):
+                s += 4
+
+            if s > best_score:
+                best_score = s
+                best_photo = p
+
+        if best_photo:
+            break
+
+    if best_photo:
+        try:
+            raw = _download_best_src(best_photo)
+            im = Image.open(BytesIO(raw)).convert("RGB")
+            if not _img_is_sharp_and_bright(im):
+                raise RuntimeError("downloaded_image_not_net")
+            buf = BytesIO()
+            im.save(buf, format="WEBP", quality=80, method=6)
+            return buf.getvalue()
+        except Exception as e:
+            print("Pexels final download/convert failed:", repr(e))
+
+    return _make_placeholder_cover(brand, model)
+
