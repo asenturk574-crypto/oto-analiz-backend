@@ -3357,17 +3357,22 @@ def _generate_vehicle_image_bytes(
     subject = " ".join([p for p in parts if p]).strip()
 
     prompt = (
-        f"Photorealistic studio-style exterior photo of a single {subject}. "
-        f"Front three-quarter angle, sharp focus, realistic proportions. "
-        f"Clean neutral background, no people, no text, no badges/logos, no watermark. "
+        "Studio product photo on a seamless neutral/white background. "
+        f"Photorealistic exterior of a single {subject}. "
+        "Centered composition, sharp focus, realistic proportions, natural reflections. "
+        "Front three-quarter view (or straight front if needed), 50mm lens look. "
+        f"Must match the real-world {b_norm} {m_norm} front fascia for the given year/generation; "
+        "headlights and grille shape must be consistent with that exact model/year. "
+        "Do NOT generate a generic car. "
+        "No people, no interior, no text, no watermark, no showroom/dealership, no extra objects. "
+        "Avoid visible brand logos/badges, but keep the correct silhouette and design cues. "
         f"Only one car in the frame. {cues}"
     )
 
     image_model = (os.getenv("OPENAI_IMAGE_MODEL") or "gpt-image-1").strip()
-    image_quality = (os.getenv("OPENAI_IMAGE_QUALITY") or "low").strip().lower()
-    # Enforce allowed values
-    if image_quality not in ("low", "medium", "high"):
-        image_quality = "low"
+
+    # Cost rule: we NEVER use medium/high in production (only low).
+    image_quality = "low"
 
     # Size is fixed per product decision
     size = "1024x1024"
@@ -3450,13 +3455,26 @@ def get_or_create_cover(req: CoverRequest) -> Dict[str, Any]:
 
     doc_ref = _firebase_cover_doc(cover_key)
 
-    # If exists and no force, return cached URL
-    if not req.force_regenerate:
-        doc = doc_ref.get()
-        if doc.exists:
-            data = doc.to_dict() or {}
-            if data.get("imageUrl"):
-                return {"coverKey": cover_key, "imageUrl": data["imageUrl"], "cached": True}
+    # Read existing doc once (for cache + regenerate guard)
+    doc = doc_ref.get()
+    data = (doc.to_dict() or {}) if doc.exists else {}
+    cached_url = data.get("imageUrl")
+    regen_count = int(data.get("regenCount") or 0)
+
+    # Cache hit (normal)
+    if cached_url and not req.force_regenerate:
+        return {"coverKey": cover_key, "imageUrl": cached_url, "cached": True}
+
+    # Force regenerate is allowed ONLY ONCE per cache key (max 2 paid generations total)
+    # - First generation: regenCount = 0
+    # - One allowed regenerate: regenCount -> 1
+    # - Further requests: return cached without regenerating
+    if cached_url and req.force_regenerate and regen_count >= 1:
+        return {"coverKey": cover_key, "imageUrl": cached_url, "cached": True, "regenLimited": True}
+    # Determine regenCount update (max one regenerate)
+    next_regen_count = regen_count
+    if req.force_regenerate and cached_url:
+        next_regen_count = regen_count + 1
 
     # Generate a brand-recognizable image (no logos)
     try:
@@ -3489,6 +3507,8 @@ def get_or_create_cover(req: CoverRequest) -> Dict[str, Any]:
             "year": req.year,
             "color": req.color,
             "imageUrl": image_url,
+            "regenCount": next_regen_count,
+            "createdAt": data.get("createdAt") or datetime.utcnow().isoformat(),
             "updatedAt": datetime.utcnow().isoformat(),
         },
         merge=True,
