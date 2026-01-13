@@ -3056,16 +3056,55 @@ class CoverResponse(BaseModel):
     cached: bool
 
 
-def _cover_key(brand: str, model: str, body: Optional[str] = None, generation: Optional[str] = None) -> str:
+def _year_bucket(year: Optional[int]) -> str:
+    if not year:
+        return "unknown"
+    base = (year // 5) * 5
+    return f"{base}-{base+4}"
+
+def _norm_color(color: Optional[str]) -> str:
+    c = (color or "").strip().lower()
+    mp = {
+        "beyaz": "white",
+        "siyah": "black",
+        "gri": "gray",
+        "mavi": "blue",
+        "lacivert": "blue",
+        "kırmızı": "red",
+        "kirmizi": "red",
+        "yeşil": "green",
+        "yesil": "green",
+        "gümüş": "silver",
+        "gumus": "silver",
+    }
+    return mp.get(c, c or "any")
+
+def _cover_key(
+    brand: str,
+    model: str,
+    body: Optional[str] = None,
+    year: Optional[int] = None,
+    color: Optional[str] = None,
+    generation: Optional[str] = None,
+) -> str:
     parts = [brand.strip().lower(), model.strip().lower()]
+
     if body:
         parts.append(body.strip().lower())
+
+    # önce generation varsa onu kullan (sen bazı araçlarda zaten kasa kodu tutuyorsun)
+    # yoksa year bucket kullan
     if generation:
         parts.append(generation.strip().lower())
-    # Firebase doc id için güvenli karakter
-    key = "|".join([re.sub(r"\s+", "-", p) for p in parts if p])
-    key = re.sub(r"[^a-z0-9\-|_]", "", key)
+    else:
+        parts.append(_year_bucket(year))
+
+    parts.append(_norm_color(color))
+
+    key = "|".join([re.sub(r"\s+", "_", p) for p in parts if p])
+    key = re.sub(r"[^a-z0-9_\-|]", "", key)
     return key or "unknown"
+
 
 
 
@@ -3344,7 +3383,14 @@ def get_or_create_cover(req: CoverRequest) -> Dict[str, Any]:
         raise HTTPException(status_code=400, detail="missing_brand_or_model")
 
     # Use explicit cache_key if provided (useful for tests / stable IDs)
-    cover_key = _normalize_cover_key(req.cache_key) if req.cache_key else _cover_key(brand, model, req.body, req.generation)
+    cover_key = _normalize_cover_key(req.cache_key) if req.cache_key else _cover_key(
+    brand,
+    model,
+    req.body,
+    req.year,
+    req.color,
+    req.generation,
+)
 
     doc_ref = _firebase_cover_doc(cover_key)
 
