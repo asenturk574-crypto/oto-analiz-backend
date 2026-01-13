@@ -8,6 +8,7 @@ import base64
 import uuid
 from io import BytesIO
 from urllib.parse import quote as urlquote
+import requests
 
 
 from fastapi import FastAPI, HTTPException
@@ -3175,48 +3176,127 @@ def _generate_vehicle_image_bytes(
     year: Optional[int] = None,
     color: Optional[str] = None,
 ) -> bytes:
-    if client is None:
-        raise RuntimeError("openai_client_not_configured")
+    """
+    Pexels-based vehicle image fetcher (external, single-car, exterior).
+    Returns raw image bytes (JPG/PNG). Upstream code will watermark + convert to WEBP.
+    Cache is handled by /get_or_create_cover (Firestore document + Storage upload).
+    """
+    api_key = (os.getenv("PEXELS_API_KEY") or "").strip()
+    if not api_key:
+        raise RuntimeError("missing_PEXELS_API_KEY")
 
     b = (brand or "").strip()
     m = (model or "").strip()
-    g = (generation or "").strip()
     by = (body or "").strip()
     c = (color or "").strip()
+    y = year if isinstance(year, int) else None
 
-    year_txt = f"{year} " if year else ""
-    gen_txt = f" ({g})" if g else ""
-    body_txt = f" {by}" if by else ""
-    color_txt = f"{c} " if c else ""
+    # Normalize a bit (TR -> EN colors for better search)
+    def _norm_color(x: str) -> str:
+        mp = {
+            "mavi": "blue", "lacivert": "blue",
+            "kırmızı": "red", "kirmizi": "red",
+            "beyaz": "white",
+            "siyah": "black",
+            "gri": "gray", "gümüş": "silver", "gumus": "silver",
+            "kahverengi": "brown",
+            "yeşil": "green", "yesil": "green",
+            "sarı": "yellow", "sari": "yellow",
+            "turuncu": "orange",
+            "mor": "purple",
+            "bej": "beige",
+        }
+        xx = (x or "").lower().strip()
+        return mp.get(xx, xx)
 
-    cues = _brand_design_cues(b)
+    c_en = _norm_color(c)
 
-    # The prompt is designed to produce a *brand-recognizable* image without using logos.
-    prompt = (
-        "Photorealistic studio product photo, front three-quarter view, neutral gradient background, "
-        "sharp focus, realistic reflections, high detail, 50mm lens look. "
-        f"Depict a {year_txt}{color_txt}{b} {m}{gen_txt}{body_txt}. "
-        "The car must clearly resemble that specific brand/model design language. "
-        f"{cues} "
-        "No logos, no badges, no text, no watermarks, no people, no license plates, no scenery."
-    )
+    # Query builder: we try strict first, then relax (to avoid "3 cars side by side" & interior)
+    base_tokens = [str(y) if y else "", b, m, by, c_en, "car", "exterior", "single"]
+    base_query = " ".join([t for t in base_tokens if t]).strip()
 
-    model_image = (os.getenv("OPENAI_IMAGE_MODEL") or "gpt-image-1").strip()
-    size = (os.getenv("COVER_IMAGE_SIZE") or "1024x1024").strip()
-    quality = (os.getenv("COVER_IMAGE_QUALITY") or "high").strip()
+    relax_queries = [
+        base_query,
+        " ".join([t for t in [str(y) if y else "", b, m, by, "car", "exterior"] if t]).strip(),
+        " ".join([t for t in [b, m, by, "car", "exterior"] if t]).strip(),
+        " ".join([t for t in [b, m, "car", "exterior"] if t]).strip(),
+    ]
 
-    img = client.images.generate(
-        model=model_image,
-        prompt=prompt,
-        size=size,
-        quality=quality,
-    )
+    bad_words = [
+        "interior", "dashboard", "steering", "seat", "cockpit",
+        "engine", "detail", "close up", "rim", "wheel", "tire", "tyre", "gear",
+    ]
+    multi_words = ["cars", "parking", "dealership", "showroom", "traffic", "fleet", "street", "race", "rally"]
+    people_words = ["people", "person", "man", "woman", "crowd"]
 
-    b64 = getattr(img.data[0], "b64_json", None)
-    if not b64:
-        raise RuntimeError("missing_b64_json_in_image_response")
+    def score_photo(p: Dict[str, Any]) -> int:
+        # Higher is better
+        alt = (p.get("alt") or "").lower()
+        s = 0
+        if not alt:
+            s += 2
+        # Penalize unwanted
+        if any(w in alt for w in bad_words):
+            s -= 8
+        if any(w in alt for w in people_words):
+            s -= 6
+        if any(w in alt for w in multi_words):
+            s -= 5
+        # Reward likely single exterior views
+        if "car" in alt:
+            s += 2
+        if "exterior" in alt or "outside" in alt:
+            s += 2
+        if "front" in alt or "side" in alt or "rear" in alt or "view" in alt:
+            s += 1
+        # Prefer shorter "clean" alts
+        if 0 < len(alt) <= 60:
+            s += 1
+        # Prefer higher resolution if present
+        src = p.get("src") or {}
+        if src.get("large2x"):
+            s += 2
+        elif src.get("large"):
+            s += 1
+        return s
 
-    return base64.b64decode(b64)
+    headers = {"Authorization": api_key}
+    search_url = "https://api.pexels.com/v1/search"
+
+    last_status = None
+    for q in relax_queries:
+        if not q:
+            continue
+        try:
+            resp = requests.get(
+                search_url,
+                headers=headers,
+                params={"query": q, "per_page": 40, "orientation": "landscape"},
+                timeout=12,
+            )
+            last_status = resp.status_code
+            if resp.status_code != 200:
+                continue
+            data = resp.json() or {}
+            photos = data.get("photos") or []
+            if not photos:
+                continue
+
+            # Score + pick best
+            ranked = sorted(photos, key=score_photo, reverse=True)
+            best = ranked[0]
+            src = best.get("src") or {}
+            url = src.get("large2x") or src.get("large") or src.get("medium") or src.get("original")
+            if not url:
+                continue
+
+            img_resp = requests.get(url, timeout=20)
+            if img_resp.status_code == 200 and img_resp.content:
+                return img_resp.content
+        except Exception:
+            continue
+
+    raise RuntimeError(f"pexels_no_image_found(status={last_status})")
 
 def _apply_watermark(image_bytes: bytes, watermark_text: str = "Oto Analiz") -> bytes:
     if Image is None or ImageDraw is None or ImageFont is None:
