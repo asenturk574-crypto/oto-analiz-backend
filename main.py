@@ -3099,8 +3099,6 @@ def _cover_key(
     else:
         parts.append(_year_bucket(year))
 
-    parts.append(_norm_color(color))
-
     key = "|".join([re.sub(r"\s+", "_", p) for p in parts if p])
     key = re.sub(r"[^a-z0-9_\-|]", "", key)
     return key or "unknown"
@@ -3288,20 +3286,49 @@ def _generate_vehicle_image_bytes(
 
     c_en = _norm_color(c)
 
-    # Model tokens for matching ALT (ignore too-short tokens like "c")
+        # Model matching helpers:
+    # - Token match for general models
+    # - Phrase match for ambiguous single-letter Mercedes classes (C/E/S/A/B/G)
     def _model_tokens(mm: str) -> List[str]:
         toks = [t for t in re.split(r"[^a-z0-9]+", (mm or "").lower()) if t]
-        toks = [t for t in toks if len(t) >= 3]  # 3+ chars only
-        # keep unique order
-        seen = set()
         out = []
+        seen = set()
         for t in toks:
-            if t not in seen:
+            if t.isdigit():
+                ok = True
+            else:
+                ok = len(t) >= 3
+            if ok and t not in seen:
                 seen.add(t)
                 out.append(t)
         return out
 
+    def _model_phrases(mm: str) -> List[str]:
+        mmn = (mm or "").lower().strip().replace("-", " ")
+        mmn = re.sub(r"\s+", " ", mmn)
+        if not mmn:
+            return []
+        phrases = {mmn, mmn.replace(" ", "-"), mmn.replace(" ", "")}
+        return sorted(phrases)
+
+    def _model_blacklist_for_brand(bb: str, mmn: str) -> List[str]:
+        # Prevent class confusion: C-Class shouldn't return S-Class, etc.
+        bb = (bb or "").lower().strip()
+        mmn2 = (mmn or "").lower().strip().replace("-", " ")
+        mmn2 = re.sub(r"\s+", " ", mmn2)
+        if bb == "mercedes" and re.match(r"^[abcegs] class$", mmn2):
+            letter = mmn2.split()[0]
+            other = [f"{x} class" for x in ["a","b","c","e","g","s"] if x != letter]
+            bl = set()
+            for o in other:
+                bl.add(o)
+                bl.add(o.replace(" ", "-"))
+            return sorted(bl)
+        return []
+
     mtoks = _model_tokens(m)
+    mphrases = _model_phrases(m)
+    mblack = _model_blacklist_for_brand(b, m)
 
     # ---------
     # Query builder: strict -> relaxed
@@ -3311,8 +3338,7 @@ def _generate_vehicle_image_bytes(
 
     strict_query = _join(
         str(y) if y else "",
-        c_en,
-        b,
+                b,
         m,
         by,
         "car exterior",
@@ -3352,6 +3378,8 @@ def _generate_vehicle_image_bytes(
         "interior", "inside", "dashboard", "cockpit", "steering", "wheel close",
         "seat", "seats", "console", "gear", "engine", "detail", "close up", "rim",
         "tire", "tyre",
+        "vintage", "classic", "retro", "antique", "old", "nostalgia",
+        "rear", "back view", "taillight", "tail light", "rearview",
     ]
     multi_words = ["cars", "parking", "dealership", "showroom", "traffic", "fleet", "street", "race", "rally"]
     people_words = ["people", "person", "man", "woman", "crowd"]
@@ -3381,11 +3409,21 @@ def _generate_vehicle_image_bytes(
                     return False
                 if b not in ("mercedes", "vw"):
                     return False
-        # If we have meaningful model tokens, require at least one in strict level 0
-        if strict_level == 0 and mtoks:
-            if not any(t in alt for t in mtoks):
+                # In strict level 0:
+        # - reject obvious other-class matches (e.g., C-Class request but ALT says S-Class)
+        if strict_level == 0:
+            if mblack and any(x in alt for x in mblack):
                 return False
+
+            # Mercedes single-letter classes are ambiguous: require a phrase match like "c class"/"c-class"
+            if b == "mercedes" and mphrases and re.match(r"^[abcegs]\s*class$", m):
+                if not any(ph in alt for ph in mphrases):
+                    return False
+            elif mtoks:
+                if not any(t in alt for t in mtoks):
+                    return False
         return True
+
 
     def score_photo(p: Dict[str, Any], strict_level: int) -> int:
         alt = _alt(p)
@@ -3814,54 +3852,3 @@ if __name__ == "__main__":
     # Lokal çalıştırma için:
     # uvicorn main:app --host 0.0.0.0 --port 8000 --reload
     pass
-
-
-# =========================
-# YOL-1 PATCH (AUTO-APPLIED)
-# Cache: brand+model+body+year_bucket
-# Pexels: strict modern exterior, no old/rear/interior, color ignored
-# =========================
-
-import re
-
-def _norm(s: str) -> str:
-    s = (s or "").lower().strip()
-    s = s.replace("-", " ")
-    s = re.sub(r"\s+", " ", s)
-    return s
-
-def build_image_cache_key(vehicle: dict) -> str:
-    make = _norm(vehicle.get("make", ""))
-    model = _norm(vehicle.get("model", ""))
-    body = _norm(vehicle.get("body", "sedan"))
-    year = vehicle.get("year")
-    if year:
-        year = int(year)
-        if year >= 2020:
-            year_bucket = "2020+"
-        elif year >= 2015:
-            year_bucket = "2015-2019"
-        else:
-            year_bucket = "pre-2015"
-    else:
-        year_bucket = "unknown"
-    return f"{make}_{model}_{body}_{year_bucket}"
-
-OLD_WORDS = ["vintage","classic","old","retro","antique","80s","70s","90s"]
-REAR_WORDS = ["rear","back view","taillight","tail light"]
-INTERIOR_WORDS = ["interior","dashboard","steering","seat","cockpit","engine","detail","close up"]
-MULTI_WORDS = ["cars","parking","dealership","showroom","traffic","fleet"]
-
-def is_valid_car_photo(photo: dict) -> bool:
-    alt = _norm(photo.get("alt",""))
-    if any(w in alt for w in OLD_WORDS): return False
-    if any(w in alt for w in REAR_WORDS): return False
-    if any(w in alt for w in INTERIOR_WORDS): return False
-    if any(w in alt for w in MULTI_WORDS): return False
-    return True
-
-def model_strict_match(photo: dict, model: str) -> bool:
-    return _norm(model) in _norm(photo.get("alt",""))
-
-# NOTE:
-# Pexels selection functions above will override earlier loose behavior
