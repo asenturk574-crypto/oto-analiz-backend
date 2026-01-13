@@ -3489,12 +3489,9 @@ def _apply_watermark(image_bytes: bytes, watermark_text: str = "Oto Analiz") -> 
 
     # large font relative to image
     font_size = max(48, int(min(W, H) * 0.10))
-    try:
-        font = ImageFont.truetype("DejaVuSans-Bold.ttf", font_size)
-    except Exception:
-        font = ImageFont.load_default()
-
-    # text bbox
+    # Use default font (Render-safe)
+    font = ImageFont.load_default()
+# text bbox
     bbox = draw.textbbox((0, 0), watermark_text, font=font)
     tw = bbox[2] - bbox[0]
     th = bbox[3] - bbox[1]
@@ -3994,51 +3991,67 @@ def _download_best_src(p: Dict[str, Any]) -> bytes:
     return r.content
 
 def _make_placeholder_cover(brand: str, model: str) -> bytes:
-    """Guaranteed-correct fallback: clean 'front' placeholder with text."""
-    w, h = 1024, 576
-    img = Image.new("RGB", (w, h), (245, 245, 245))
-    draw = ImageDraw.Draw(img)
-
-    cx, cy = w // 2, int(h * 0.55)
-    car_w, car_h = int(w * 0.55), int(h * 0.28)
-    x0, y0 = cx - car_w // 2, cy - car_h // 2
-    x1, y1 = cx + car_w // 2, cy + car_h // 2
-    draw.rounded_rectangle([x0, y0, x1, y1], radius=28, fill=(220, 220, 220), outline=(180, 180, 180), width=4)
-
-    wx0, wy0 = cx - int(car_w * 0.22), y0 + int(car_h * 0.10)
-    wx1, wy1 = cx + int(car_w * 0.22), y0 + int(car_h * 0.42)
-    draw.rounded_rectangle([wx0, wy0, wx1, wy1], radius=18, fill=(200, 200, 200), outline=(170, 170, 170), width=3)
-
-    hw = int(car_w * 0.10)
-    hh = int(car_h * 0.18)
-    draw.rounded_rectangle([x0 + 24, y0 + int(car_h * 0.55), x0 + 24 + hw, y0 + int(car_h * 0.55) + hh], radius=12, fill=(210, 210, 210), outline=(160, 160, 160), width=2)
-    draw.rounded_rectangle([x1 - 24 - hw, y0 + int(car_h * 0.55), x1 - 24, y0 + int(car_h * 0.55) + hh], radius=12, fill=(210, 210, 210), outline=(160, 160, 160), width=2)
-
-    rr = int(car_h * 0.22)
-    draw.ellipse([x0 + int(car_w*0.18)-rr, y1 - rr, x0 + int(car_w*0.18)+rr, y1 + rr], fill=(90, 90, 90))
-    draw.ellipse([x1 - int(car_w*0.18)-rr, y1 - rr, x1 - int(car_w*0.18)+rr, y1 + rr], fill=(90, 90, 90))
-
-    title = f"{brand.strip()} {model.strip()}".strip()
-    subtitle = "OtoAnaliz Cover (fallback)"
+    """
+    Guaranteed-correct fallback cover.
+    Goal: NEVER crash on Render (no truetype fonts, no rounded_rectangle).
+    """
     try:
-        font_big = ImageFont.truetype("DejaVuSans.ttf", 54)
-        font_small = ImageFont.truetype("DejaVuSans.ttf", 26)
-        font_wm = ImageFont.truetype("DejaVuSans.ttf", 28)
+        from io import BytesIO
+        w, h = 1024, 576
+        img = Image.new("RGB", (w, h), (245, 245, 245))
+        draw = ImageDraw.Draw(img)
+
+        # Simple "car" silhouette (front-like) using basic primitives
+        cx, cy = w // 2, int(h * 0.55)
+        car_w, car_h = int(w * 0.60), int(h * 0.28)
+        x0, y0 = cx - car_w // 2, cy - car_h // 2
+        x1, y1 = cx + car_w // 2, cy + car_h // 2
+
+        # Body
+        draw.rectangle([x0, y0, x1, y1], fill=(220, 220, 220), outline=(180, 180, 180), width=4)
+        # Grille
+        gx0, gy0 = cx - int(car_w * 0.20), y0 + int(car_h * 0.12)
+        gx1, gy1 = cx + int(car_w * 0.20), y0 + int(car_h * 0.42)
+        draw.rectangle([gx0, gy0, gx1, gy1], fill=(200, 200, 200), outline=(170, 170, 170), width=3)
+        # Headlights
+        hw, hh = int(car_w * 0.10), int(car_h * 0.18)
+        draw.rectangle([x0 + 28, y0 + int(car_h * 0.55), x0 + 28 + hw, y0 + int(car_h * 0.55) + hh],
+                       fill=(210, 210, 210), outline=(160, 160, 160), width=2)
+        draw.rectangle([x1 - 28 - hw, y0 + int(car_h * 0.55), x1 - 28, y0 + int(car_h * 0.55) + hh],
+                       fill=(210, 210, 210), outline=(160, 160, 160), width=2)
+        # Wheels
+        r = int(car_h * 0.22)
+        wy = y1 - int(r * 0.25)
+        wx_left = x0 + int(car_w * 0.20)
+        wx_right = x1 - int(car_w * 0.20)
+        draw.ellipse([wx_left - r, wy - r, wx_left + r, wy + r], fill=(80, 80, 80), outline=(40, 40, 40), width=4)
+        draw.ellipse([wx_right - r, wy - r, wx_right + r, wy + r], fill=(80, 80, 80), outline=(40, 40, 40), width=4)
+
+        # Text (Render-safe default font)
+        title = f"{(brand or '').strip()} {(model or '').strip()}".strip() or "Vehicle"
+        subtitle = "OtoAnaliz Cover (fallback)"
+
+        font = ImageFont.load_default()
+        # Centered-ish
+        tw = draw.textlength(title, font=font) if hasattr(draw, "textlength") else len(title) * 6
+        draw.text((max(16, (w - tw) // 2), int(h * 0.12)), title, fill=(30, 30, 30), font=font)
+        draw.text((24, h - 32), subtitle, fill=(90, 90, 90), font=font)
+
+        buf = BytesIO()
+        # WEBP smaller
+        img.save(buf, format="WEBP", quality=72, method=6)
+        return buf.getvalue()
     except Exception:
-        font_big = ImageFont.load_default()
-        font_small = ImageFont.load_default()
-        font_wm = ImageFont.load_default()
+        # Last-ditch: return a tiny valid WEBP-like placeholder (actually PNG if WEBP fails)
+        try:
+            from io import BytesIO
+            img = Image.new("RGB", (512, 288), (245, 245, 245))
+            buf = BytesIO()
+            img.save(buf, format="PNG", optimize=True)
+            return buf.getvalue()
+        except Exception:
+            return b""
 
-    tw = draw.textlength(title, font=font_big)
-    draw.text((cx - tw/2, int(h*0.12)), title, fill=(30, 30, 30), font=font_big)
-    sw = draw.textlength(subtitle, font=font_small)
-    draw.text((cx - sw/2, int(h*0.12)+70), subtitle, fill=(90, 90, 90), font=font_small)
-
-    draw.text((w-150, h-45), "otoanaliz", fill=(40, 40, 40), font=font_wm)
-
-    buf = BytesIO()
-    img.save(buf, format="WEBP", quality=80, method=6)
-    return buf.getvalue()
 
 def _generate_vehicle_image_bytes(
     brand: str,
