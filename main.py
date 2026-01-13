@@ -3814,3 +3814,54 @@ if __name__ == "__main__":
     # Lokal çalıştırma için:
     # uvicorn main:app --host 0.0.0.0 --port 8000 --reload
     pass
+
+
+# =========================
+# YOL-1 PATCH (AUTO-APPLIED)
+# Cache: brand+model+body+year_bucket
+# Pexels: strict modern exterior, no old/rear/interior, color ignored
+# =========================
+
+import re
+
+def _norm(s: str) -> str:
+    s = (s or "").lower().strip()
+    s = s.replace("-", " ")
+    s = re.sub(r"\s+", " ", s)
+    return s
+
+def build_image_cache_key(vehicle: dict) -> str:
+    make = _norm(vehicle.get("make", ""))
+    model = _norm(vehicle.get("model", ""))
+    body = _norm(vehicle.get("body", "sedan"))
+    year = vehicle.get("year")
+    if year:
+        year = int(year)
+        if year >= 2020:
+            year_bucket = "2020+"
+        elif year >= 2015:
+            year_bucket = "2015-2019"
+        else:
+            year_bucket = "pre-2015"
+    else:
+        year_bucket = "unknown"
+    return f"{make}_{model}_{body}_{year_bucket}"
+
+OLD_WORDS = ["vintage","classic","old","retro","antique","80s","70s","90s"]
+REAR_WORDS = ["rear","back view","taillight","tail light"]
+INTERIOR_WORDS = ["interior","dashboard","steering","seat","cockpit","engine","detail","close up"]
+MULTI_WORDS = ["cars","parking","dealership","showroom","traffic","fleet"]
+
+def is_valid_car_photo(photo: dict) -> bool:
+    alt = _norm(photo.get("alt",""))
+    if any(w in alt for w in OLD_WORDS): return False
+    if any(w in alt for w in REAR_WORDS): return False
+    if any(w in alt for w in INTERIOR_WORDS): return False
+    if any(w in alt for w in MULTI_WORDS): return False
+    return True
+
+def model_strict_match(photo: dict, model: str) -> bool:
+    return _norm(model) in _norm(photo.get("alt",""))
+
+# NOTE:
+# Pexels selection functions above will override earlier loose behavior
