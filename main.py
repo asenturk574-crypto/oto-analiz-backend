@@ -3087,22 +3087,56 @@ def _cover_key(
     color: Optional[str] = None,
     generation: Optional[str] = None,
 ) -> str:
-    parts = [brand.strip().lower(), model.strip().lower()]
+    """Cache key rule (critical):
+
+    New cover is generated ONLY if one of these changes:
+    - brand, model
+    - body (sedan/suv/hatch etc.)
+    - generation/kasa (if provided)
+    - year
+    - color
+    """
+    # lightweight normalization for cache stability
+    def _norm_token(x: Optional[str]) -> str:
+        x = (x or "").strip().lower()
+        x = x.replace("ı", "i").replace("ş", "s").replace("ğ", "g").replace("ü", "u").replace("ö", "o").replace("ç", "c")
+        x = re.sub(r"\s+", "_", x)
+        x = re.sub(r"[^a-z0-9_\-|]", "", x)
+        return x
+
+    # brand aliases (typo tolerance)
+    b = _norm_token(brand)
+    brand_alias = {
+        "mercdes": "mercedes",
+        "mercedez": "mercedes",
+        "mercedesbenz": "mercedes",
+        "mercedes-benz": "mercedes",
+        "benz": "mercedes",
+        "mb": "mercedes",
+        "vw": "volkswagen",
+    }
+    b = brand_alias.get(b, b)
+
+    m = _norm_token(model)
+
+    parts = [b, m]
 
     if body:
-        parts.append(body.strip().lower())
+        parts.append(_norm_token(body))
 
-    # önce generation varsa onu kullan (sen bazı araçlarda zaten kasa kodu tutuyorsun)
-    # yoksa year bucket kullan
     if generation:
-        parts.append(generation.strip().lower())
+        parts.append(_norm_token(generation))
+
+    # exact year (not bucket) — user rule
+    if isinstance(year, int) and 1900 <= year <= 2100:
+        parts.append(str(year))
     else:
-        parts.append(_year_bucket(year))
+        parts.append("unknown_year")
 
     parts.append(_norm_color(color))
 
-    key = "|".join([re.sub(r"\s+", "_", p) for p in parts if p])
-    key = re.sub(r"[^a-z0-9_\-|]", "", key)
+    key = "|".join([p for p in parts if p])
+    key = re.sub(r"\|{2,}", "|", key).strip("|")
     return key or "unknown"
 
 
@@ -3215,266 +3249,152 @@ def _generate_vehicle_image_bytes(
     year: Optional[int] = None,
     color: Optional[str] = None,
 ) -> bytes:
+    """Generate a single-car exterior cover image using OpenAI Images.
+
+    We intentionally avoid stock-photo search (Pexels etc.) because it can return
+    wrong brands/models. Instead we generate a consistent, controllable cover.
+
+    Output: raw image bytes (PNG) from the Images API. We later watermark + convert to WEBP.
     """
-    Pexels-based vehicle image fetcher (external, single-car, exterior).
+    if client is None:
+        raise HTTPException(status_code=500, detail="openai_client_not_configured")
 
-    IMPORTANT QUALITY RULES (to avoid "Subaru for Mercedes" issues):
-    - We normalize obvious brand typos/aliases (e.g., "mercdes" -> "mercedes").
-    - We run queries from strict -> relaxed.
-    - For strict queries we *require* the returned photo ALT text to contain the requested
-      brand (and if model tokens are meaningful, at least one model token).
-    - We avoid interior/multi-car/dealership shots with hard filters (not just scoring).
-    """
-    api_key = (os.getenv("PEXELS_API_KEY") or "").strip()
-    if not api_key:
-        raise RuntimeError("missing_PEXELS_API_KEY")
+    b = (brand or "").strip()
+    m = (model or "").strip()
+    if not b or not m:
+        raise HTTPException(status_code=400, detail="missing_brand_or_model")
 
-    b_raw = (brand or "").strip()
-    m_raw = (model or "").strip()
-    by = (body or "").strip()
-    gen = (generation or "").strip()
-    c = (color or "").strip()
-    y = year if isinstance(year, int) else None
-
-    # ---------
-    # Normalize brand/model for better recall + less mismatch
-    # ---------
-    def _clean_token(s: str) -> str:
-        s = (s or "").lower().strip()
-        s = re.sub(r"\s+", " ", s)
-        return s
-
+    # Normalize very common typos/aliases (for both prompt & cache stability)
     brand_alias = {
-        # common TR typos / variants
-        "mercdes": "mercedes",
-        "mercedes-benz": "mercedes",
-        "mercedes benz": "mercedes",
-        "volkswagen": "vw",  # Pexels often uses VW
-        "wolswagen": "vw",
-        "wolkswagen": "vw",
-        "bmv": "bmw",
-        "hyndai": "hyundai",
-        "renault ": "renault",
+        "mercedesbenz": "Mercedes-Benz",
+        "mercedes-benz": "Mercedes-Benz",
+        "mercdes": "Mercedes-Benz",
+        "mercedez": "Mercedes-Benz",
+        "mercedes": "Mercedes-Benz",
+        "benz": "Mercedes-Benz",
+        "mb": "Mercedes-Benz",
+        "bmw": "BMW",
+        "volkswagen": "Volkswagen",
+        "vw": "Volkswagen",
+        "audi": "Audi",
+        "toyota": "Toyota",
+        "honda": "Honda",
+        "hyundai": "Hyundai",
+        "kia": "Kia",
+        "ford": "Ford",
+        "renault": "Renault",
+        "fiat": "Fiat",
+        "peugeot": "Peugeot",
+        "citroen": "Citroën",
+        "opel": "Opel",
+        "skoda": "Škoda",
+        "seat": "SEAT",
+        "dacia": "Dacia",
+        "nissan": "Nissan",
+        "mazda": "Mazda",
+        "volvo": "Volvo",
+        "porsche": "Porsche",
     }
 
-    b = _clean_token(b_raw)
-    b = brand_alias.get(b, b)
+    b_key = re.sub(r"[^a-z0-9]+", "", b.lower())
+    b_norm = brand_alias.get(b_key, b.strip().title())
 
-    m = _clean_token(m_raw)
-    # Mercedes class heuristics: single-letter models are too ambiguous.
-    if b in ("mercedes", "mb") and m in ("a", "b", "c", "e", "s", "g"):
-        m = f"{m} class"
-    if b == "vw":
-        # many people type "golf 7" etc; leave as is.
-        pass
+    # Model cleanup
+    m_norm = re.sub(r"\s+", " ", m.strip())
 
-    # Color TR -> EN
-    def _norm_color(x: str) -> str:
+    # Color TR->EN (prompt only; cache uses _norm_color elsewhere)
+    def _color_en(x: Optional[str]) -> str:
+        if not x:
+            return ""
         mp = {
-            "mavi": "blue", "lacivert": "blue",
-            "kırmızı": "red", "kirmizi": "red",
-            "beyaz": "white",
             "siyah": "black",
-            "gri": "gray", "gümüş": "silver", "gumus": "silver",
-            "kahverengi": "brown",
-            "yeşil": "green", "yesil": "green",
-            "sarı": "yellow", "sari": "yellow",
+            "beyaz": "white",
+            "gri": "gray",
+            "füme": "gray",
+            "fume": "gray",
+            "kırmızı": "red",
+            "kirmizi": "red",
+            "mavi": "blue",
+            "lacivert": "navy blue",
+            "yeşil": "green",
+            "yesil": "green",
+            "sarı": "yellow",
+            "sari": "yellow",
             "turuncu": "orange",
             "mor": "purple",
             "bej": "beige",
+            "kahverengi": "brown",
+            "gümüş": "silver",
+            "gumus": "silver",
         }
-        xx = _clean_token(x)
+        xx = (x or "").strip().lower()
+        xx = xx.replace("ı", "i").replace("ş", "s").replace("ğ", "g").replace("ü", "u").replace("ö", "o").replace("ç", "c")
         return mp.get(xx, xx)
 
-    c_en = _norm_color(c)
+    c_en = _color_en(color)
 
-    # Model tokens for matching ALT (ignore too-short tokens like "c")
-    def _model_tokens(mm: str) -> List[str]:
-        toks = [t for t in re.split(r"[^a-z0-9]+", (mm or "").lower()) if t]
-        toks = [t for t in toks if len(t) >= 3]  # 3+ chars only
-        # keep unique order
-        seen = set()
-        out = []
-        for t in toks:
-            if t not in seen:
-                seen.add(t)
-                out.append(t)
-        return out
+    # Prompt: photoreal, single car, clean background, front 3/4
+    # Also explicitly forbid extra objects/people/text/logos.
+    y = str(int(year)) if isinstance(year, int) and 1950 <= int(year) <= 2035 else ""
+    body_s = (body or "").strip()
+    gen_s = (generation or "").strip()
 
-    mtoks = _model_tokens(m)
+    # Brand-specific design cues help reduce "wrong brand" look.
+    cues = _brand_design_cues(b_norm)
 
-    # ---------
-    # Query builder: strict -> relaxed
-    # ---------
-    def _join(*parts: str) -> str:
-        return " ".join([p for p in parts if p and p.strip()]).strip()
+    parts = []
+    if c_en:
+        parts.append(c_en)
+    if y:
+        parts.append(y)
+    parts.append(b_norm)
+    parts.append(m_norm)
+    if gen_s:
+        parts.append(gen_s)
+    if body_s:
+        parts.append(body_s)
 
-    strict_query = _join(
-        str(y) if y else "",
-        c_en,
-        b,
-        m,
-        by,
-        "car exterior",
-        "front view",
-        "single car",
+    subject = " ".join([p for p in parts if p]).strip()
+
+    prompt = (
+        f"Photorealistic studio-style exterior photo of a single {subject}. "
+        f"Front three-quarter angle, sharp focus, realistic proportions. "
+        f"Clean neutral background, no people, no text, no badges/logos, no watermark. "
+        f"Only one car in the frame. {cues}"
     )
 
-    semi_query = _join(
-        str(y) if y else "",
-        b,
-        m,
-        by,
-        "car exterior",
-        "single car",
+    image_model = (os.getenv("OPENAI_IMAGE_MODEL") or "gpt-image-1").strip()
+    image_quality = (os.getenv("OPENAI_IMAGE_QUALITY") or "low").strip().lower()
+    # Enforce allowed values
+    if image_quality not in ("low", "medium", "high"):
+        image_quality = "low"
+
+    # Size is fixed per product decision
+    size = "1024x1024"
+
+    # OpenAI Python SDK returns base64 for images
+    res = client.images.generate(
+        model=image_model,
+        prompt=prompt,
+        size=size,
+        quality=image_quality,
     )
 
-    relaxed_query = _join(
-        b,
-        m,
-        "car exterior",
-    )
+    # Support both shapes (b64_json or raw bytes-like)
+    b64 = None
+    try:
+        if hasattr(res, "data") and res.data and getattr(res.data[0], "b64_json", None):
+            b64 = res.data[0].b64_json
+        elif isinstance(res, dict):
+            # Very defensive for older/alt shapes
+            b64 = (((res.get("data") or [{}])[0]).get("b64_json"))
+    except Exception:
+        b64 = None
 
-    # Last resort: brand only (still try to keep exterior / single)
-    brand_only_query = _join(
-        b,
-        "car exterior",
-        "front view",
-        "single car",
-    )
+    if not b64:
+        raise RuntimeError("missing_b64_json_from_images_api")
 
-    relax_queries = [strict_query, semi_query, relaxed_query, brand_only_query]
-
-    # ---------
-    # Hard filters / scoring
-    # ---------
-    bad_words = [
-        "interior", "inside", "dashboard", "cockpit", "steering", "wheel close",
-        "seat", "seats", "console", "gear", "engine", "detail", "close up", "rim",
-        "tire", "tyre",
-    ]
-    multi_words = ["cars", "parking", "dealership", "showroom", "traffic", "fleet", "street", "race", "rally"]
-    people_words = ["people", "person", "man", "woman", "crowd"]
-
-    def _alt(p: Dict[str, Any]) -> str:
-        return (p.get("alt") or "").lower().strip()
-
-    def _passes_hard_filters(alt: str, strict_level: int) -> bool:
-        # strict_level: 0 (strict) -> 3 (brand only)
-        if any(w in alt for w in bad_words):
-            return False
-        if any(w in alt for w in people_words):
-            return False
-        # Multi-car scenes: for strict levels, reject outright (not just penalty)
-        if strict_level <= 1 and any(w in alt for w in multi_words):
-            return False
-        return True
-
-    def _passes_identity(alt: str, strict_level: int) -> bool:
-        # For strict & semi, require brand in ALT
-        if strict_level <= 1:
-            if b and b not in alt:
-                # Allow "mercedes" to appear as "benz" sometimes
-                if b == "mercedes" and ("mercedes" not in alt and "benz" not in alt):
-                    return False
-                if b == "vw" and ("vw" not in alt and "volkswagen" not in alt):
-                    return False
-                if b not in ("mercedes", "vw"):
-                    return False
-        # If we have meaningful model tokens, require at least one in strict level 0
-        if strict_level == 0 and mtoks:
-            if not any(t in alt for t in mtoks):
-                return False
-        return True
-
-    def score_photo(p: Dict[str, Any], strict_level: int) -> int:
-        alt = _alt(p)
-        s = 0
-        # Favor having an ALT (usually more descriptive)
-        if alt:
-            s += 3
-        # Reward identity matches
-        if b and (b in alt or (b == "mercedes" and "benz" in alt) or (b == "vw" and "volkswagen" in alt)):
-            s += 6
-        if mtoks and any(t in alt for t in mtoks):
-            s += 4
-        # Penalize multi-car/dealership hints
-        if any(w in alt for w in multi_words):
-            s -= 6
-        # Prefer landscape-ish sources for cover cards
-        src = p.get("src") or {}
-        if isinstance(src, dict) and src.get("large"):
-            s += 1
-        return s
-
-    import requests
-
-    headers = {"Authorization": api_key}
-
-    def _search(query: str, per_page: int = 30) -> List[Dict[str, Any]]:
-        if not query:
-            return []
-        r = requests.get(
-            "https://api.pexels.com/v1/search",
-            headers=headers,
-            params={"query": query, "per_page": per_page},
-            timeout=20,
-        )
-        if r.status_code != 200:
-            raise RuntimeError(f"pexels_search_failed_{r.status_code}")
-        js = r.json()
-        return js.get("photos") or []
-
-    def _pick_best(photos: List[Dict[str, Any]], strict_level: int) -> Optional[Dict[str, Any]]:
-        candidates = []
-        for p in photos:
-            alt = _alt(p)
-            if not _passes_hard_filters(alt, strict_level):
-                continue
-            if not _passes_identity(alt, strict_level):
-                continue
-            candidates.append(p)
-        if not candidates:
-            return None
-        candidates.sort(key=lambda p: score_photo(p, strict_level), reverse=True)
-        return candidates[0]
-
-    # Try strict -> relaxed, but keep identity as much as possible
-    chosen = None
-    chosen_level = None
-    for level, q in enumerate(relax_queries):
-        photos = _search(q, per_page=40 if level <= 1 else 60)
-        chosen = _pick_best(photos, strict_level=level)
-        chosen_level = level
-        if chosen:
-            break
-
-    # If still none: as a last resort, pick best-scored from relaxed_query (no identity requirement)
-    if not chosen:
-        photos = _search(relaxed_query, per_page=80)
-        if photos:
-            photos.sort(key=lambda p: score_photo(p, strict_level=3), reverse=True)
-            chosen = photos[0]
-            chosen_level = 3
-
-    if not chosen:
-        raise RuntimeError("pexels_no_photo_found")
-
-    src = chosen.get("src") or {}
-    url = None
-    if isinstance(src, dict):
-        # best for covers: large2x > large > original
-        url = src.get("large2x") or src.get("large") or src.get("original")
-
-    if not url:
-        raise RuntimeError("pexels_missing_src_url")
-
-    # Download image bytes
-    rr = requests.get(url, timeout=25)
-    if rr.status_code != 200 or not rr.content:
-        raise RuntimeError(f"pexels_download_failed_{rr.status_code}")
-
-    return rr.content
+    return base64.b64decode(b64)
 
 def _apply_watermark(image_bytes: bytes, watermark_text: str = "Oto Analiz") -> bytes:
     if Image is None or ImageDraw is None or ImageFont is None:
@@ -3968,171 +3888,5 @@ def _passes_brand_model(alt: str, b: str, must_phrases: List[str], must_tokens: 
             return False
     return True
 
-def _search_pexels_photos(query: str, per_page: int = 40) -> List[Dict[str, Any]]:
-    key = os.getenv("PEXELS_API_KEY", "").strip()
-    if not key:
-        raise RuntimeError("missing_PEXELS_API_KEY")
-    url = "https://api.pexels.com/v1/search"
-    headers = {"Authorization": key}
-    params = {"query": query, "per_page": per_page, "orientation": "landscape"}
-    r = requests.get(url, headers=headers, params=params, timeout=20)
-    if r.status_code != 200:
-        raise RuntimeError(f"pexels_search_failed_{r.status_code}")
-    js = r.json()
-    return js.get("photos") or []
 
-def _download_best_src(p: Dict[str, Any]) -> bytes:
-    src = p.get("src") or {}
-    url = src.get("large2x") or src.get("large") or src.get("original") or src.get("medium")
-    if not url:
-        raise RuntimeError("pexels_missing_src")
-    r = requests.get(url, timeout=30)
-    r.raise_for_status()
-    return r.content
-
-def _make_placeholder_cover(brand: str, model: str) -> bytes:
-    """
-    Guaranteed-correct fallback cover.
-    Goal: NEVER crash on Render (no truetype fonts, no rounded_rectangle).
-    """
-    try:
-        from io import BytesIO
-        w, h = 1024, 576
-        img = Image.new("RGB", (w, h), (245, 245, 245))
-        draw = ImageDraw.Draw(img)
-
-        # Simple "car" silhouette (front-like) using basic primitives
-        cx, cy = w // 2, int(h * 0.55)
-        car_w, car_h = int(w * 0.60), int(h * 0.28)
-        x0, y0 = cx - car_w // 2, cy - car_h // 2
-        x1, y1 = cx + car_w // 2, cy + car_h // 2
-
-        # Body
-        draw.rectangle([x0, y0, x1, y1], fill=(220, 220, 220), outline=(180, 180, 180), width=4)
-        # Grille
-        gx0, gy0 = cx - int(car_w * 0.20), y0 + int(car_h * 0.12)
-        gx1, gy1 = cx + int(car_w * 0.20), y0 + int(car_h * 0.42)
-        draw.rectangle([gx0, gy0, gx1, gy1], fill=(200, 200, 200), outline=(170, 170, 170), width=3)
-        # Headlights
-        hw, hh = int(car_w * 0.10), int(car_h * 0.18)
-        draw.rectangle([x0 + 28, y0 + int(car_h * 0.55), x0 + 28 + hw, y0 + int(car_h * 0.55) + hh],
-                       fill=(210, 210, 210), outline=(160, 160, 160), width=2)
-        draw.rectangle([x1 - 28 - hw, y0 + int(car_h * 0.55), x1 - 28, y0 + int(car_h * 0.55) + hh],
-                       fill=(210, 210, 210), outline=(160, 160, 160), width=2)
-        # Wheels
-        r = int(car_h * 0.22)
-        wy = y1 - int(r * 0.25)
-        wx_left = x0 + int(car_w * 0.20)
-        wx_right = x1 - int(car_w * 0.20)
-        draw.ellipse([wx_left - r, wy - r, wx_left + r, wy + r], fill=(80, 80, 80), outline=(40, 40, 40), width=4)
-        draw.ellipse([wx_right - r, wy - r, wx_right + r, wy + r], fill=(80, 80, 80), outline=(40, 40, 40), width=4)
-
-        # Text (Render-safe default font)
-        title = f"{(brand or '').strip()} {(model or '').strip()}".strip() or "Vehicle"
-        subtitle = "OtoAnaliz Cover (fallback)"
-
-        font = ImageFont.load_default()
-        # Centered-ish
-        tw = draw.textlength(title, font=font) if hasattr(draw, "textlength") else len(title) * 6
-        draw.text((max(16, (w - tw) // 2), int(h * 0.12)), title, fill=(30, 30, 30), font=font)
-        draw.text((24, h - 32), subtitle, fill=(90, 90, 90), font=font)
-
-        buf = BytesIO()
-        # WEBP smaller
-        img.save(buf, format="WEBP", quality=72, method=6)
-        return buf.getvalue()
-    except Exception:
-        # Last-ditch: return a tiny valid WEBP-like placeholder (actually PNG if WEBP fails)
-        try:
-            from io import BytesIO
-            img = Image.new("RGB", (512, 288), (245, 245, 245))
-            buf = BytesIO()
-            img.save(buf, format="PNG", optimize=True)
-            return buf.getvalue()
-        except Exception:
-            return b""
-
-
-def _generate_vehicle_image_bytes(
-    brand: str,
-    model: str,
-    body: Optional[str] = None,
-    generation: Optional[str] = None,
-    year: Optional[int] = None,
-    color: Optional[str] = None,
-) -> bytes:
-    """
-    FINAL logic:
-    - Pexels strict: brand+model MUST match, and ALT must indicate front/side view, and image must be net (sharp+bright).
-    - If not found, fallback to placeholder (always correct).
-    """
-    b, m_norm, must_phrases, must_tokens = _norm_brand_model_for_match(brand, model)
-    body_tok = _clean_token(body) if body else ""
-    q_base = f"{brand} {model} {body_tok} exterior".strip()
-
-    queries = [
-        f"{q_base} front view",
-        f"{q_base} side view",
-        f"{brand} {model} exterior front view",
-        f"{brand} {model} exterior side view",
-    ]
-
-    best_photo = None
-    best_score = -10**9
-
-    for q in queries:
-        photos = _search_pexels_photos(q, per_page=60)
-        for p in photos:
-            alt = _alt_text(p)
-            if not alt:
-                continue
-            if not _passes_front_only(alt):
-                continue
-            if not _passes_brand_model(alt, b, must_phrases, must_tokens):
-                continue
-
-            src = (p.get("src") or {})
-            thumb_url = src.get("medium") or src.get("small") or src.get("large") or src.get("original")
-            if not thumb_url:
-                continue
-            try:
-                tr = requests.get(thumb_url, timeout=20)
-                tr.raise_for_status()
-                tim = Image.open(BytesIO(tr.content)).convert("RGB")
-            except Exception:
-                continue
-
-            if not _img_is_sharp_and_bright(tim):
-                continue
-
-            s = 0
-            if "front" in alt:
-                s += 10
-            if "side" in alt:
-                s += 6
-            if any(ph in alt for ph in must_phrases):
-                s += 8
-            if any(t in alt for t in must_tokens):
-                s += 4
-
-            if s > best_score:
-                best_score = s
-                best_photo = p
-
-        if best_photo:
-            break
-
-    if best_photo:
-        try:
-            raw = _download_best_src(best_photo)
-            im = Image.open(BytesIO(raw)).convert("RGB")
-            if not _img_is_sharp_and_bright(im):
-                raise RuntimeError("downloaded_image_not_net")
-            buf = BytesIO()
-            im.save(buf, format="WEBP", quality=80, method=6)
-            return buf.getvalue()
-        except Exception as e:
-            print("Pexels final download/convert failed:", repr(e))
-
-    return _make_placeholder_cover(brand, model)
 
