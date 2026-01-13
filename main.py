@@ -3217,20 +3217,58 @@ def _generate_vehicle_image_bytes(
 ) -> bytes:
     """
     Pexels-based vehicle image fetcher (external, single-car, exterior).
-    Returns raw image bytes (JPG/PNG). Upstream code will watermark + convert to WEBP.
-    Cache is handled by /get_or_create_cover (Firestore document + Storage upload).
+
+    IMPORTANT QUALITY RULES (to avoid "Subaru for Mercedes" issues):
+    - We normalize obvious brand typos/aliases (e.g., "mercdes" -> "mercedes").
+    - We run queries from strict -> relaxed.
+    - For strict queries we *require* the returned photo ALT text to contain the requested
+      brand (and if model tokens are meaningful, at least one model token).
+    - We avoid interior/multi-car/dealership shots with hard filters (not just scoring).
     """
     api_key = (os.getenv("PEXELS_API_KEY") or "").strip()
     if not api_key:
         raise RuntimeError("missing_PEXELS_API_KEY")
 
-    b = (brand or "").strip()
-    m = (model or "").strip()
+    b_raw = (brand or "").strip()
+    m_raw = (model or "").strip()
     by = (body or "").strip()
+    gen = (generation or "").strip()
     c = (color or "").strip()
     y = year if isinstance(year, int) else None
 
-    # Normalize a bit (TR -> EN colors for better search)
+    # ---------
+    # Normalize brand/model for better recall + less mismatch
+    # ---------
+    def _clean_token(s: str) -> str:
+        s = (s or "").lower().strip()
+        s = re.sub(r"\s+", " ", s)
+        return s
+
+    brand_alias = {
+        # common TR typos / variants
+        "mercdes": "mercedes",
+        "mercedes-benz": "mercedes",
+        "mercedes benz": "mercedes",
+        "volkswagen": "vw",  # Pexels often uses VW
+        "wolswagen": "vw",
+        "wolkswagen": "vw",
+        "bmv": "bmw",
+        "hyndai": "hyundai",
+        "renault ": "renault",
+    }
+
+    b = _clean_token(b_raw)
+    b = brand_alias.get(b, b)
+
+    m = _clean_token(m_raw)
+    # Mercedes class heuristics: single-letter models are too ambiguous.
+    if b in ("mercedes", "mb") and m in ("a", "b", "c", "e", "s", "g"):
+        m = f"{m} class"
+    if b == "vw":
+        # many people type "golf 7" etc; leave as is.
+        pass
+
+    # Color TR -> EN
     def _norm_color(x: str) -> str:
         mp = {
             "mavi": "blue", "lacivert": "blue",
@@ -3245,97 +3283,198 @@ def _generate_vehicle_image_bytes(
             "mor": "purple",
             "bej": "beige",
         }
-        xx = (x or "").lower().strip()
+        xx = _clean_token(x)
         return mp.get(xx, xx)
 
     c_en = _norm_color(c)
 
-    # Query builder: we try strict first, then relax (to avoid "3 cars side by side" & interior)
-    base_tokens = [str(y) if y else "", b, m, by, c_en, "car", "exterior", "single"]
-    base_query = " ".join([t for t in base_tokens if t]).strip()
+    # Model tokens for matching ALT (ignore too-short tokens like "c")
+    def _model_tokens(mm: str) -> List[str]:
+        toks = [t for t in re.split(r"[^a-z0-9]+", (mm or "").lower()) if t]
+        toks = [t for t in toks if len(t) >= 3]  # 3+ chars only
+        # keep unique order
+        seen = set()
+        out = []
+        for t in toks:
+            if t not in seen:
+                seen.add(t)
+                out.append(t)
+        return out
 
-    relax_queries = [
-        base_query,
-        " ".join([t for t in [str(y) if y else "", b, m, by, "car", "exterior"] if t]).strip(),
-        " ".join([t for t in [b, m, by, "car", "exterior"] if t]).strip(),
-        " ".join([t for t in [b, m, "car", "exterior"] if t]).strip(),
-    ]
+    mtoks = _model_tokens(m)
 
+    # ---------
+    # Query builder: strict -> relaxed
+    # ---------
+    def _join(*parts: str) -> str:
+        return " ".join([p for p in parts if p and p.strip()]).strip()
+
+    strict_query = _join(
+        str(y) if y else "",
+        c_en,
+        b,
+        m,
+        by,
+        "car exterior",
+        "front view",
+        "single car",
+    )
+
+    semi_query = _join(
+        str(y) if y else "",
+        b,
+        m,
+        by,
+        "car exterior",
+        "single car",
+    )
+
+    relaxed_query = _join(
+        b,
+        m,
+        "car exterior",
+    )
+
+    # Last resort: brand only (still try to keep exterior / single)
+    brand_only_query = _join(
+        b,
+        "car exterior",
+        "front view",
+        "single car",
+    )
+
+    relax_queries = [strict_query, semi_query, relaxed_query, brand_only_query]
+
+    # ---------
+    # Hard filters / scoring
+    # ---------
     bad_words = [
-        "interior", "dashboard", "steering", "seat", "cockpit",
-        "engine", "detail", "close up", "rim", "wheel", "tire", "tyre", "gear",
+        "interior", "inside", "dashboard", "cockpit", "steering", "wheel close",
+        "seat", "seats", "console", "gear", "engine", "detail", "close up", "rim",
+        "tire", "tyre",
     ]
     multi_words = ["cars", "parking", "dealership", "showroom", "traffic", "fleet", "street", "race", "rally"]
     people_words = ["people", "person", "man", "woman", "crowd"]
 
-    def score_photo(p: Dict[str, Any]) -> int:
-        # Higher is better
-        alt = (p.get("alt") or "").lower()
-        s = 0
-        if not alt:
-            s += 2
-        # Penalize unwanted
+    def _alt(p: Dict[str, Any]) -> str:
+        return (p.get("alt") or "").lower().strip()
+
+    def _passes_hard_filters(alt: str, strict_level: int) -> bool:
+        # strict_level: 0 (strict) -> 3 (brand only)
         if any(w in alt for w in bad_words):
-            s -= 8
+            return False
         if any(w in alt for w in people_words):
-            s -= 6
+            return False
+        # Multi-car scenes: for strict levels, reject outright (not just penalty)
+        if strict_level <= 1 and any(w in alt for w in multi_words):
+            return False
+        return True
+
+    def _passes_identity(alt: str, strict_level: int) -> bool:
+        # For strict & semi, require brand in ALT
+        if strict_level <= 1:
+            if b and b not in alt:
+                # Allow "mercedes" to appear as "benz" sometimes
+                if b == "mercedes" and ("mercedes" not in alt and "benz" not in alt):
+                    return False
+                if b == "vw" and ("vw" not in alt and "volkswagen" not in alt):
+                    return False
+                if b not in ("mercedes", "vw"):
+                    return False
+        # If we have meaningful model tokens, require at least one in strict level 0
+        if strict_level == 0 and mtoks:
+            if not any(t in alt for t in mtoks):
+                return False
+        return True
+
+    def score_photo(p: Dict[str, Any], strict_level: int) -> int:
+        alt = _alt(p)
+        s = 0
+        # Favor having an ALT (usually more descriptive)
+        if alt:
+            s += 3
+        # Reward identity matches
+        if b and (b in alt or (b == "mercedes" and "benz" in alt) or (b == "vw" and "volkswagen" in alt)):
+            s += 6
+        if mtoks and any(t in alt for t in mtoks):
+            s += 4
+        # Penalize multi-car/dealership hints
         if any(w in alt for w in multi_words):
-            s -= 5
-        # Reward likely single exterior views
-        if "car" in alt:
-            s += 2
-        if "exterior" in alt or "outside" in alt:
-            s += 2
-        if "front" in alt or "side" in alt or "rear" in alt or "view" in alt:
-            s += 1
-        # Prefer shorter "clean" alts
-        if 0 < len(alt) <= 60:
-            s += 1
-        # Prefer higher resolution if present
+            s -= 6
+        # Prefer landscape-ish sources for cover cards
         src = p.get("src") or {}
-        if src.get("large2x"):
-            s += 2
-        elif src.get("large"):
+        if isinstance(src, dict) and src.get("large"):
             s += 1
         return s
 
+    import requests
+
     headers = {"Authorization": api_key}
-    search_url = "https://api.pexels.com/v1/search"
 
-    last_status = None
-    for q in relax_queries:
-        if not q:
-            continue
-        try:
-            resp = requests.get(
-                search_url,
-                headers=headers,
-                params={"query": q, "per_page": 40, "orientation": "landscape"},
-                timeout=12,
-            )
-            last_status = resp.status_code
-            if resp.status_code != 200:
+    def _search(query: str, per_page: int = 30) -> List[Dict[str, Any]]:
+        if not query:
+            return []
+        r = requests.get(
+            "https://api.pexels.com/v1/search",
+            headers=headers,
+            params={"query": query, "per_page": per_page},
+            timeout=20,
+        )
+        if r.status_code != 200:
+            raise RuntimeError(f"pexels_search_failed_{r.status_code}")
+        js = r.json()
+        return js.get("photos") or []
+
+    def _pick_best(photos: List[Dict[str, Any]], strict_level: int) -> Optional[Dict[str, Any]]:
+        candidates = []
+        for p in photos:
+            alt = _alt(p)
+            if not _passes_hard_filters(alt, strict_level):
                 continue
-            data = resp.json() or {}
-            photos = data.get("photos") or []
-            if not photos:
+            if not _passes_identity(alt, strict_level):
                 continue
+            candidates.append(p)
+        if not candidates:
+            return None
+        candidates.sort(key=lambda p: score_photo(p, strict_level), reverse=True)
+        return candidates[0]
 
-            # Score + pick best
-            ranked = sorted(photos, key=score_photo, reverse=True)
-            best = ranked[0]
-            src = best.get("src") or {}
-            url = src.get("large2x") or src.get("large") or src.get("medium") or src.get("original")
-            if not url:
-                continue
+    # Try strict -> relaxed, but keep identity as much as possible
+    chosen = None
+    chosen_level = None
+    for level, q in enumerate(relax_queries):
+        photos = _search(q, per_page=40 if level <= 1 else 60)
+        chosen = _pick_best(photos, strict_level=level)
+        chosen_level = level
+        if chosen:
+            break
 
-            img_resp = requests.get(url, timeout=20)
-            if img_resp.status_code == 200 and img_resp.content:
-                return img_resp.content
-        except Exception:
-            continue
+    # If still none: as a last resort, pick best-scored from relaxed_query (no identity requirement)
+    if not chosen:
+        photos = _search(relaxed_query, per_page=80)
+        if photos:
+            photos.sort(key=lambda p: score_photo(p, strict_level=3), reverse=True)
+            chosen = photos[0]
+            chosen_level = 3
 
-    raise RuntimeError(f"pexels_no_image_found(status={last_status})")
+    if not chosen:
+        raise RuntimeError("pexels_no_photo_found")
+
+    src = chosen.get("src") or {}
+    url = None
+    if isinstance(src, dict):
+        # best for covers: large2x > large > original
+        url = src.get("large2x") or src.get("large") or src.get("original")
+
+    if not url:
+        raise RuntimeError("pexels_missing_src_url")
+
+    # Download image bytes
+    rr = requests.get(url, timeout=25)
+    if rr.status_code != 200 or not rr.content:
+        raise RuntimeError(f"pexels_download_failed_{rr.status_code}")
+
+    return rr.content
 
 def _apply_watermark(image_bytes: bytes, watermark_text: str = "Oto Analiz") -> bytes:
     if Image is None or ImageDraw is None or ImageFont is None:
