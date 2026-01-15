@@ -3209,8 +3209,30 @@ def _firebase_upload_cover_bytes(cover_key: str, image_bytes: bytes, content_typ
     blob.patch()
 
     # Firebase download URL (token-based)
-    url = f"https://firebasestorage.googleapis.com/v0/b/{bucket_name}/o/{urlquote(object_path)}?alt=media&token={token}"
+    url = f"https://firebasestorage.googleapis.com/v0/b/{bucket_name}/o/{urlquote(object_path, safe="")}?alt=media&token={token}"
     return url
+
+
+def _fix_firebase_download_url(url: str) -> str:
+    """Fix Firebase Storage download URLs where the object name is not fully URL-encoded (slashes not encoded).
+    Some URLs may contain `/o/folder/file.webp` instead of `/o/folder%2Ffile.webp`, which causes HTTP 400.
+    We safely fix this by encoding only the slashes in the object part."""
+    try:
+        if not url or "firebasestorage.googleapis.com" not in url or "/o/" not in url:
+            return url
+        pre, rest = url.split("/o/", 1)
+        if "?" not in rest:
+            return url
+        obj, qs = rest.split("?", 1)
+        # If already encoded, keep as-is
+        if "%2F" in obj or "%2f" in obj:
+            return url
+        if "/" in obj:
+            obj_fixed = obj.replace("/", "%2F")
+            return f"{pre}/o/{obj_fixed}?{qs}"
+        return url
+    except Exception:
+        return url
 
 
 def _brand_design_cues(brand: str) -> str:
@@ -3463,6 +3485,7 @@ def get_or_create_cover(req: CoverRequest) -> Dict[str, Any]:
 
     # Cache hit (normal)
     if cached_url and not req.force_regenerate:
+        cached_url = _fix_firebase_download_url(str(cached_url))
         return {"coverKey": cover_key, "imageUrl": cached_url, "cached": True}
 
     # Force regenerate is allowed ONLY ONCE per cache key (max 2 paid generations total)
@@ -3907,6 +3930,4 @@ def _passes_brand_model(alt: str, b: str, must_phrases: List[str], must_tokens: 
         if not any(t in alt for t in must_tokens):
             return False
     return True
-
-
 
