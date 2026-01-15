@@ -3193,14 +3193,14 @@ def _init_firebase_admin() -> None:
 def _firebase_cover_doc(cover_key: str):
     _init_firebase_admin()
     db = fb_firestore.client()
-    return db.collection("vehicle_covers").document(cover_key)
+    return db.collection("discover_covers_cache").document(cover_key)
 
 
 def _firebase_upload_cover_bytes(cover_key: str, image_bytes: bytes, content_type: str = "image/webp") -> str:
     _init_firebase_admin()
     bucket_name = os.getenv("FIREBASE_STORAGE_BUCKET", "").strip()
     bucket = fb_storage.bucket()  # default bucket from initialize_app
-    object_path = f"vehicle_covers/{cover_key}.webp"
+    object_path = f"discover_covers/generated/{cover_key}.webp"
 
     token = uuid.uuid4().hex
     blob = bucket.blob(object_path)
