@@ -3209,7 +3209,13 @@ def _firebase_upload_cover_bytes(cover_key: str, image_bytes: bytes, content_typ
     blob.patch()
 
     # Firebase download URL (token-based)
-    url = f"https://firebasestorage.googleapis.com/v0/b/{bucket_name}/o/{urlquote(object_path, safe="")}?alt=media&token={token}"
+    if not bucket_name:
+        try:
+            bucket_name = bucket.name  # type: ignore
+        except Exception:
+            bucket_name = os.getenv("FIREBASE_STORAGE_BUCKET", "").strip()
+    encoded_object = urlquote(object_path, safe="")
+    url = f"https://firebasestorage.googleapis.com/v0/b/{bucket_name}/o/{encoded_object}?alt=media&token={token}"
     return url
 
 
@@ -3423,38 +3429,137 @@ def _generate_vehicle_image_bytes(
 
     return base64.b64decode(b64)
 
-def _apply_watermark(image_bytes: bytes, watermark_text: str = "Oto Analiz") -> bytes:
+def _apply_watermark(image_bytes: bytes, watermark_text: str = "OtoAnaliz") -> bytes:
+    """Apply a very subtle (sahibinden-style) diagonal watermark + a small AI badge.
+
+    - Watermark is faint and tiled, rotated diagonally.
+    - AI badge is a small pill at the top-right edge.
+
+    If PIL is not available, returns original bytes.
+    """
     if Image is None or ImageDraw is None or ImageFont is None:
-        # If PIL missing, return as-is
         return image_bytes
 
-    im = Image.open(BytesIO(image_bytes)).convert("RGBA")
+    try:
+        im = Image.open(BytesIO(image_bytes)).convert("RGBA")
+    except Exception:
+        return image_bytes
+
     W, H = im.size
+
+    # Decide watermark color based on brightness
+    try:
+        small = im.convert("L").resize((64, 64))
+        avg = sum(small.getdata()) / (64 * 64)
+    except Exception:
+        avg = 200
+
+    is_bright = avg > 160
+    wm_rgb = (0, 0, 0) if is_bright else (255, 255, 255)
+    wm_alpha = int(os.getenv("COVER_WATERMARK_ALPHA", "22"))  # ~8-10%
+
+    # Try to load a scalable font (Render-safe fallbacks)
+    def _load_font(size: int):
+        for fp in (
+            "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
+            "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",
+            "/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf",
+            "/usr/share/fonts/truetype/freefont/FreeSans.ttf",
+        ):
+            try:
+                if os.path.exists(fp):
+                    return ImageFont.truetype(fp, size=size)
+            except Exception:
+                pass
+        try:
+            return ImageFont.load_default()
+        except Exception:
+            return None
+
+    base_font_size = max(48, int(min(W, H) * 0.10))
+    font = _load_font(base_font_size)
 
     overlay = Image.new("RGBA", (W, H), (0, 0, 0, 0))
     draw = ImageDraw.Draw(overlay)
 
-    # large font relative to image
-    font_size = max(48, int(min(W, H) * 0.10))
-    # Use default font (Render-safe)
-    font = ImageFont.load_default()
-# text bbox
-    bbox = draw.textbbox((0, 0), watermark_text, font=font)
-    tw = bbox[2] - bbox[0]
-    th = bbox[3] - bbox[1]
+    # Slightly spaced text for a premium look
+    text = watermark_text or "OtoAnaliz"
 
-    # Center text then rotate the overlay
-    cx = (W - tw) // 2
-    cy = (H - th) // 2
+    # If we can, approximate tracking by inserting thin spaces
+    if len(text) <= 16:
+        text_draw = " ".join(list(text))
+    else:
+        text_draw = text
 
-    # Opacity ~10%
-    draw.text((cx, cy), watermark_text, font=font, fill=(255, 255, 255, 28))
+    # Measure
+    try:
+        bbox = draw.textbbox((0, 0), text_draw, font=font)
+        tw = bbox[2] - bbox[0]
+        th = bbox[3] - bbox[1]
+    except Exception:
+        tw, th = int(W * 0.5), int(H * 0.08)
 
+    # Tile positions
+    step_x = max(200, int(tw * 1.4))
+    step_y = max(140, int(th * 3.0))
+
+    fill = (wm_rgb[0], wm_rgb[1], wm_rgb[2], wm_alpha)
+
+    for y in range(-H, H * 2, step_y):
+        for x in range(-W, W * 2, step_x):
+            draw.text((x, y), text_draw, font=font, fill=fill)
+
+    # Rotate overlay diagonally
     overlay = overlay.rotate(-18, resample=Image.BICUBIC, expand=0)
-    out = Image.alpha_composite(im, overlay).convert("RGB")
+    im2 = Image.alpha_composite(im, overlay)
 
+    # --- AI badge (small pill at edge) ---
+    badge_text = os.getenv("COVER_AI_BADGE_TEXT", "AI")
+    if badge_text:
+        badge_font = _load_font(max(22, int(min(W, H) * 0.035)))
+        bd = ImageDraw.Draw(im2)
+
+        pad = max(14, int(min(W, H) * 0.02))
+        bx_pad = max(14, int(min(W, H) * 0.018))
+        by_pad = max(8, int(min(W, H) * 0.012))
+
+        try:
+            tb = bd.textbbox((0, 0), badge_text, font=badge_font)
+            btw = tb[2] - tb[0]
+            bth = tb[3] - tb[1]
+        except Exception:
+            btw, bth = 40, 22
+
+        bw = btw + bx_pad * 2
+        bh = bth + by_pad * 2
+
+        x2 = W - pad
+        y1 = pad
+        x1 = x2 - bw
+        y2 = y1 + bh
+
+        # Background: subtle glass effect
+        if is_bright:
+            bg = (0, 0, 0, 90)
+            fg = (255, 255, 255, 220)
+            border = (0, 0, 0, 60)
+        else:
+            bg = (255, 255, 255, 120)
+            fg = (0, 0, 0, 220)
+            border = (255, 255, 255, 80)
+
+        radius = int(bh * 0.45)
+        # rounded_rectangle is available in newer Pillow; fallback to rectangle if not
+        try:
+            bd.rounded_rectangle([x1, y1, x2, y2], radius=radius, fill=bg, outline=border, width=2)
+        except Exception:
+            bd.rectangle([x1, y1, x2, y2], fill=bg)
+
+        bd.text((x1 + bx_pad, y1 + by_pad), badge_text, font=badge_font, fill=fg)
+
+    out = im2.convert("RGB")
     buf = BytesIO()
-    out.save(buf, format="WEBP", quality=90)
+    out.save(buf, format="WEBP", quality=int(os.getenv("COVER_WEBP_QUALITY", "90")))
     return buf.getvalue()
 
 
