@@ -3457,7 +3457,8 @@ def _load_font(size: int):
 def _fallback_cover_bytes(brand: str, model: str, year: int | None, color: str | None) -> bytes:
     # Simple placeholder so endpoint never fails.
     if Image is None:
-        return b""
+        # 1x1 transparent PNG so endpoint never crashes even without PIL
+        return base64.b64decode("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+Xr2UAAAAASUVORK5CYII=")
     size = 1024
     img = Image.new('RGBA', (size, size), (18, 18, 20, 255))
     draw = ImageDraw.Draw(img)
@@ -3498,7 +3499,7 @@ def _apply_watermark(image_bytes: bytes, watermark_text: str = "Oto Analiz") -> 
     if Image is None or ImageDraw is None:
         return image_bytes
 
-    im = Image.open(io.BytesIO(image_bytes)).convert("RGBA")
+    im = Image.open(BytesIO(image_bytes)).convert("RGBA")
     w, h = im.size
 
     # --- Watermark (single, subtle) ---
@@ -3573,7 +3574,7 @@ def _apply_watermark(image_bytes: bytes, watermark_text: str = "Oto Analiz") -> 
     im = Image.alpha_composite(im, badge)
 
     # Export as WEBP
-    out = io.BytesIO()
+    out = BytesIO()
     im.convert("RGB").save(out, format="WEBP", quality=88, method=6)
     return out.getvalue()
 
