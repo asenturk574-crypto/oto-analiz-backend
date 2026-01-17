@@ -39,15 +39,10 @@ except Exception:
 # =========================================================
 try:
     from PIL import Image, ImageDraw, ImageFont
-    try:
-        from PIL import ImageFilter  # type: ignore
-    except Exception:
-        ImageFilter = None  # type: ignore
 except Exception:
     Image = None  # type: ignore
     ImageDraw = None  # type: ignore
     ImageFont = None  # type: ignore
-    ImageFilter = None  # type: ignore
 
 try:
     import firebase_admin
@@ -3141,7 +3136,7 @@ def _cover_key(
     parts.append(_norm_color(color))
 
     # Style/version tag to force regeneration when cover design/prompt changes
-    style_ver = (os.getenv("COVER_STYLE_VERSION") or "v6").strip()
+    style_ver = (os.getenv("COVER_STYLE_VERSION") or "v5").strip()
     if style_ver:
         parts.append(_norm_token(style_ver))
 
@@ -3395,14 +3390,11 @@ def _generate_vehicle_image_bytes(
     subject = " ".join([p for p in parts if p]).strip()
 
     prompt = (
-        "High-end studio automotive photograph of a single vehicle. "
-        "The car is parked on clean dark asphalt with subtle texture, under soft studio lighting. "
-        "Background: a premium dark-gray gradient studio backdrop with a gentle vignette. "
-        "Framing: square 1:1, the FULL car must be completely visible (no cropping), centered, with generous margins; the vehicle occupies about 60-70% of the frame. "
-        "Camera: eye-level, 3/4 front angle, ~50mm lens look, crisp details, realistic reflections, high fidelity. "
-        f"Must correspond to a real-world {y} {b_norm} {m_norm} with correct generation/body shape and proportions. "
-        "Only one car. No people. No text. No license plates. No logos/badges. No watermark. No extra objects. "
-        f"{cues}"
+        f"High-quality, ultra-realistic studio photo of a {c_norm} {y} {b_norm} {m_norm}{body_hint}. "
+        f"The car is parked on dark asphalt at night with a subtle moody city bokeh background. "
+        f"Full vehicle must be fully inside the square frame with generous margins (no cropping, wheels fully visible). "
+        f"Centered composition, slightly front 3/4 angle, sharp details, correct logo and proportions. "
+        f"No people, no text, no showroom labels, no extra cars, no watermarks."
     )
 
     image_model = (os.getenv("OPENAI_IMAGE_MODEL") or "gpt-image-1").strip()
@@ -3438,51 +3430,6 @@ def _generate_vehicle_image_bytes(
     return base64.b64decode(b64)
 
 
-def _generate_fallback_cover_bytes(size: int = 1024) -> bytes:
-    """Last-resort cover generator that never calls external APIs.
-
-    Creates a premium dark asphalt + dark gradient background.
-    Used only when OpenAI image generation fails, to avoid HTTP 500s.
-    Returns PNG bytes.
-    """
-    if Image is None or ImageDraw is None:
-        raise RuntimeError("pillow_not_available")
-
-    # Base gradient (dark gray)
-    im = Image.new("RGB", (size, size), (18, 18, 18))
-    draw = ImageDraw.Draw(im)
-
-    # Vertical gradient + gentle vignette
-    for y in range(size):
-        t = y / max(1, size - 1)
-        # slightly lighter towards top
-        val = int(18 + (1.0 - t) * 22)
-        draw.line([(0, y), (size, y)], fill=(val, val, val))
-
-    # Asphalt band (bottom ~55%)
-    asphalt_top = int(size * 0.45)
-    for y in range(asphalt_top, size):
-        t = (y - asphalt_top) / max(1, size - asphalt_top)
-        base = int(30 - t * 6)
-        draw.line([(0, y), (size, y)], fill=(base, base, base))
-
-    # Subtle noise texture (best effort)
-    try:
-        noise = Image.effect_noise((size, size), 48).convert("L")  # type: ignore[attr-defined]
-        noise = noise.point(lambda p: int(p * 0.55))
-        noise_rgba = Image.merge("RGBA", (noise, noise, noise, noise.point(lambda p: 35)))
-        im_rgba = im.convert("RGBA")
-        im_rgba = Image.alpha_composite(im_rgba, noise_rgba)
-        im = im_rgba.convert("RGB")
-    except Exception:
-        pass
-
-    out = io.BytesIO()
-    im.save(out, format="PNG")
-    return out.getvalue()
-
-
-
 
 def _load_font(size: int):
     """Best-effort font loader for PIL.
@@ -3505,6 +3452,42 @@ def _load_font(size: int):
         return ImageFont.load_default()
     except Exception:
         return ImageFont.load_default()
+
+
+def _fallback_cover_bytes(brand: str, model: str, year: int | None, color: str | None) -> bytes:
+    # Simple placeholder so endpoint never fails.
+    if Image is None:
+        return b""
+    size = 1024
+    img = Image.new('RGBA', (size, size), (18, 18, 20, 255))
+    draw = ImageDraw.Draw(img)
+
+    # Subtle vertical gradient
+    for y in range(size):
+        v = int(18 + (y / size) * 20)
+        draw.line([(0, y), (size, y)], fill=(v, v, v + 2, 255))
+
+    title = f"{brand} {model}".strip() or "Oto Analiz"
+    subtitle = f"{year or ''} {color or ''}".strip()
+
+    # Text
+    try:
+        font_big = ImageFont.truetype('DejaVuSans-Bold.ttf', 64)
+        font_small = ImageFont.truetype('DejaVuSans.ttf', 36)
+    except Exception:
+        font_big = ImageFont.load_default()
+        font_small = ImageFont.load_default()
+
+    draw.text((60, 80), title, fill=(240, 240, 240, 255), font=font_big)
+    if subtitle:
+        draw.text((60, 160), subtitle, fill=(200, 200, 200, 255), font=font_small)
+
+    out = img.convert('RGB')
+    from io import BytesIO
+    buf = BytesIO()
+    out.save(buf, format='WEBP', quality=90, method=6)
+    return buf.getvalue()
+
 def _apply_watermark(image_bytes: bytes, watermark_text: str = "Oto Analiz") -> bytes:
     """Apply a subtle single watermark + a small AI badge (premium look).
 
@@ -3519,8 +3502,8 @@ def _apply_watermark(image_bytes: bytes, watermark_text: str = "Oto Analiz") -> 
     w, h = im.size
 
     # --- Watermark (single, subtle) ---
-    wm_alpha = 12  # 0..255 (lower = more subtle)
-    font_size = max(140, int(w * 0.20))
+    wm_alpha = 14  # 0..255 (lower = more subtle)
+    font_size = max(120, int(w * 0.16))
     font = _load_font(font_size)
 
     # Create a larger canvas so rotation won't crop
@@ -3556,7 +3539,7 @@ def _apply_watermark(image_bytes: bytes, watermark_text: str = "Oto Analiz") -> 
     bdraw = ImageDraw.Draw(badge)
 
     badge_text = "AI"
-    badge_font_size = max(20, int(w * 0.028))  # smaller than before
+    badge_font_size = max(26, int(w * 0.035))  # smaller than before
     bfont = _load_font(badge_font_size)
 
     pad_x = int(w * 0.03)
@@ -3569,8 +3552,8 @@ def _apply_watermark(image_bytes: bytes, watermark_text: str = "Oto Analiz") -> 
     else:
         ttw, tth = 20, 12
 
-    pill_w = ttw + int(w * 0.045)
-    pill_h = tth + int(h * 0.022)
+    pill_w = ttw + int(w * 0.055)
+    pill_h = tth + int(h * 0.03)
 
     x1 = w - pad_x - pill_w
     y1 = pad_y
@@ -3579,8 +3562,7 @@ def _apply_watermark(image_bytes: bytes, watermark_text: str = "Oto Analiz") -> 
 
     radius = int(pill_h * 0.55)
     # Slight transparency for premium feel
-    bdraw.rounded_rectangle([x1+1, y1+2, x2+1, y2+2], radius=radius, fill=(0, 0, 0, 70))
-    bdraw.rounded_rectangle([x1, y1, x2, y2], radius=radius, fill=(0, 0, 0, 160), outline=(255, 255, 255, 60), width=1)
+    bdraw.rounded_rectangle([x1, y1, x2, y2], radius=radius, fill=(0, 0, 0, 200))
     bdraw.text(
         (x1 + (pill_w - ttw) / 2, y1 + (pill_h - tth) / 2),
         badge_text,
@@ -3638,7 +3620,6 @@ def get_or_create_cover(req: CoverRequest) -> Dict[str, Any]:
         next_regen_count = regen_count + 1
 
     # Generate a brand-recognizable image (no logos)
-    is_fallback = False
     try:
         img_bytes = _generate_vehicle_image_bytes(
             brand=brand,
@@ -3649,11 +3630,9 @@ def get_or_create_cover(req: CoverRequest) -> Dict[str, Any]:
             color=req.color,
         )
     except Exception as e:
-        # Do NOT fail the whole request with HTTP 500.
-        # Fall back to a local synthetic background and continue.
-        is_fallback = True
-        print("OpenAI image generation error:", repr(e))
-        img_bytes = _generate_fallback_cover_bytes(size=1024)
+        # Log reason but fallback so we never return 500 for cover generation
+        print('OpenAI image generation error:', repr(e))
+        img_bytes = _fallback_cover_bytes(brand=brand, model=model, year=req.year, color=req.color)
 
     # Watermark + convert to webp
     final_bytes = _apply_watermark(img_bytes, watermark_text=os.getenv("COVER_WATERMARK_TEXT", "Oto Analiz"))
@@ -3672,14 +3651,13 @@ def get_or_create_cover(req: CoverRequest) -> Dict[str, Any]:
             "color": req.color,
             "imageUrl": image_url,
             "regenCount": next_regen_count,
-            "fallback": is_fallback,
             "createdAt": data.get("createdAt") or datetime.utcnow().isoformat(),
             "updatedAt": datetime.utcnow().isoformat(),
         },
         merge=True,
     )
 
-    return {"coverKey": cover_key, "imageUrl": image_url, "cached": False, "fallback": is_fallback}
+    return {"coverKey": cover_key, "imageUrl": image_url, "cached": False}
 
 @app.post("/analyze")
 async def analyze(req: AnalyzeRequest) -> Dict[str, Any]:
