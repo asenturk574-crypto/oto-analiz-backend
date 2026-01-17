@@ -3432,109 +3432,116 @@ def _generate_vehicle_image_bytes(
 
     return base64.b64decode(b64)
 
-def _apply_watermark(image_bytes: bytes, watermark_text: str = "Oto Analiz") -> bytes:
-    """Apply a subtle single watermark + a small AI badge.
 
-    Notes:
-    - Watermark: single diagonal, very low opacity (Sahibinden-style subtle), NOT tiled.
-    - AI badge: small, clean pill in the top-right.
+
+def _load_font(size: int):
+    """Best-effort font loader for PIL.
+
+    Render containers usually have DejaVu/Liberation fonts. If none found,
+    fallback to PIL's default bitmap font.
     """
-    if Image is None or ImageDraw is None or ImageFont is None:
-        return image_bytes
-
+    if ImageFont is None:
+        return None
     try:
-        im = Image.open(io.BytesIO(image_bytes)).convert("RGBA")
+        candidates = [
+            "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
+            "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",
+            "/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf",
+            "/usr/share/fonts/truetype/freefont/FreeSans.ttf",
+        ]
+        for p in candidates:
+            if os.path.exists(p):
+                return ImageFont.truetype(p, size=size)
+        return ImageFont.load_default()
     except Exception:
+        return ImageFont.load_default()
+def _apply_watermark(image_bytes: bytes, watermark_text: str = "Oto Analiz") -> bytes:
+    """Apply a subtle single watermark + a small AI badge (premium look).
+
+    - Output: WEBP
+    - Watermark: single, very light, diagonal like marketplace marks
+    - AI badge: small rounded pill (top-right)
+    """
+    if Image is None or ImageDraw is None:
         return image_bytes
 
+    im = Image.open(io.BytesIO(image_bytes)).convert("RGBA")
     w, h = im.size
 
-    # ---- 1) Single subtle watermark ----
-    wm_text = (watermark_text or "Oto Analiz").strip()
-
-    # pick a very subtle color based on background brightness
-    try:
-        # sample a small region near top-left to estimate brightness
-        sample = im.crop((0, 0, max(1, w // 10), max(1, h // 10))).convert("RGB")
-        r, g, b = sample.resize((1, 1)).getpixel((0, 0))
-        bright = (0.2126 * r + 0.7152 * g + 0.0722 * b)  # 0..255
-    except Exception:
-        bright = 200
-
-    # subtle alpha and color
-    if bright >= 140:
-        wm_rgb = (0, 0, 0)
-        wm_alpha = 18
-    else:
-        wm_rgb = (255, 255, 255)
-        wm_alpha = 22
-
-    # font sizing (keep readable but subtle)
-    font_size = max(36, int(min(w, h) * 0.12))
+    # --- Watermark (single, subtle) ---
+    wm_alpha = 18  # 0..255 (lower = more subtle)
+    font_size = max(120, int(w * 0.16))
     font = _load_font(font_size)
 
+    # Create a larger canvas so rotation won't crop
+    diag = int((w * w + h * h) ** 0.5)
+    canvas = Image.new("RGBA", (diag, diag), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(canvas)
+
+    if font is not None:
+        bbox = draw.textbbox((0, 0), watermark_text, font=font)
+        tw, th = bbox[2] - bbox[0], bbox[3] - bbox[1]
+    else:
+        tw, th = len(watermark_text) * 10, 12
+
+    cx, cy = diag // 2, diag // 2
+    draw.text(
+        (cx - tw // 2, cy - th // 2),
+        watermark_text,
+        fill=(255, 255, 255, wm_alpha),
+        font=font,
+    )
+
+    rotated = canvas.rotate(-24, resample=Image.BICUBIC, expand=False)
+
+    # Paste rotated watermark centered onto an overlay sized (w,h)
     overlay = Image.new("RGBA", (w, h), (0, 0, 0, 0))
-    draw = ImageDraw.Draw(overlay)
-
-    bbox = draw.textbbox((0, 0), wm_text, font=font)
-    tw, th = bbox[2] - bbox[0], bbox[3] - bbox[1]
-    x = (w - tw) // 2
-    y = (h - th) // 2
-
-    draw.text((x, y), wm_text, font=font, fill=(wm_rgb[0], wm_rgb[1], wm_rgb[2], wm_alpha))
-
-    # rotate the whole overlay around center for a diagonal watermark
-    overlay = overlay.rotate(-22, resample=Image.BICUBIC, expand=False)
-
+    dx = (w - diag) // 2
+    dy = (h - diag) // 2
+    overlay.paste(rotated, (dx, dy), rotated)
     im = Image.alpha_composite(im, overlay)
 
-    # ---- 2) Small AI badge (top-right) ----
-    badge_h = max(26, int(min(w, h) * 0.04))
-    badge_w = int(badge_h * 1.6)
-    margin = max(10, int(min(w, h) * 0.02))
+    # --- AI badge (smaller, clean) ---
+    badge = Image.new("RGBA", (w, h), (0, 0, 0, 0))
+    bdraw = ImageDraw.Draw(badge)
 
-    bx1 = w - margin - badge_w
-    by1 = margin
-    bx2 = w - margin
-    by2 = margin + badge_h
+    badge_text = "AI"
+    badge_font_size = max(26, int(w * 0.035))  # smaller than before
+    bfont = _load_font(badge_font_size)
 
-    badge_layer = Image.new("RGBA", (w, h), (0, 0, 0, 0))
-    bd = ImageDraw.Draw(badge_layer)
+    pad_x = int(w * 0.03)
+    pad_y = int(h * 0.03)
 
-    # subtle shadow
-    shadow_offset = max(1, badge_h // 12)
-    bd.rounded_rectangle(
-        [bx1 + shadow_offset, by1 + shadow_offset, bx2 + shadow_offset, by2 + shadow_offset],
-        radius=badge_h // 2,
-        fill=(0, 0, 0, 70),
+    # Measure text
+    if bfont is not None:
+        bb = bdraw.textbbox((0, 0), badge_text, font=bfont)
+        ttw, tth = bb[2] - bb[0], bb[3] - bb[1]
+    else:
+        ttw, tth = 20, 12
+
+    pill_w = ttw + int(w * 0.055)
+    pill_h = tth + int(h * 0.03)
+
+    x1 = w - pad_x - pill_w
+    y1 = pad_y
+    x2 = w - pad_x
+    y2 = pad_y + pill_h
+
+    radius = int(pill_h * 0.55)
+    # Slight transparency for premium feel
+    bdraw.rounded_rectangle([x1, y1, x2, y2], radius=radius, fill=(0, 0, 0, 200))
+    bdraw.text(
+        (x1 + (pill_w - ttw) / 2, y1 + (pill_h - tth) / 2),
+        badge_text,
+        fill=(255, 255, 255, 255),
+        font=bfont,
     )
 
-    # badge body
-    bd.rounded_rectangle(
-        [bx1, by1, bx2, by2],
-        radius=badge_h // 2,
-        fill=(0, 0, 0, 160),
-        outline=(255, 255, 255, 55),
-        width=max(1, badge_h // 18),
-    )
+    im = Image.alpha_composite(im, badge)
 
-    ai_font = _load_font(max(14, int(badge_h * 0.55)))
-    ai_text = "AI"
-    tbox = bd.textbbox((0, 0), ai_text, font=ai_font)
-    ttw, tth = tbox[2] - tbox[0], tbox[3] - tbox[1]
-    tx = bx1 + (badge_w - ttw) // 2
-    ty = by1 + (badge_h - tth) // 2 - 1
-    bd.text((tx, ty), ai_text, font=ai_font, fill=(255, 255, 255, 235))
-
-    im = Image.alpha_composite(im, badge_layer)
-
-    # export as WEBP (storage uses .webp)
+    # Export as WEBP
     out = io.BytesIO()
-    try:
-        im.convert("RGB").save(out, format="WEBP", quality=92, method=6)
-    except Exception:
-        # fallback
-        im.convert("RGB").save(out, format="PNG")
+    im.convert("RGB").save(out, format="WEBP", quality=88, method=6)
     return out.getvalue()
 
 
@@ -3547,13 +3554,13 @@ def get_or_create_cover(req: CoverRequest) -> Dict[str, Any]:
 
     # Use explicit cache_key if provided (useful for tests / stable IDs)
     cover_key = _normalize_cover_key(req.cache_key) if req.cache_key else _cover_key(
-    brand,
-    model,
-    req.body,
-    req.year,
-    req.color,
-    req.generation,
-)
+            brand,
+            model,
+            req.body,
+            req.year,
+            req.color,
+            req.generation,
+        )
 
     doc_ref = _firebase_cover_doc(cover_key)
 
