@@ -3135,11 +3135,6 @@ def _cover_key(
 
     parts.append(_norm_color(color))
 
-    # Style/version tag to force regeneration when cover design/prompt changes
-    style_ver = (os.getenv("COVER_STYLE_VERSION") or "v5").strip()
-    if style_ver:
-        parts.append(_norm_token(style_ver))
-
     key = "|".join([p for p in parts if p])
     key = re.sub(r"\|{2,}", "|", key).strip("|")
     return key or "unknown"
@@ -3214,13 +3209,7 @@ def _firebase_upload_cover_bytes(cover_key: str, image_bytes: bytes, content_typ
     blob.patch()
 
     # Firebase download URL (token-based)
-    if not bucket_name:
-        try:
-            bucket_name = bucket.name  # type: ignore
-        except Exception:
-            bucket_name = os.getenv("FIREBASE_STORAGE_BUCKET", "").strip()
-    encoded_object = urlquote(object_path, safe="")
-    url = f"https://firebasestorage.googleapis.com/v0/b/{bucket_name}/o/{encoded_object}?alt=media&token={token}"
+    url = f"https://firebasestorage.googleapis.com/v0/b/{bucket_name}/o/{urlquote(object_path, safe='')}?alt=media&token={token}"
     return url
 
 
@@ -3277,321 +3266,499 @@ def _brand_design_cues(brand: str) -> str:
 def _generate_vehicle_image_bytes(
     brand: str,
     model: str,
-    body: Optional[str],
-    generation: Optional[str],
-    year: Optional[int],
-    color: Optional[str],
+    body: Optional[str] = None,
+    generation: Optional[str] = None,
+    year: Optional[int] = None,
+    color: Optional[str] = None,
 ) -> bytes:
-    """Generate a 1024x1024 car cover image (bytes).
+    """Generate a single-car exterior cover image using OpenAI Images.
 
-    Style target:
-      - Car fully visible (no cropping)
-      - Clean asphalt ground
-      - Dark / moody background with soft haze
-      - No text/logos/watermarks (we add watermark + AI badge later)
+    We intentionally avoid stock-photo search (Pexels etc.) because it can return
+    wrong brands/models. Instead we generate a consistent, controllable cover.
 
-    IMPORTANT: This function must not reference undefined variables.
+    Output: raw image bytes (PNG) from the Images API. We later watermark + convert to WEBP.
     """
     if client is None:
-        raise RuntimeError("OpenAI client is not initialized")
+        raise HTTPException(status_code=500, detail="openai_client_not_configured")
+
+    b = (brand or "").strip()
+    m = (model or "").strip()
+    if not b or not m:
+        raise HTTPException(status_code=400, detail="missing_brand_or_model")
+
+    # Normalize very common typos/aliases (for both prompt & cache stability)
+    brand_alias = {
+        "mercedesbenz": "Mercedes-Benz",
+        "mercedes-benz": "Mercedes-Benz",
+        "mercdes": "Mercedes-Benz",
+        "mercedez": "Mercedes-Benz",
+        "mercedes": "Mercedes-Benz",
+        "benz": "Mercedes-Benz",
+        "mb": "Mercedes-Benz",
+        "bmw": "BMW",
+        "volkswagen": "Volkswagen",
+        "vw": "Volkswagen",
+        "audi": "Audi",
+        "toyota": "Toyota",
+        "honda": "Honda",
+        "hyundai": "Hyundai",
+        "kia": "Kia",
+        "ford": "Ford",
+        "renault": "Renault",
+        "fiat": "Fiat",
+        "peugeot": "Peugeot",
+        "citroen": "Citroën",
+        "opel": "Opel",
+        "skoda": "Škoda",
+        "seat": "SEAT",
+        "dacia": "Dacia",
+        "nissan": "Nissan",
+        "mazda": "Mazda",
+        "volvo": "Volvo",
+        "porsche": "Porsche",
+    }
+
+    b_key = re.sub(r"[^a-z0-9]+", "", b.lower())
+    b_norm = brand_alias.get(b_key, b.strip().title())
+
+    # Model cleanup
+    m_norm = re.sub(r"\s+", " ", m.strip())
+
+    # Color TR->EN (prompt only; cache uses _norm_color elsewhere)
+    def _color_en(x: Optional[str]) -> str:
+        if not x:
+            return ""
+        mp = {
+            "siyah": "black",
+            "beyaz": "white",
+            "gri": "gray",
+            "füme": "gray",
+            "fume": "gray",
+            "kırmızı": "red",
+            "kirmizi": "red",
+            "mavi": "blue",
+            "lacivert": "navy blue",
+            "yeşil": "green",
+            "yesil": "green",
+            "sarı": "yellow",
+            "sari": "yellow",
+            "turuncu": "orange",
+            "mor": "purple",
+            "bej": "beige",
+            "kahverengi": "brown",
+            "gümüş": "silver",
+            "gumus": "silver",
+        }
+        xx = (x or "").strip().lower()
+        xx = xx.replace("ı", "i").replace("ş", "s").replace("ğ", "g").replace("ü", "u").replace("ö", "o").replace("ç", "c")
+        return mp.get(xx, xx)
+
+    c_en = _color_en(color)
+
+    # Prompt: photoreal, single car, clean background, front 3/4
+    # Also explicitly forbid extra objects/people/text/logos.
+    y = str(int(year)) if isinstance(year, int) and 1950 <= int(year) <= 2035 else ""
+    body_s = (body or "").strip()
+    gen_s = (generation or "").strip()
+
+    # Brand-specific design cues help reduce "wrong brand" look.
+    cues = _brand_design_cues(b_norm)
+
+    parts = []
+    if c_en:
+        parts.append(c_en)
+    if y:
+        parts.append(y)
+    parts.append(b_norm)
+    parts.append(m_norm)
+    if gen_s:
+        parts.append(gen_s)
+    if body_s:
+        parts.append(body_s)
+
+    subject = " ".join([p for p in parts if p]).strip()
+
+    prompt = (
+        "High-end automotive studio photograph. "
+        "Medium-dark charcoal/graphite gradient background. "
+        "The car is parked on a clean asphalt-like ground surface with subtle texture; realistic tire contact shadow. "
+        f"Photorealistic exterior of a single {subject}. "
+        "Centered composition, sharp focus, realistic proportions, natural reflections. "
+        "Front three-quarter view (or straight front if needed), 50mm lens look. "
+        f"Must match the real-world {b_norm} {m_norm} front fascia for the given year/generation; "
+        "headlights and grille shape must be consistent with that exact model/year. "
+        "Do NOT generate a generic car. "
+        "No people, no interior, no text, no watermark, no showroom/dealership, no extra objects. "
+        "Avoid visible brand logos/badges, but keep the correct silhouette and design cues. "
+        f"Only one car in the frame. {cues}"
+    )
 
     image_model = (os.getenv("OPENAI_IMAGE_MODEL") or "gpt-image-1").strip()
 
-    brand_norm = (brand or "").strip()
-    model_norm = (model or "").strip()
-    y = int(year) if year else None
+    # Cost rule: we NEVER use medium/high in production (only low).
+    image_quality = "low"
 
-    b_norm = _normalize_body_name(body or "")
-    c_en = _normalize_color_name(color or "")
+    # Size is fixed per product decision
+    size = "1024x1024"
 
-    body_hint_map = {
-        "sedan": "sport sedan",
-        "wagon": "sport wagon",
-        "stationwagon": "sport wagon",
-        "hatchback": "hatchback",
-        "suv": "SUV",
-        "crossover": "crossover SUV",
-        "coupe": "coupe",
-        "pickup": "pickup truck",
-    }
-    body_hint = body_hint_map.get((b_norm or "").lower(), "car")
-
-    year_part = f" {y}" if y else ""
-    color_part = f"{c_en} " if c_en else ""
-    gen_hint = f" Trim/generation hint: {generation}." if generation else ""
-    brand_cues = _brand_design_cues(brand_norm)
-
-    prompt = (
-        f"A photorealistic, ultra-detailed cinematic car photo of a {color_part}{brand_norm} {model_norm}{year_part} ({body_hint})."
-        " Front three-quarter angle (front-left)."
-        " FULL vehicle visible with comfortable margins (no cropping)."
-        " The car is parked on clean asphalt."
-        " Background: dark and moody with subtle fog/haze, soft gradient sky, faint bokeh lights; realistic rim lighting."
-        " No people. No text. No logos or brand badges. No watermarks."
-        " Sharp focus, realistic reflections, high dynamic range."
-        " Square 1:1 composition."
-        f" {brand_cues}"
-        + gen_hint
-    )
-
-    # Request base64 to avoid URL download issues.
-    result = client.images.generate(
+    # OpenAI Python SDK returns base64 for images
+    res = client.images.generate(
         model=image_model,
         prompt=prompt,
-        size="1024x1024",
-        response_format="b64_json",
+        size=size,
+        quality=image_quality,
     )
 
-    b64 = getattr(result.data[0], "b64_json", None)
+    # Support both shapes (b64_json or raw bytes-like)
+    b64 = None
+    try:
+        if hasattr(res, "data") and res.data and getattr(res.data[0], "b64_json", None):
+            b64 = res.data[0].b64_json
+        elif isinstance(res, dict):
+            # Very defensive for older/alt shapes
+            b64 = (((res.get("data") or [{}])[0]).get("b64_json"))
+    except Exception:
+        b64 = None
+
     if not b64:
-        raise RuntimeError("image_generation_empty_b64")
+        raise RuntimeError("missing_b64_json_from_images_api")
 
     return base64.b64decode(b64)
 
-
-def _load_font(size: int):
-    """Best-effort font loader for PIL.
-
-    Render containers usually have DejaVu/Liberation fonts. If none found,
-    fallback to PIL's default bitmap font.
-    """
-    if ImageFont is None:
-        return None
-    try:
-        candidates = [
-            "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
-            "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",
-            "/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf",
-            "/usr/share/fonts/truetype/freefont/FreeSans.ttf",
-        ]
-        for p in candidates:
-            if os.path.exists(p):
-                return ImageFont.truetype(p, size=size)
-        return ImageFont.load_default()
-    except Exception:
-        return ImageFont.load_default()
-
-
-def _fallback_cover_bytes(brand: str, model: str, year: int | None, color: str | None) -> bytes:
-    """A subtle, dark placeholder (used only if generation fails).
-
-    We keep it intentionally clean (no big text overlays) so it won't look "broken" in Keşfet.
-    """
-    if Image is None:
-        # 1x1 transparent PNG
-        return base64.b64decode(
-            "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+Xr2UAAAAASUVORK5CYII="
-        )
-
-    size = 1024
-    img = Image.new("RGBA", (size, size), (12, 14, 18, 255))
-    draw = ImageDraw.Draw(img)
-
-    # Soft vertical gradient
-    for y in range(size):
-        t = y / (size - 1)
-        r = int(12 + (26 - 12) * t)
-        g = int(14 + (28 - 14) * t)
-        b = int(18 + (34 - 18) * t)
-        draw.line([(0, y), (size, y)], fill=(r, g, b, 255))
-
-    # Very subtle vignette
-    for i in range(0, 220, 8):
-        a = int(120 * (i / 220))
-        draw.rectangle([i, i, size - i, size - i], outline=(0, 0, 0, a))
-
-    out = BytesIO()
-    img.convert("RGB").save(out, format="PNG")
-    return out.getvalue()
-
-
 def _apply_watermark(image_bytes: bytes, watermark_text: str = "Oto Analiz") -> bytes:
-    """Apply a single subtle diagonal watermark + a small premium AI badge.
+    """Post-process cover image.
 
-    Output: WEBP bytes.
+    - Replaces the (usually white) studio background with a medium-dark studio gradient.
+    - Adds a subtle asphalt-like ground plane.
+    - Adds a single "Oto Analiz" watermark (sahibinden-style, but only once).
+    - Adds an "AI" badge at the top-right.
+
+    Always returns WEBP bytes. If PIL is unavailable, returns the original bytes.
     """
-    if Image is None or ImageDraw is None:
+    if Image is None or ImageDraw is None or ImageFont is None:
+        # If PIL missing, return as-is
         return image_bytes
 
-    im = Image.open(BytesIO(image_bytes)).convert("RGBA")
-    w, h = im.size
+    try:
+        from PIL import ImageChops, ImageFilter
+    except Exception:
+        ImageChops = None  # type: ignore
+        ImageFilter = None  # type: ignore
 
-    # --- Watermark (single, subtle) ---
-    wm_alpha = 14  # lower = more subtle
-    font_size = max(120, int(w * 0.16))
+    # --- Load
+    im_rgba = Image.open(BytesIO(image_bytes)).convert("RGBA")
+    W, H = im_rgba.size
+
+    # --- Helper: corner brightness to decide if background-keying makes sense
+    def _avg_corner_brightness(img: "Image.Image") -> float:
+        rgb = img.convert("RGB")
+        samples = []
+        step = max(1, int(min(W, H) * 0.02))
+        boxes = [
+            (0, 0, step, step),
+            (W - step, 0, W, step),
+            (0, H - step, step, H),
+            (W - step, H - step, W, H),
+        ]
+        for b in boxes:
+            crop = rgb.crop(b)
+            # average luminance
+            px = list(crop.getdata())
+            if not px:
+                continue
+            lum = [(0.2126*r + 0.7152*g + 0.0722*b) for (r, g, b) in px]
+            samples.append(sum(lum) / len(lum))
+        return sum(samples) / max(1, len(samples))
+
+    # --- Build background (dark gradient + asphalt)
+    def _build_background() -> "Image.Image":
+        bg = Image.new("RGB", (W, H), (25, 28, 32))
+        draw = ImageDraw.Draw(bg)
+
+        # vertical gradient (top: medium-dark, bottom: darker)
+        top = (46, 50, 56)
+        mid = (28, 31, 36)
+        bottom = (18, 20, 24)
+        for y in range(H):
+            t = y / float(max(1, H - 1))
+            if t < 0.65:
+                k = t / 0.65
+                r = int(top[0] + (mid[0] - top[0]) * k)
+                g = int(top[1] + (mid[1] - top[1]) * k)
+                b = int(top[2] + (mid[2] - top[2]) * k)
+            else:
+                k = (t - 0.65) / 0.35
+                r = int(mid[0] + (bottom[0] - mid[0]) * k)
+                g = int(mid[1] + (bottom[1] - mid[1]) * k)
+                b = int(mid[2] + (bottom[2] - mid[2]) * k)
+            draw.line([(0, y), (W, y)], fill=(r, g, b))
+
+        # asphalt plane (bottom part)
+        asphalt_y = int(H * 0.70)
+        asphalt_h = H - asphalt_y
+        asphalt = Image.new("RGB", (W, asphalt_h), (22, 24, 28))
+
+        # texture (noise) - keep it lightweight + Render-safe
+        try:
+            noise = Image.effect_noise((W, asphalt_h), 64).convert("L")
+            if ImageFilter is not None:
+                noise = noise.filter(ImageFilter.GaussianBlur(radius=1.2))
+            # map noise to subtle variations
+            # 0..255 -> around 0..40
+            noise = noise.point(lambda p: int(p * 0.18))
+            tex = Image.new("RGB", (W, asphalt_h), (0, 0, 0))
+            tex.putalpha(noise)
+            asphalt_rgba = asphalt.convert("RGBA")
+            asphalt_rgba = Image.alpha_composite(asphalt_rgba, tex)
+            asphalt = asphalt_rgba.convert("RGB")
+        except Exception:
+            pass
+
+        # slight vignette on asphalt
+        try:
+            vign = Image.new("L", (W, asphalt_h), 0)
+            vdraw = ImageDraw.Draw(vign)
+            for i in range(0, max(W, asphalt_h), 8):
+                alpha = int(110 * (i / float(max(1, max(W, asphalt_h)))))
+                vdraw.rectangle([i, i, W - i, asphalt_h - i], outline=alpha)
+            if ImageFilter is not None:
+                vign = vign.filter(ImageFilter.GaussianBlur(radius=18))
+            vcol = Image.new("RGBA", (W, asphalt_h), (0, 0, 0, 0))
+            vcol.putalpha(vign)
+            asphalt = Image.alpha_composite(asphalt.convert("RGBA"), vcol).convert("RGB")
+        except Exception:
+            pass
+
+        bg.paste(asphalt, (0, asphalt_y))
+        return bg
+
+    bg = _build_background()
+
+    # --- If background is bright (white studio), key it out and re-place car
+    try:
+        corner_b = _avg_corner_brightness(im_rgba)
+    except Exception:
+        corner_b = 0
+
+    composed = bg.convert("RGBA")
+
+    if corner_b >= 220 and ImageChops is not None:
+        try:
+            rgb = im_rgba.convert("RGB")
+            diff = ImageChops.difference(rgb, Image.new("RGB", (W, H), (255, 255, 255))).convert("L")
+            # threshold: anything far enough from white is foreground
+            mask = diff.point(lambda p: 255 if p > 18 else 0)
+            if ImageFilter is not None:
+                mask = mask.filter(ImageFilter.GaussianBlur(radius=1.6))
+
+            bbox = mask.getbbox()
+            if bbox:
+                pad = int(min(W, H) * 0.02)
+                x0, y0, x1, y1 = bbox
+                x0 = max(0, x0 - pad)
+                y0 = max(0, y0 - pad)
+                x1 = min(W, x1 + pad)
+                y1 = min(H, y1 + pad)
+
+                car_crop = im_rgba.crop((x0, y0, x1, y1))
+                mask_crop = mask.crop((x0, y0, x1, y1))
+                cw, ch = car_crop.size
+
+                # place car a bit lower so it sits on asphalt
+                desired_bottom = int(H * 0.93)
+                px = (W - cw) // 2
+                py = desired_bottom - ch
+                py = max(0, min(H - ch, py))
+
+                # shadow (subtle)
+                if ImageFilter is not None:
+                    sh = mask_crop.filter(ImageFilter.GaussianBlur(radius=10))
+                else:
+                    sh = mask_crop
+                # reduce shadow alpha
+                sh = sh.point(lambda p: int(p * 0.35))
+                shadow = Image.new("RGBA", (cw, ch), (0, 0, 0, 0))
+                shadow.putalpha(sh)
+                composed.alpha_composite(shadow, (px, min(H - ch, py + 10)))
+
+                # car
+                composed.alpha_composite(car_crop, (px, py), mask_crop)
+            else:
+                # fallback: just composite full image with a very rough mask
+                composed.alpha_composite(im_rgba)
+        except Exception:
+            composed.alpha_composite(im_rgba)
+    else:
+        # If not a clean white background, keep original but still add overlays
+        composed = im_rgba
+
+    # --- Overlays: watermark + AI badge
+    over = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(over)
+
+    # Font helper (Render-safe): try DejaVu, else default
+    def _load_font(size: int):
+        try:
+            for fp in (
+                "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",
+                "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
+                "/usr/share/fonts/truetype/freefont/FreeSansBold.ttf",
+            ):
+                if os.path.exists(fp):
+                    return ImageFont.truetype(fp, size=size)
+        except Exception:
+            pass
+        try:
+            return ImageFont.load_default()
+        except Exception:
+            return None
+
+    # 1) Watermark (single, sahibinden-like)
+    wm_text = (watermark_text or "Oto Analiz").strip() or "Oto Analiz"
+    wm_text = wm_text.upper() if len(wm_text) <= 16 else wm_text
+
+    font_size = max(52, int(min(W, H) * 0.11))
     font = _load_font(font_size)
-
-    diag = int((w * w + h * h) ** 0.5)
-    canvas = Image.new("RGBA", (diag, diag), (0, 0, 0, 0))
-    draw = ImageDraw.Draw(canvas)
-
     if font is not None:
-        bbox = draw.textbbox((0, 0), watermark_text, font=font)
-        tw, th = bbox[2] - bbox[0], bbox[3] - bbox[1]
-    else:
-        tw, th = len(watermark_text) * 10, 12
+        # Measure
+        try:
+            bbox = draw.textbbox((0, 0), wm_text, font=font)
+            tw = bbox[2] - bbox[0]
+            th = bbox[3] - bbox[1]
+        except Exception:
+            tw, th = (font_size * max(6, len(wm_text)//2), font_size)
 
-    cx, cy = diag // 2, diag // 2
-    draw.text(
-        (cx - tw // 2, cy - th // 2),
-        watermark_text,
-        fill=(255, 255, 255, wm_alpha),
-        font=font,
-    )
+        cx = (W - tw) // 2
+        cy = (H - th) // 2
+        draw.text((cx, cy), wm_text, font=font, fill=(255, 255, 255, 30))
+        # rotate the entire overlay for a watermark vibe
+        try:
+            over = over.rotate(-16, resample=Image.BICUBIC, expand=0)
+        except Exception:
+            pass
 
-    rotated = canvas.rotate(-24, resample=Image.BICUBIC, expand=False)
-    overlay = Image.new("RGBA", (w, h), (0, 0, 0, 0))
-    dx = (w - diag) // 2
-    dy = (h - diag) // 2
-    overlay.paste(rotated, (dx, dy), rotated)
-    im = Image.alpha_composite(im, overlay)
+    # 2) AI badge (top-right)
+    badge_pad = int(min(W, H) * 0.03)
+    badge_w = int(min(W, H) * 0.14)
+    badge_h = int(min(W, H) * 0.07)
+    bx1 = W - badge_pad
+    by0 = badge_pad
+    bx0 = bx1 - badge_w
+    by1 = by0 + badge_h
 
-    # --- AI badge (small, clean) ---
-    badge = Image.new("RGBA", (w, h), (0, 0, 0, 0))
-    bdraw = ImageDraw.Draw(badge)
+    # badge background (semi-opaque white)
+    try:
+        draw = ImageDraw.Draw(over)
+        if hasattr(draw, "rounded_rectangle"):
+            draw.rounded_rectangle([bx0, by0, bx1, by1], radius=int(badge_h * 0.28), fill=(255, 255, 255, 210))
+        else:
+            draw.rectangle([bx0, by0, bx1, by1], fill=(255, 255, 255, 210))
+    except Exception:
+        pass
 
-    badge_text = "AI"
-    badge_font_size = max(18, int(w * 0.028))  # smaller
-    bfont = _load_font(badge_font_size)
+    ai_font = _load_font(max(18, int(badge_h * 0.55)))
+    if ai_font is not None:
+        try:
+            t = "AI"
+            tb = draw.textbbox((0, 0), t, font=ai_font)
+            tw = tb[2] - tb[0]
+            th = tb[3] - tb[1]
+            tx = bx0 + (badge_w - tw) // 2
+            ty = by0 + (badge_h - th) // 2
+            draw.text((tx, ty), t, font=ai_font, fill=(0, 0, 0, 235))
+        except Exception:
+            draw.text((bx0 + 10, by0 + 6), "AI", font=ai_font, fill=(0, 0, 0, 235))
 
-    pad = max(18, int(w * 0.02))
+    # Composite overlays
+    base = composed.convert("RGBA")
+    out_rgba = Image.alpha_composite(base, over)
+    out_rgb = out_rgba.convert("RGB")
 
-    if bfont is not None:
-        bb = bdraw.textbbox((0, 0), badge_text, font=bfont)
-        ttw, tth = bb[2] - bb[0], bb[3] - bb[1]
-    else:
-        ttw, tth = 20, 12
+    buf = BytesIO()
+    out_rgb.save(buf, format="WEBP", quality=90)
+    return buf.getvalue()
 
-    pill_w = ttw + max(26, int(w * 0.045))
-    pill_h = tth + max(18, int(h * 0.02))
 
-    x2 = w - pad
-    y1 = pad
-    x1 = x2 - pill_w
-    y2 = y1 + pill_h
-    radius = int(pill_h * 0.55)
-
-    bdraw.rounded_rectangle([x1, y1, x2, y2], radius=radius, fill=(0, 0, 0, 200))
-    bdraw.text(
-        (x1 + (pill_w - ttw) / 2, y1 + (pill_h - tth) / 2),
-        badge_text,
-        fill=(255, 255, 255, 255),
-        font=bfont,
-    )
-
-    im = Image.alpha_composite(im, badge)
-
-    out = BytesIO()
-    im.convert("RGB").save(out, format="WEBP", quality=92, method=6)
-    return out.getvalue()
 @app.post("/get_or_create_cover")
-async def get_or_create_cover(req: CoverRequest):
-    """Returns (and caches) a generated cover URL.
+def get_or_create_cover(req: CoverRequest) -> Dict[str, Any]:
+    brand = (req.brand or "").strip()
+    model = (req.model or "").strip()
+    if not brand or not model:
+        raise HTTPException(status_code=400, detail="missing_brand_or_model")
 
-    This endpoint is designed to NEVER crash the client with a 500 due to generation hiccups.
-    If something fails, it returns either the cached URL or a safe placeholder.
-    """
-    cover_key = _cover_key(req.brand, req.model, req.body, req.year, req.color, generation=req.generation)
+    # Use explicit cache_key if provided (useful for tests / stable IDs)
+    cover_key = _normalize_cover_key(req.cache_key) if req.cache_key else _cover_key(
+    brand,
+    model,
+    req.body,
+    req.year,
+    req.color,
+    req.generation,
+)
 
-    doc_ref = firestore_db.collection("cover_cache").document(cover_key)
+    doc_ref = _firebase_cover_doc(cover_key)
 
-    data = None
-    try:
-        snap = doc_ref.get()
-        data = snap.to_dict() if snap.exists else None
-    except Exception as e:
-        print("[cover] cache read failed:", repr(e))
+    # Read existing doc once (for cache + regenerate guard)
+    doc = doc_ref.get()
+    data = (doc.to_dict() or {}) if doc.exists else {}
+    cached_url = data.get("imageUrl")
+    regen_count = int(data.get("regenCount") or 0)
 
-    cached_url = (data or {}).get("imageUrl") if data else None
-    regen_count = int((data or {}).get("regenCount") or 0)
-
-    # Cache hit
+    # Cache hit (normal)
     if cached_url and not req.force_regenerate:
-        return {"coverKey": cover_key, "imageUrl": _fix_firebase_download_url(str(cached_url)), "cached": True}
+        cached_url = _fix_firebase_download_url(str(cached_url))
+        return {"coverKey": cover_key, "imageUrl": cached_url, "cached": True}
 
-    # Limit paid regenerations per cache key
-    allow_force = req.force_regenerate and regen_count < 1
-    if req.force_regenerate and not allow_force:
-        if cached_url:
-            return {"coverKey": cover_key, "imageUrl": _fix_firebase_download_url(str(cached_url)), "cached": True, "regenBlocked": True}
-        # No cached image; continue with generation (best effort)
+    # Force regenerate is allowed ONLY ONCE per cache key (max 2 paid generations total)
+    # - First generation: regenCount = 0
+    # - One allowed regenerate: regenCount -> 1
+    # - Further requests: return cached without regenerating
+    if cached_url and req.force_regenerate and regen_count >= 1:
+        return {"coverKey": cover_key, "imageUrl": cached_url, "cached": True, "regenLimited": True}
+    # Determine regenCount update (max one regenerate)
+    next_regen_count = regen_count
+    if req.force_regenerate and cached_url:
+        next_regen_count = regen_count + 1
 
-    # Generate
-    gen_ok = True
+    # Generate a brand-recognizable image (no logos)
     try:
-        raw = _generate_vehicle_image_bytes(
-            brand=req.brand,
-            model=req.model,
+        img_bytes = _generate_vehicle_image_bytes(
+            brand=brand,
+            model=model,
             body=req.body,
             generation=req.generation,
             year=req.year,
             color=req.color,
         )
     except Exception as e:
-        gen_ok = False
-        print("[cover] image generation failed:", repr(e))
-        raw = _fallback_cover_bytes(req.brand, req.model, req.year, req.color)
+        # Surface real reason to Render logs and client
+        print("OpenAI image generation error:", repr(e))
+        raise HTTPException(status_code=500, detail=f"image_generation_failed: {type(e).__name__}")
 
-    # Watermark + AI badge
-    try:
-        stamped = _apply_watermark(raw, watermark_text="OtoAnaliz")
-    except Exception as e:
-        print("[cover] watermark failed:", repr(e))
-        stamped = raw
+    # Watermark + convert to webp
+    final_bytes = _apply_watermark(img_bytes, watermark_text=os.getenv("COVER_WATERMARK_TEXT", "Oto Analiz"))
 
-    # Convert to webp (if not already)
-    try:
-        webp = _convert_to_webp(stamped)
-    except Exception as e:
-        print("[cover] webp convert failed:", repr(e))
-        webp = stamped
+    # Upload to Firebase Storage (token-based URL)
+    image_url = _firebase_upload_cover_bytes(cover_key, final_bytes, content_type="image/webp")
 
-    storage_path = f"discover_covers/generated/{cover_key}.webp"
-
-    # Upload
-    image_url = None
-    try:
-        image_url = _firebase_upload_cover_bytes(webp, storage_path)
-        image_url = _fix_firebase_download_url(str(image_url))
-    except Exception as e:
-        print("[cover] firebase upload failed:", repr(e))
-        # Return cached if possible
-        if cached_url:
-            return {
-                "coverKey": cover_key,
-                "imageUrl": _fix_firebase_download_url(str(cached_url)),
-                "cached": True,
-                "uploadFailed": True,
-                "generationOk": gen_ok,
-            }
-        return {
-            "coverKey": cover_key,
-            "imageUrl": None,
-            "cached": False,
-            "uploadFailed": True,
-            "generationOk": gen_ok,
-        }
-
-    # Update cache doc (best effort)
-    try:
-        new_doc = {
-            "imageUrl": image_url,
-            "brand": req.brand,
-            "model": req.model,
+    # Persist mapping
+    doc_ref.set(
+        {
+            "brand": brand,
+            "model": model,
             "body": req.body,
+            "generation": req.generation,
             "year": req.year,
             "color": req.color,
-            "generation": req.generation,
+            "imageUrl": image_url,
+            "regenCount": next_regen_count,
+            "createdAt": data.get("createdAt") or datetime.utcnow().isoformat(),
             "updatedAt": datetime.utcnow().isoformat(),
-            "regenCount": (regen_count + 1) if allow_force else regen_count,
-            "generationOk": gen_ok,
-        }
-        doc_ref.set(new_doc, merge=True)
-    except Exception as e:
-        print("[cover] cache write failed:", repr(e))
+        },
+        merge=True,
+    )
 
-    return {"coverKey": cover_key, "imageUrl": image_url, "cached": False, "generationOk": gen_ok}
-
+    return {"coverKey": cover_key, "imageUrl": image_url, "cached": False}
 
 @app.post("/analyze")
 async def analyze(req: AnalyzeRequest) -> Dict[str, Any]:
