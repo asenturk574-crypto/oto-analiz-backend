@@ -3135,6 +3135,11 @@ def _cover_key(
 
     parts.append(_norm_color(color))
 
+    # Style/version tag to force regeneration when cover design/prompt changes
+    style_ver = (os.getenv("COVER_STYLE_VERSION") or "v5").strip()
+    if style_ver:
+        parts.append(_norm_token(style_ver))
+
     key = "|".join([p for p in parts if p])
     key = re.sub(r"\|{2,}", "|", key).strip("|")
     return key or "unknown"
@@ -3385,16 +3390,14 @@ def _generate_vehicle_image_bytes(
     subject = " ".join([p for p in parts if p]).strip()
 
     prompt = (
-        "Studio product photo on a seamless neutral/white background. "
-        f"Photorealistic exterior of a single {subject}. "
-        "Centered composition, sharp focus, realistic proportions, natural reflections. "
-        "Front three-quarter view (or straight front if needed), 50mm lens look. "
-        f"Must match the real-world {b_norm} {m_norm} front fascia for the given year/generation; "
-        "headlights and grille shape must be consistent with that exact model/year. "
-        "Do NOT generate a generic car. "
-        "No people, no interior, no text, no watermark, no showroom/dealership, no extra objects. "
-        "Avoid visible brand logos/badges, but keep the correct silhouette and design cues. "
-        f"Only one car in the frame. {cues}"
+        "High-end studio automotive photograph of a single vehicle. "
+        "The car is parked on clean dark asphalt with subtle texture, under soft studio lighting. "
+        "Background: a premium dark-gray gradient studio backdrop with a gentle vignette. "
+        "Framing: square 1:1, the FULL car must be completely visible (no cropping), centered, with generous margins; the vehicle occupies about 60-70% of the frame. "
+        "Camera: eye-level, 3/4 front angle, ~50mm lens look, crisp details, realistic reflections, high fidelity. "
+        f"Must correspond to a real-world {y_norm} {b_norm} {m_norm} with correct generation/body shape and proportions. "
+        "Only one car. No people. No text. No logos/badges. No watermark. No extra objects. "
+        f"{cues}"
     )
 
     image_model = (os.getenv("OPENAI_IMAGE_MODEL") or "gpt-image-1").strip()
@@ -3429,138 +3432,110 @@ def _generate_vehicle_image_bytes(
 
     return base64.b64decode(b64)
 
-def _apply_watermark(image_bytes: bytes, watermark_text: str = "OtoAnaliz") -> bytes:
-    """Apply a very subtle (sahibinden-style) diagonal watermark + a small AI badge.
+def _apply_watermark(image_bytes: bytes, watermark_text: str = "Oto Analiz") -> bytes:
+    """Apply a subtle single watermark + a small AI badge.
 
-    - Watermark is faint and tiled, rotated diagonally.
-    - AI badge is a small pill at the top-right edge.
-
-    If PIL is not available, returns original bytes.
+    Notes:
+    - Watermark: single diagonal, very low opacity (Sahibinden-style subtle), NOT tiled.
+    - AI badge: small, clean pill in the top-right.
     """
     if Image is None or ImageDraw is None or ImageFont is None:
         return image_bytes
 
     try:
-        im = Image.open(BytesIO(image_bytes)).convert("RGBA")
+        im = Image.open(io.BytesIO(image_bytes)).convert("RGBA")
     except Exception:
         return image_bytes
 
-    W, H = im.size
+    w, h = im.size
 
-    # Decide watermark color based on brightness
+    # ---- 1) Single subtle watermark ----
+    wm_text = (watermark_text or "Oto Analiz").strip()
+
+    # pick a very subtle color based on background brightness
     try:
-        small = im.convert("L").resize((64, 64))
-        avg = sum(small.getdata()) / (64 * 64)
+        # sample a small region near top-left to estimate brightness
+        sample = im.crop((0, 0, max(1, w // 10), max(1, h // 10))).convert("RGB")
+        r, g, b = sample.resize((1, 1)).getpixel((0, 0))
+        bright = (0.2126 * r + 0.7152 * g + 0.0722 * b)  # 0..255
     except Exception:
-        avg = 200
+        bright = 200
 
-    is_bright = avg > 160
-    wm_rgb = (0, 0, 0) if is_bright else (255, 255, 255)
-    wm_alpha = int(os.getenv("COVER_WATERMARK_ALPHA", "22"))  # ~8-10%
+    # subtle alpha and color
+    if bright >= 140:
+        wm_rgb = (0, 0, 0)
+        wm_alpha = 18
+    else:
+        wm_rgb = (255, 255, 255)
+        wm_alpha = 22
 
-    # Try to load a scalable font (Render-safe fallbacks)
-    def _load_font(size: int):
-        for fp in (
-            "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
-            "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",
-            "/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf",
-            "/usr/share/fonts/truetype/freefont/FreeSans.ttf",
-        ):
-            try:
-                if os.path.exists(fp):
-                    return ImageFont.truetype(fp, size=size)
-            except Exception:
-                pass
-        try:
-            return ImageFont.load_default()
-        except Exception:
-            return None
+    # font sizing (keep readable but subtle)
+    font_size = max(36, int(min(w, h) * 0.12))
+    font = _load_font(font_size)
 
-    base_font_size = max(48, int(min(W, H) * 0.10))
-    font = _load_font(base_font_size)
-
-    overlay = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    overlay = Image.new("RGBA", (w, h), (0, 0, 0, 0))
     draw = ImageDraw.Draw(overlay)
 
-    # Slightly spaced text for a premium look
-    text = watermark_text or "OtoAnaliz"
+    bbox = draw.textbbox((0, 0), wm_text, font=font)
+    tw, th = bbox[2] - bbox[0], bbox[3] - bbox[1]
+    x = (w - tw) // 2
+    y = (h - th) // 2
 
-    # If we can, approximate tracking by inserting thin spaces
-    if len(text) <= 16:
-        text_draw = " ".join(list(text))
-    else:
-        text_draw = text
+    draw.text((x, y), wm_text, font=font, fill=(wm_rgb[0], wm_rgb[1], wm_rgb[2], wm_alpha))
 
-    # Measure
+    # rotate the whole overlay around center for a diagonal watermark
+    overlay = overlay.rotate(-22, resample=Image.BICUBIC, expand=False)
+
+    im = Image.alpha_composite(im, overlay)
+
+    # ---- 2) Small AI badge (top-right) ----
+    badge_h = max(26, int(min(w, h) * 0.04))
+    badge_w = int(badge_h * 1.6)
+    margin = max(10, int(min(w, h) * 0.02))
+
+    bx1 = w - margin - badge_w
+    by1 = margin
+    bx2 = w - margin
+    by2 = margin + badge_h
+
+    badge_layer = Image.new("RGBA", (w, h), (0, 0, 0, 0))
+    bd = ImageDraw.Draw(badge_layer)
+
+    # subtle shadow
+    shadow_offset = max(1, badge_h // 12)
+    bd.rounded_rectangle(
+        [bx1 + shadow_offset, by1 + shadow_offset, bx2 + shadow_offset, by2 + shadow_offset],
+        radius=badge_h // 2,
+        fill=(0, 0, 0, 70),
+    )
+
+    # badge body
+    bd.rounded_rectangle(
+        [bx1, by1, bx2, by2],
+        radius=badge_h // 2,
+        fill=(0, 0, 0, 160),
+        outline=(255, 255, 255, 55),
+        width=max(1, badge_h // 18),
+    )
+
+    ai_font = _load_font(max(14, int(badge_h * 0.55)))
+    ai_text = "AI"
+    tbox = bd.textbbox((0, 0), ai_text, font=ai_font)
+    ttw, tth = tbox[2] - tbox[0], tbox[3] - tbox[1]
+    tx = bx1 + (badge_w - ttw) // 2
+    ty = by1 + (badge_h - tth) // 2 - 1
+    bd.text((tx, ty), ai_text, font=ai_font, fill=(255, 255, 255, 235))
+
+    im = Image.alpha_composite(im, badge_layer)
+
+    # export as WEBP (storage uses .webp)
+    out = io.BytesIO()
     try:
-        bbox = draw.textbbox((0, 0), text_draw, font=font)
-        tw = bbox[2] - bbox[0]
-        th = bbox[3] - bbox[1]
+        im.convert("RGB").save(out, format="WEBP", quality=92, method=6)
     except Exception:
-        tw, th = int(W * 0.5), int(H * 0.08)
-
-    # Tile positions
-    step_x = max(200, int(tw * 1.4))
-    step_y = max(140, int(th * 3.0))
-
-    fill = (wm_rgb[0], wm_rgb[1], wm_rgb[2], wm_alpha)
-
-    for y in range(-H, H * 2, step_y):
-        for x in range(-W, W * 2, step_x):
-            draw.text((x, y), text_draw, font=font, fill=fill)
-
-    # Rotate overlay diagonally
-    overlay = overlay.rotate(-18, resample=Image.BICUBIC, expand=0)
-    im2 = Image.alpha_composite(im, overlay)
-
-    # --- AI badge (small pill at edge) ---
-    badge_text = os.getenv("COVER_AI_BADGE_TEXT", "AI")
-    if badge_text:
-        badge_font = _load_font(max(22, int(min(W, H) * 0.035)))
-        bd = ImageDraw.Draw(im2)
-
-        pad = max(14, int(min(W, H) * 0.02))
-        bx_pad = max(14, int(min(W, H) * 0.018))
-        by_pad = max(8, int(min(W, H) * 0.012))
-
-        try:
-            tb = bd.textbbox((0, 0), badge_text, font=badge_font)
-            btw = tb[2] - tb[0]
-            bth = tb[3] - tb[1]
-        except Exception:
-            btw, bth = 40, 22
-
-        bw = btw + bx_pad * 2
-        bh = bth + by_pad * 2
-
-        x2 = W - pad
-        y1 = pad
-        x1 = x2 - bw
-        y2 = y1 + bh
-
-        # Background: subtle glass effect
-        if is_bright:
-            bg = (0, 0, 0, 90)
-            fg = (255, 255, 255, 220)
-            border = (0, 0, 0, 60)
-        else:
-            bg = (255, 255, 255, 120)
-            fg = (0, 0, 0, 220)
-            border = (255, 255, 255, 80)
-
-        radius = int(bh * 0.45)
-        # rounded_rectangle is available in newer Pillow; fallback to rectangle if not
-        try:
-            bd.rounded_rectangle([x1, y1, x2, y2], radius=radius, fill=bg, outline=border, width=2)
-        except Exception:
-            bd.rectangle([x1, y1, x2, y2], fill=bg)
-
-        bd.text((x1 + bx_pad, y1 + by_pad), badge_text, font=badge_font, fill=fg)
-
-    out = im2.convert("RGB")
-    buf = BytesIO()
-    out.save(buf, format="WEBP", quality=int(os.getenv("COVER_WEBP_QUALITY", "90")))
-    return buf.getvalue()
+        # fallback
+        im.convert("RGB").save(out, format="PNG")
+    return out.getvalue()
 
 
 @app.post("/get_or_create_cover")
