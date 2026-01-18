@@ -3196,11 +3196,24 @@ def _firebase_cover_doc(cover_key: str):
     return db.collection("discover_covers_cache").document(cover_key)
 
 
-def _firebase_upload_cover_bytes(cover_key: str, image_bytes: bytes, content_type: str = "image/webp") -> str:
+def _firebase_upload_cover_bytes(
+    cover_key: str,
+    image_bytes: bytes,
+    content_type: str = "image/webp",
+    object_path: Optional[str] = None,
+) -> str:
+    """Upload bytes to Firebase Storage and return a token-based download URL.
+
+    - Default path stays backward compatible: discover_covers/generated/{cover_key}.webp
+    - For multi-variant covers you can pass object_path, e.g.
+      discover_covers/generated/{cover_key}/bg_07.webp
+    """
     _init_firebase_admin()
     bucket_name = os.getenv("FIREBASE_STORAGE_BUCKET", "").strip()
     bucket = fb_storage.bucket()  # default bucket from initialize_app
-    object_path = f"discover_covers/generated/{cover_key}.webp"
+
+    if not object_path:
+        object_path = f"discover_covers/generated/{cover_key}.webp"
 
     token = uuid.uuid4().hex
     blob = bucket.blob(object_path)
@@ -3211,6 +3224,7 @@ def _firebase_upload_cover_bytes(cover_key: str, image_bytes: bytes, content_typ
     # Firebase download URL (token-based)
     url = f"https://firebasestorage.googleapis.com/v0/b/{bucket_name}/o/{urlquote(object_path, safe='')}?alt=media&token={token}"
     return url
+
 
 
 def _fix_firebase_download_url(url: str) -> str:
@@ -3425,18 +3439,23 @@ def _generate_vehicle_image_bytes(
 
     return base64.b64decode(b64)
 
-def _apply_watermark(image_bytes: bytes, watermark_text: str = "Oto Analiz") -> bytes:
-    """Post-process cover image.
+def _apply_watermark(
+    image_bytes: bytes,
+    watermark_text: str = "Oto Analiz",
+    bg_id: int = 1,
+) -> bytes:
+    """Post-process cover image (PIL).
 
-    - Replaces the (usually white) studio background with a medium-dark studio gradient.
-    - Adds a subtle asphalt-like ground plane.
-    - Adds a single "Oto Analiz" watermark (sahibinden-style, but only once).
-    - Adds an "AI" badge at the top-right.
+    What we guarantee:
+    - Medium/dark background with an asphalt/concrete ground plane (car never "floating")
+    - Single sahibinden-style watermark: "Oto Analiz" (once)
+    - Small AI badge at top-right
+
+    bg_id (1..24) controls the background variant.
 
     Always returns WEBP bytes. If PIL is unavailable, returns the original bytes.
     """
     if Image is None or ImageDraw is None or ImageFont is None:
-        # If PIL missing, return as-is
         return image_bytes
 
     try:
@@ -3448,6 +3467,46 @@ def _apply_watermark(image_bytes: bytes, watermark_text: str = "Oto Analiz") -> 
     # --- Load
     im_rgba = Image.open(BytesIO(image_bytes)).convert("RGBA")
     W, H = im_rgba.size
+
+    # --- Background variants (24): keep as lightweight parameters (not 24 huge prompts)
+    # Each entry: (topRGB, midRGB, bottomRGB, asphaltRGB, accent_mode)
+    # accent_mode: None | "bokeh" | "streak" | "garage" | "rain"
+    BG = {
+        1:  ((46, 50, 56), (28, 31, 36), (18, 20, 24), (22, 24, 28), None),
+        2:  ((55, 58, 62), (30, 32, 36), (16, 18, 22), (20, 22, 26), "garage"),
+        3:  ((40, 46, 58), (22, 26, 36), (14, 16, 22), (18, 20, 26), "bokeh"),
+        4:  ((60, 55, 52), (32, 30, 30), (18, 18, 20), (22, 21, 22), None),
+        5:  ((44, 52, 50), (24, 30, 30), (14, 16, 18), (18, 19, 20), "streak"),
+        6:  ((54, 44, 48), (30, 24, 28), (18, 14, 16), (20, 18, 18), None),
+        7:  ((42, 48, 62), (22, 26, 38), (12, 14, 22), (16, 18, 26), "rain"),
+        8:  ((58, 60, 64), (30, 32, 34), (16, 18, 20), (22, 24, 26), None),
+        9:  ((48, 44, 40), (28, 24, 22), (16, 14, 14), (20, 18, 18), "garage"),
+        10: ((46, 54, 46), (26, 32, 26), (16, 20, 16), (20, 22, 20), None),
+        11: ((50, 52, 60), (26, 28, 34), (14, 16, 22), (18, 20, 26), "bokeh"),
+        12: ((52, 48, 58), (28, 26, 34), (16, 14, 22), (20, 18, 26), "streak"),
+        13: ((62, 58, 50), (34, 32, 28), (18, 18, 18), (22, 21, 20), None),
+        14: ((40, 42, 48), (22, 24, 28), (12, 14, 18), (18, 20, 22), "garage"),
+        15: ((44, 50, 66), (24, 28, 40), (14, 16, 24), (18, 20, 26), "bokeh"),
+        16: ((60, 50, 46), (32, 28, 26), (18, 16, 16), (22, 20, 20), None),
+        17: ((50, 56, 54), (26, 32, 30), (14, 18, 18), (20, 22, 22), "rain"),
+        18: ((56, 56, 58), (30, 30, 32), (16, 16, 18), (22, 22, 24), None),
+        19: ((46, 46, 54), (24, 24, 34), (14, 14, 22), (18, 18, 26), "streak"),
+        20: ((52, 44, 44), (28, 24, 24), (16, 14, 14), (20, 18, 18), None),
+        21: ((44, 58, 58), (24, 34, 34), (14, 20, 20), (18, 22, 22), "bokeh"),
+        22: ((58, 52, 62), (30, 28, 36), (16, 16, 22), (22, 20, 26), None),
+        23: ((42, 44, 54), (22, 24, 34), (12, 14, 22), (18, 20, 26), "rain"),
+        24: ((54, 54, 54), (30, 30, 30), (16, 16, 16), (22, 22, 22), None),
+    }
+
+    if bg_id not in BG:
+        try:
+            bg_id = int(bg_id)
+        except Exception:
+            bg_id = 1
+    if bg_id not in BG:
+        bg_id = 1
+
+    top, mid, bottom, asphalt_rgb, accent = BG[bg_id]
 
     # --- Helper: corner brightness to decide if background-keying makes sense
     def _avg_corner_brightness(img: "Image.Image") -> float:
@@ -3462,7 +3521,6 @@ def _apply_watermark(image_bytes: bytes, watermark_text: str = "Oto Analiz") -> 
         ]
         for b in boxes:
             crop = rgb.crop(b)
-            # average luminance
             px = list(crop.getdata())
             if not px:
                 continue
@@ -3470,41 +3528,36 @@ def _apply_watermark(image_bytes: bytes, watermark_text: str = "Oto Analiz") -> 
             samples.append(sum(lum) / len(lum))
         return sum(samples) / max(1, len(samples))
 
-    # --- Build background (dark gradient + asphalt)
+    # --- Build background (variant gradient + asphalt)
     def _build_background() -> "Image.Image":
-        bg = Image.new("RGB", (W, H), (25, 28, 32))
+        bg = Image.new("RGB", (W, H), bottom)
         draw = ImageDraw.Draw(bg)
 
-        # vertical gradient (top: medium-dark, bottom: darker)
-        top = (46, 50, 56)
-        mid = (28, 31, 36)
-        bottom = (18, 20, 24)
+        # vertical gradient (top -> mid -> bottom)
+        split = 0.66
         for y in range(H):
             t = y / float(max(1, H - 1))
-            if t < 0.65:
-                k = t / 0.65
+            if t < split:
+                k = t / split
                 r = int(top[0] + (mid[0] - top[0]) * k)
                 g = int(top[1] + (mid[1] - top[1]) * k)
                 b = int(top[2] + (mid[2] - top[2]) * k)
             else:
-                k = (t - 0.65) / 0.35
+                k = (t - split) / float(max(1e-6, 1.0 - split))
                 r = int(mid[0] + (bottom[0] - mid[0]) * k)
                 g = int(mid[1] + (bottom[1] - mid[1]) * k)
                 b = int(mid[2] + (bottom[2] - mid[2]) * k)
             draw.line([(0, y), (W, y)], fill=(r, g, b))
 
-        # asphalt plane (bottom part)
         asphalt_y = int(H * 0.70)
         asphalt_h = H - asphalt_y
-        asphalt = Image.new("RGB", (W, asphalt_h), (22, 24, 28))
+        asphalt = Image.new("RGB", (W, asphalt_h), asphalt_rgb)
 
-        # texture (noise) - keep it lightweight + Render-safe
+        # texture (noise)
         try:
             noise = Image.effect_noise((W, asphalt_h), 64).convert("L")
             if ImageFilter is not None:
                 noise = noise.filter(ImageFilter.GaussianBlur(radius=1.2))
-            # map noise to subtle variations
-            # 0..255 -> around 0..40
             noise = noise.point(lambda p: int(p * 0.18))
             tex = Image.new("RGB", (W, asphalt_h), (0, 0, 0))
             tex.putalpha(noise)
@@ -3514,7 +3567,7 @@ def _apply_watermark(image_bytes: bytes, watermark_text: str = "Oto Analiz") -> 
         except Exception:
             pass
 
-        # slight vignette on asphalt
+        # subtle vignette
         try:
             vign = Image.new("L", (W, asphalt_h), 0)
             vdraw = ImageDraw.Draw(vign)
@@ -3530,6 +3583,52 @@ def _apply_watermark(image_bytes: bytes, watermark_text: str = "Oto Analiz") -> 
             pass
 
         bg.paste(asphalt, (0, asphalt_y))
+
+        # lightweight accents for variety (kept subtle so car remains focus)
+        try:
+            if accent == "bokeh" and ImageFilter is not None:
+                dots = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+                d = ImageDraw.Draw(dots)
+                for i in range(18):
+                    x = int((W * (i * 37 % 100)) / 100.0)
+                    y = int((H * (i * 53 % 100)) / 140.0)
+                    r = int(min(W, H) * (0.03 + (i % 5) * 0.006))
+                    a = 18 + (i % 7) * 6
+                    d.ellipse([x - r, y - r, x + r, y + r], fill=(255, 255, 255, a))
+                dots = dots.filter(ImageFilter.GaussianBlur(radius=8))
+                bg = Image.alpha_composite(bg.convert("RGBA"), dots).convert("RGB")
+
+            if accent == "streak" and ImageFilter is not None:
+                st = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+                d = ImageDraw.Draw(st)
+                for i in range(6):
+                    y = int(H * (0.12 + i * 0.07))
+                    d.rectangle([int(W*0.15), y, int(W*0.85), y + 2], fill=(255, 255, 255, 18))
+                st = st.filter(ImageFilter.GaussianBlur(radius=6))
+                bg = Image.alpha_composite(bg.convert("RGBA"), st).convert("RGB")
+
+            if accent == "garage" and ImageFilter is not None:
+                g = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+                d = ImageDraw.Draw(g)
+                # soft vertical columns
+                for i in range(5):
+                    x = int(W * (0.12 + i * 0.18))
+                    d.rectangle([x, 0, x + int(W*0.05), int(H*0.68)], fill=(0, 0, 0, 22))
+                g = g.filter(ImageFilter.GaussianBlur(radius=10))
+                bg = Image.alpha_composite(bg.convert("RGBA"), g).convert("RGB")
+
+            if accent == "rain" and ImageFilter is not None:
+                rimg = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+                d = ImageDraw.Draw(rimg)
+                for i in range(70):
+                    x = int((i * 97) % W)
+                    y0 = int((i * 53) % int(H*0.68))
+                    d.line([x, y0, x + 8, y0 + 18], fill=(255, 255, 255, 10), width=1)
+                rimg = rimg.filter(ImageFilter.GaussianBlur(radius=1))
+                bg = Image.alpha_composite(bg.convert("RGBA"), rimg).convert("RGB")
+        except Exception:
+            pass
+
         return bg
 
     bg = _build_background()
@@ -3546,7 +3645,6 @@ def _apply_watermark(image_bytes: bytes, watermark_text: str = "Oto Analiz") -> 
         try:
             rgb = im_rgba.convert("RGB")
             diff = ImageChops.difference(rgb, Image.new("RGB", (W, H), (255, 255, 255))).convert("L")
-            # threshold: anything far enough from white is foreground
             mask = diff.point(lambda p: 255 if p > 18 else 0)
             if ImageFilter is not None:
                 mask = mask.filter(ImageFilter.GaussianBlur(radius=1.6))
@@ -3564,39 +3662,33 @@ def _apply_watermark(image_bytes: bytes, watermark_text: str = "Oto Analiz") -> 
                 mask_crop = mask.crop((x0, y0, x1, y1))
                 cw, ch = car_crop.size
 
-                # place car a bit lower so it sits on asphalt
                 desired_bottom = int(H * 0.93)
                 px = (W - cw) // 2
                 py = desired_bottom - ch
                 py = max(0, min(H - ch, py))
 
-                # shadow (subtle)
+                # shadow (subtle, helps "ground contact")
                 if ImageFilter is not None:
                     sh = mask_crop.filter(ImageFilter.GaussianBlur(radius=10))
                 else:
                     sh = mask_crop
-                # reduce shadow alpha
                 sh = sh.point(lambda p: int(p * 0.35))
                 shadow = Image.new("RGBA", (cw, ch), (0, 0, 0, 0))
                 shadow.putalpha(sh)
                 composed.alpha_composite(shadow, (px, min(H - ch, py + 10)))
 
-                # car
                 composed.alpha_composite(car_crop, (px, py), mask_crop)
             else:
-                # fallback: just composite full image with a very rough mask
                 composed.alpha_composite(im_rgba)
         except Exception:
             composed.alpha_composite(im_rgba)
     else:
-        # If not a clean white background, keep original but still add overlays
         composed = im_rgba
 
     # --- Overlays: watermark + AI badge
     over = Image.new("RGBA", (W, H), (0, 0, 0, 0))
     draw = ImageDraw.Draw(over)
 
-    # Font helper (Render-safe): try DejaVu, else default
     def _load_font(size: int):
         try:
             for fp in (
@@ -3613,14 +3705,13 @@ def _apply_watermark(image_bytes: bytes, watermark_text: str = "Oto Analiz") -> 
         except Exception:
             return None
 
-    # 1) Watermark (single, sahibinden-like)
+    # 1) Watermark (single)
     wm_text = (watermark_text or "Oto Analiz").strip() or "Oto Analiz"
     wm_text = wm_text.upper() if len(wm_text) <= 16 else wm_text
 
     font_size = max(52, int(min(W, H) * 0.11))
     font = _load_font(font_size)
     if font is not None:
-        # Measure
         try:
             bbox = draw.textbbox((0, 0), wm_text, font=font)
             tw = bbox[2] - bbox[0]
@@ -3631,7 +3722,6 @@ def _apply_watermark(image_bytes: bytes, watermark_text: str = "Oto Analiz") -> 
         cx = (W - tw) // 2
         cy = (H - th) // 2
         draw.text((cx, cy), wm_text, font=font, fill=(255, 255, 255, 30))
-        # rotate the entire overlay for a watermark vibe
         try:
             over = over.rotate(-16, resample=Image.BICUBIC, expand=0)
         except Exception:
@@ -3646,7 +3736,6 @@ def _apply_watermark(image_bytes: bytes, watermark_text: str = "Oto Analiz") -> 
     bx0 = bx1 - badge_w
     by1 = by0 + badge_h
 
-    # badge background (semi-opaque white)
     try:
         draw = ImageDraw.Draw(over)
         if hasattr(draw, "rounded_rectangle"):
@@ -3669,7 +3758,6 @@ def _apply_watermark(image_bytes: bytes, watermark_text: str = "Oto Analiz") -> 
         except Exception:
             draw.text((bx0 + 10, by0 + 6), "AI", font=ai_font, fill=(0, 0, 0, 235))
 
-    # Composite overlays
     base = composed.convert("RGBA")
     out_rgba = Image.alpha_composite(base, over)
     out_rgb = out_rgba.convert("RGB")
@@ -3681,44 +3769,174 @@ def _apply_watermark(image_bytes: bytes, watermark_text: str = "Oto Analiz") -> 
 
 @app.post("/get_or_create_cover")
 def get_or_create_cover(req: CoverRequest) -> Dict[str, Any]:
+    """Get or create a vehicle cover with multi-variant cache.
+
+    Rules (final):
+    - 24 background pool
+    - Per vehicle (cover_key) keep max 6 variants
+    - If <6: generate a NEW variant with an unused background id
+    - If 6 full: serve one of existing 6 (no cost), avoid repeating last served
+    - Daily refresh: once per 24h per cover_key, replace the oldest/least-used variant with a new bg id
+    - Watermark + AI badge always applied
+
+    Backward compatibility:
+    - Response still returns {coverKey, imageUrl, cached}
+    - Firestore doc keeps imageUrl as a convenience pointer (last served)
+    """
+
     brand = (req.brand or "").strip()
     model = (req.model or "").strip()
     if not brand or not model:
         raise HTTPException(status_code=400, detail="missing_brand_or_model")
 
-    # Use explicit cache_key if provided (useful for tests / stable IDs)
     cover_key = _normalize_cover_key(req.cache_key) if req.cache_key else _cover_key(
-    brand,
-    model,
-    req.body,
-    req.year,
-    req.color,
-    req.generation,
-)
+        brand,
+        model,
+        req.body,
+        req.year,
+        req.color,
+        req.generation,
+    )
 
     doc_ref = _firebase_cover_doc(cover_key)
-
-    # Read existing doc once (for cache + regenerate guard)
     doc = doc_ref.get()
     data = (doc.to_dict() or {}) if doc.exists else {}
-    cached_url = data.get("imageUrl")
+
+    # Stored variants (list of dicts)
+    variants = data.get("variants")
+    if not isinstance(variants, list):
+        variants = []
+
+    # Legacy single url -> migrate into variants once
+    legacy_url = data.get("imageUrl")
+    if legacy_url and not variants:
+        try:
+            variants = [{"bg_id": 1, "url": str(legacy_url), "createdAt": data.get("createdAt") or datetime.utcnow().isoformat(), "useCount": 0}]
+        except Exception:
+            variants = [{"bg_id": 1, "url": str(legacy_url), "createdAt": datetime.utcnow().isoformat(), "useCount": 0}]
+
     regen_count = int(data.get("regenCount") or 0)
+    last_served_bg = data.get("lastServedBgId")
+    last_refresh_at = data.get("lastRefreshAt")
 
-    # Cache hit (normal)
-    if cached_url and not req.force_regenerate:
-        cached_url = _fix_firebase_download_url(str(cached_url))
-        return {"coverKey": cover_key, "imageUrl": cached_url, "cached": True}
+    def _parse_iso(s: Any) -> Optional[datetime]:
+        if not s or not isinstance(s, str):
+            return None
+        try:
+            return datetime.fromisoformat(s.replace("Z", ""))
+        except Exception:
+            return None
 
-    # Force regenerate is allowed ONLY ONCE per cache key (max 2 paid generations total)
-    # - First generation: regenCount = 0
-    # - One allowed regenerate: regenCount -> 1
-    # - Further requests: return cached without regenerating
-    if cached_url and req.force_regenerate and regen_count >= 1:
-        return {"coverKey": cover_key, "imageUrl": cached_url, "cached": True, "regenLimited": True}
-    # Determine regenCount update (max one regenerate)
-    next_regen_count = regen_count
-    if req.force_regenerate and cached_url:
-        next_regen_count = regen_count + 1
+    now = datetime.utcnow()
+    refresh_due = False
+    dt_last_refresh = _parse_iso(last_refresh_at)
+    if dt_last_refresh is None:
+        refresh_due = True if variants else False
+    else:
+        refresh_due = (now - dt_last_refresh).total_seconds() >= 24 * 3600
+
+    # Helper choose bg id
+    def _bg_ids_in_variants(vs: List[Dict[str, Any]]) -> List[int]:
+        out = []
+        for x in vs:
+            try:
+                bid = int(x.get("bg_id"))
+                if 1 <= bid <= 24:
+                    out.append(bid)
+            except Exception:
+                continue
+        return out
+
+    def _choose_new_bg_id(existing_ids: List[int]) -> int:
+        pool = [i for i in range(1, 25) if i not in set(existing_ids)]
+        if not pool:
+            pool = list(range(1, 25))
+        # deterministic-ish but still random without importing heavy deps
+        try:
+            # uuid randomness is good enough
+            idx = int(uuid.uuid4().hex[:8], 16) % len(pool)
+            return pool[idx]
+        except Exception:
+            return pool[0]
+
+    # Decide action
+    action = "serve"
+    if req.force_regenerate:
+        # keep old safety: allow only once total for a key
+        if regen_count >= 1 and variants:
+            action = "serve"
+        else:
+            action = "refresh"
+    else:
+        if len(variants) < 6:
+            action = "create"
+        elif refresh_due and variants:
+            action = "refresh"
+        else:
+            action = "serve"
+
+    # Serve logic (no new gen)
+    if action == "serve" and variants:
+        # choose a variant, avoid repeating last bg if possible
+        pick = None
+        try:
+            # prioritize those not equal to last served
+            candidates = [v for v in variants if str(v.get("bg_id")) != str(last_served_bg)]
+            if not candidates:
+                candidates = variants
+            idx = int(uuid.uuid4().hex[:8], 16) % len(candidates)
+            pick = candidates[idx]
+        except Exception:
+            pick = variants[0]
+
+        url = _fix_firebase_download_url(str(pick.get("url") or ""))
+        bg_id = int(pick.get("bg_id") or 1)
+
+        # update usage counters lightly (best-effort)
+        try:
+            for v in variants:
+                if v is pick:
+                    v["useCount"] = int(v.get("useCount") or 0) + 1
+                    v["lastUsedAt"] = now.isoformat()
+                    break
+        except Exception:
+            pass
+
+        doc_ref.set(
+            {
+                "variants": variants,
+                "imageUrl": url,
+                "lastServedBgId": bg_id,
+                "updatedAt": now.isoformat(),
+            },
+            merge=True,
+        )
+
+        return {"coverKey": cover_key, "imageUrl": url, "cached": True}
+
+    # For create/refresh we need a new background id
+    existing_ids = _bg_ids_in_variants(variants)
+    new_bg_id = _choose_new_bg_id(existing_ids)
+
+    # If refresh: replace a slot (oldest / least used)
+    replace_index = None
+    if action == "refresh" and variants:
+        # choose least used; tie-break by oldest createdAt
+        def _score(v: Dict[str, Any]):
+            use = int(v.get("useCount") or 0)
+            created = _parse_iso(v.get("createdAt")) or datetime(1970, 1, 1)
+            return (use, created)
+        try:
+            best_i = 0
+            best = _score(variants[0])
+            for i in range(1, len(variants)):
+                sc = _score(variants[i])
+                if sc < best:
+                    best = sc
+                    best_i = i
+            replace_index = best_i
+        except Exception:
+            replace_index = 0
 
     # Generate a brand-recognizable image (no logos)
     try:
@@ -3731,17 +3949,42 @@ def get_or_create_cover(req: CoverRequest) -> Dict[str, Any]:
             color=req.color,
         )
     except Exception as e:
-        # Surface real reason to Render logs and client
         print("OpenAI image generation error:", repr(e))
         raise HTTPException(status_code=500, detail=f"image_generation_failed: {type(e).__name__}")
 
-    # Watermark + convert to webp
-    final_bytes = _apply_watermark(img_bytes, watermark_text=os.getenv("COVER_WATERMARK_TEXT", "Oto Analiz"))
+    # Watermark + AI badge + background variant
+    final_bytes = _apply_watermark(
+        img_bytes,
+        watermark_text=os.getenv("COVER_WATERMARK_TEXT", "Oto Analiz"),
+        bg_id=int(new_bg_id),
+    )
 
-    # Upload to Firebase Storage (token-based URL)
-    image_url = _firebase_upload_cover_bytes(cover_key, final_bytes, content_type="image/webp")
+    # Upload to Firebase Storage
+    object_path = f"discover_covers/generated/{cover_key}/bg_{int(new_bg_id):02d}.webp"
+    image_url = _firebase_upload_cover_bytes(cover_key, final_bytes, content_type="image/webp", object_path=object_path)
 
-    # Persist mapping
+    # Update variants list
+    entry = {
+        "bg_id": int(new_bg_id),
+        "url": image_url,
+        "createdAt": now.isoformat(),
+        "lastUsedAt": now.isoformat(),
+        "useCount": 1,
+    }
+
+    if action == "create":
+        variants.append(entry)
+    elif action == "refresh" and variants and replace_index is not None:
+        variants[int(replace_index)] = entry
+    else:
+        # safety fallback
+        variants = [entry]
+
+    # regen counter (only for force_regenerate)
+    next_regen_count = regen_count
+    if req.force_regenerate:
+        next_regen_count = regen_count + 1
+
     doc_ref.set(
         {
             "brand": brand,
@@ -3750,15 +3993,18 @@ def get_or_create_cover(req: CoverRequest) -> Dict[str, Any]:
             "generation": req.generation,
             "year": req.year,
             "color": req.color,
+            "variants": variants,
             "imageUrl": image_url,
+            "lastServedBgId": int(new_bg_id),
+            "lastRefreshAt": now.isoformat(),
             "regenCount": next_regen_count,
-            "createdAt": data.get("createdAt") or datetime.utcnow().isoformat(),
-            "updatedAt": datetime.utcnow().isoformat(),
+            "createdAt": data.get("createdAt") or now.isoformat(),
+            "updatedAt": now.isoformat(),
         },
         merge=True,
     )
 
-    return {"coverKey": cover_key, "imageUrl": image_url, "cached": False}
+    return {"coverKey": cover_key, "imageUrl": image_url, "cached": False, "bgId": int(new_bg_id), "action": action}
 
 @app.post("/analyze")
 async def analyze(req: AnalyzeRequest) -> Dict[str, Any]:
