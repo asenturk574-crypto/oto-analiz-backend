@@ -3773,9 +3773,9 @@ def get_or_create_cover(req: CoverRequest) -> Dict[str, Any]:
 
     Rules (final):
     - 24 background pool
-    - Per vehicle (cover_key) keep max 6 variants
-    - If <6: generate a NEW variant with an unused background id
-    - If 6 full: serve one of existing 6 (no cost), avoid repeating last served
+    - Per vehicle (cover_key) keep max 3 variants
+    - If <3: generate a NEW variant with an unused background id
+    - If 3 full: serve one of existing 3 (no cost), avoid repeating last served
     - Daily refresh: once per 24h per cover_key, replace the oldest/least-used variant with a new bg id
     - Watermark + AI badge always applied
 
@@ -3872,7 +3872,7 @@ def get_or_create_cover(req: CoverRequest) -> Dict[str, Any]:
 
         Goals:
         - Prefer bg_ids not already in variants
-        - Prefer categories that are under-represented in the 6-variant set
+        - Prefer categories that are under-represented in the variant set
         - Avoid repeating last served category when possible
         """
         existing_set = set(existing_ids)
@@ -3921,7 +3921,7 @@ def get_or_create_cover(req: CoverRequest) -> Dict[str, Any]:
         else:
             action = "refresh"
     else:
-        if len(variants) < 6:
+        if len(variants) < 3:
             action = "create"
         elif refresh_due and variants:
             action = "refresh"
@@ -4047,6 +4047,25 @@ def get_or_create_cover(req: CoverRequest) -> Dict[str, Any]:
     else:
         # safety fallback
         variants = [entry]
+
+    # Hard cap: keep at most 3 variants even under concurrent requests.
+    try:
+        def _score(v: Dict[str, Any]):
+            use = int(v.get("useCount") or 0)
+            created = _parse_iso(v.get("createdAt")) or datetime(1970, 1, 1)
+            return (use, created)
+        while len(variants) > 3:
+            # drop the least used / oldest
+            drop_i = 0
+            best = _score(variants[0])
+            for i in range(1, len(variants)):
+                sc = _score(variants[i])
+                if sc < best:
+                    best = sc
+                    drop_i = i
+            variants.pop(drop_i)
+    except Exception:
+        variants = variants[-3:]
 
     # regen counter (only for force_regenerate)
     next_regen_count = regen_count
