@@ -3817,6 +3817,7 @@ def get_or_create_cover(req: CoverRequest) -> Dict[str, Any]:
 
     regen_count = int(data.get("regenCount") or 0)
     last_served_bg = data.get("lastServedBgId")
+    last_served_cat = data.get("lastServedCategory")
     last_refresh_at = data.get("lastRefreshAt")
 
     def _parse_iso(s: Any) -> Optional[datetime]:
@@ -3835,9 +3836,24 @@ def get_or_create_cover(req: CoverRequest) -> Dict[str, Any]:
     else:
         refresh_due = (now - dt_last_refresh).total_seconds() >= 24 * 3600
 
-    # Helper choose bg id
+    # Helper choose bg id (category-aware: rotate background styles)
+    # We keep 24 backgrounds, but avoid picking the same *style* repeatedly.
+    BG_CATS: Dict[str, List[int]] = {
+        "studio":   [1, 2, 3, 4, 5, 6],
+        "urban":    [7, 8, 9, 10, 11, 12],
+        "dramatic": [13, 14, 15, 16, 17, 18],
+        "neutral":  [19, 20, 21, 22, 23, 24],
+    }
+    BG_ID_TO_CAT: Dict[int, str] = {bid: cat for cat, ids in BG_CATS.items() for bid in ids}
+
+    def _bg_category(bid: int) -> str:
+        try:
+            return BG_ID_TO_CAT.get(int(bid), "studio")
+        except Exception:
+            return "studio"
+
     def _bg_ids_in_variants(vs: List[Dict[str, Any]]) -> List[int]:
-        out = []
+        out: List[int] = []
         for x in vs:
             try:
                 bid = int(x.get("bg_id"))
@@ -3847,17 +3863,54 @@ def get_or_create_cover(req: CoverRequest) -> Dict[str, Any]:
                 continue
         return out
 
-    def _choose_new_bg_id(existing_ids: List[int]) -> int:
-        pool = [i for i in range(1, 25) if i not in set(existing_ids)]
-        if not pool:
-            pool = list(range(1, 25))
-        # deterministic-ish but still random without importing heavy deps
-        try:
-            # uuid randomness is good enough
-            idx = int(uuid.uuid4().hex[:8], 16) % len(pool)
-            return pool[idx]
-        except Exception:
-            return pool[0]
+    def _choose_new_bg_id(
+        existing_ids: List[int],
+        vs: List[Dict[str, Any]],
+        avoid_category: Optional[str],
+    ) -> Tuple[int, str]:
+        """Pick a new bg_id and its category.
+
+        Goals:
+        - Prefer bg_ids not already in variants
+        - Prefer categories that are under-represented in the 6-variant set
+        - Avoid repeating last served category when possible
+        """
+        existing_set = set(existing_ids)
+
+        # count current category usage
+        counts: Dict[str, int] = {cat: 0 for cat in BG_CATS.keys()}
+        for v in vs:
+            try:
+                counts[_bg_category(int(v.get("bg_id") or 1))] += 1
+            except Exception:
+                continue
+
+        candidates: List[Tuple[int, str, List[int]]] = []
+        for cat, ids in BG_CATS.items():
+            avail = [i for i in ids if i not in existing_set]
+            if avail:
+                candidates.append((counts.get(cat, 0), cat, avail))
+
+        # If we already used all 24 ids for this vehicle over time, allow reuse.
+        if not candidates:
+            for cat, ids in BG_CATS.items():
+                candidates.append((counts.get(cat, 0), cat, list(ids)))
+
+        # Avoid repeating the last served category if possible.
+        if avoid_category:
+            filtered = [c for c in candidates if c[1] != str(avoid_category)]
+            if filtered:
+                candidates = filtered
+
+        # Prefer lowest-count categories to keep styles mixed.
+        candidates.sort(key=lambda x: (x[0], x[1]))
+        min_count = candidates[0][0]
+        top = [c for c in candidates if c[0] == min_count]
+
+        idx = int(uuid.uuid4().hex[:8], 16) % len(top)
+        _, cat, avail = top[idx]
+        idx2 = int(uuid.uuid4().hex[8:16], 16) % len(avail)
+        return int(avail[idx2]), cat
 
     # Decide action
     action = "serve"
@@ -3882,6 +3935,14 @@ def get_or_create_cover(req: CoverRequest) -> Dict[str, Any]:
         try:
             # prioritize those not equal to last served
             candidates = [v for v in variants if str(v.get("bg_id")) != str(last_served_bg)]
+            # avoid repeating the same background *style* if possible
+            try:
+                if last_served_cat:
+                    c2 = [v for v in candidates if _bg_category(int(v.get("bg_id") or 1)) != str(last_served_cat)]
+                    if c2:
+                        candidates = c2
+            except Exception:
+                pass
             if not candidates:
                 candidates = variants
             idx = int(uuid.uuid4().hex[:8], 16) % len(candidates)
@@ -3891,6 +3952,7 @@ def get_or_create_cover(req: CoverRequest) -> Dict[str, Any]:
 
         url = _fix_firebase_download_url(str(pick.get("url") or ""))
         bg_id = int(pick.get("bg_id") or 1)
+        served_cat = _bg_category(bg_id)
 
         # update usage counters lightly (best-effort)
         try:
@@ -3907,6 +3969,7 @@ def get_or_create_cover(req: CoverRequest) -> Dict[str, Any]:
                 "variants": variants,
                 "imageUrl": url,
                 "lastServedBgId": bg_id,
+                "lastServedCategory": served_cat,
                 "updatedAt": now.isoformat(),
             },
             merge=True,
@@ -3916,7 +3979,11 @@ def get_or_create_cover(req: CoverRequest) -> Dict[str, Any]:
 
     # For create/refresh we need a new background id
     existing_ids = _bg_ids_in_variants(variants)
-    new_bg_id = _choose_new_bg_id(existing_ids)
+    new_bg_id, new_bg_cat = _choose_new_bg_id(
+        existing_ids,
+        variants,
+        str(last_served_cat) if last_served_cat else None,
+    )
 
     # If refresh: replace a slot (oldest / least used)
     replace_index = None
@@ -3966,6 +4033,7 @@ def get_or_create_cover(req: CoverRequest) -> Dict[str, Any]:
     # Update variants list
     entry = {
         "bg_id": int(new_bg_id),
+        "category": str(new_bg_cat),
         "url": image_url,
         "createdAt": now.isoformat(),
         "lastUsedAt": now.isoformat(),
@@ -3996,6 +4064,7 @@ def get_or_create_cover(req: CoverRequest) -> Dict[str, Any]:
             "variants": variants,
             "imageUrl": image_url,
             "lastServedBgId": int(new_bg_id),
+            "lastServedCategory": str(new_bg_cat),
             "lastRefreshAt": now.isoformat(),
             "regenCount": next_regen_count,
             "createdAt": data.get("createdAt") or now.isoformat(),
