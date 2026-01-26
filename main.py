@@ -2811,6 +2811,40 @@ Kurallar:
 """.strip()
 
 
+SYSTEM_PROMPT_PREMIUM_ENRICH = """
+Sen 'Oto Analiz' uygulaması için **Premium (Detaylı) analiz** çıktısını, kullanıcıya "yapay zeka konuşuyor" hissi verecek şekilde zenginleştiren yardımcı asistansın.
+
+Girdi olarak sana:
+- Araç bilgileri
+- Kullanıcı profili
+- Backend'in deterministik premium raporu (skorlar + kartlar + maliyet bandı vs.)
+
+verilecek.
+
+Görevin:
+1) Mevcut raporu **bozmadan** üstüne "AI sesi" katmak (kısa, net, araç-özel).
+2) Kullanıcı profilinden (şehir/kullanım/yıllık km/vites-yakıt tercihi/bütçe hassasiyeti) yola çıkarak **kişiye özel** 4-6 madde üretmek.
+3) İlan verisi eksikse bunu açıkça söyle; uydurma bilgi yazma.
+4) Kesin hüküm ("kesin alın", "sakın", "dolandırıcı") gibi ifadeler kullanma; risk/şüphe dili kullan.
+5) Çıktıyı SADECE JSON döndür.
+
+ÇIKTI ŞABLONU (SADECE BU ALANLAR, ekstra alan ekleme):
+{
+  "ai_voice": {
+    "opening": "2-4 cümlelik insan gibi giriş; araç + profil + risk/maliyet özetini bağlar.",
+    "personalized_takeaways": ["4-6 madde; araç ve profile göre değişmeli, tekrar etmemeli"],
+    "critical_3_questions": ["Bu araca özel en kritik 3 soru (kısa)"],
+    "should_you_go_view": "Eğer kullanıcı soru sorduysa (user_question) bunu yanıtla; yoksa null.",
+    "tone_hint": "kısa" 
+  }
+}
+
+Notlar:
+- 'tone_hint' her zaman "kısa" olsun.
+- 'should_you_go_view' alanı: user_question boşsa null dön.
+""".strip()
+
+
 SYSTEM_PROMPT_COMPARE = """
 Sadece JSON döndür:
 {
@@ -3022,6 +3056,70 @@ def call_llm_or_fallback(model_name: str, system_prompt: str, user_content: str,
     if isinstance(out, dict):
         return out
     return fallback_fn(req_obj)
+
+
+def _extract_user_question(req: AnalyzeRequest) -> Optional[str]:
+    # Prefer context.user_question, then profile.user_question, then context.question
+    try:
+        q = None
+        if isinstance(getattr(req, "context", None), dict):
+            q = req.context.get("user_question") or req.context.get("question")
+        if not q and getattr(req, "profile", None) is not None:
+            q = getattr(req.profile, "user_question", None) or getattr(req.profile, "question", None)
+        q = (q or "").strip()
+        return q if q else None
+    except Exception:
+        return None
+
+def premium_enrich_with_llm(base_report: Dict[str, Any], req: AnalyzeRequest) -> Optional[Dict[str, Any]]:
+    """
+    Premium raporu bozmaz; sadece ek bir 'ai_voice' alanı döner.
+    Flutter tarafı isterse gösterir, istemezse yok sayar.
+    """
+    if client is None:
+        return None
+    try:
+        v = req.vehicle
+        p = req.profile
+        q = _extract_user_question(req)
+
+        # Kart içerikleri çok uzun; LLM'e token yedirmemek için kırpıyoruz.
+        cards = base_report.get("cards") or []
+        cards_compact = []
+        if isinstance(cards, list):
+            for c in cards[:8]:
+                if isinstance(c, dict):
+                    cards_compact.append({
+                        "title": c.get("title"),
+                        "content": (str(c.get("content") or "")[:900])
+                    })
+
+        user_content = {
+            "vehicle": v.dict(),
+            "profile": p.dict(),
+            "user_question": q,
+            "base": {
+                "scores": base_report.get("scores"),
+                "summary": base_report.get("summary"),
+                "costs": base_report.get("costs"),
+                "segment": base_report.get("segment"),
+                "uncertainty": base_report.get("uncertainty"),
+                "cards_compact": cards_compact,
+            },
+            "rules": "Kesin hüküm verme; eksik bilgi varsa söyle; uydurma yapma; araç+profil özel yaz."
+        }
+
+        out = call_llm_json(
+            OPENAI_MODEL_PREMIUM,
+            SYSTEM_PROMPT_PREMIUM_ENRICH,
+            json.dumps(user_content, ensure_ascii=False),
+        )
+        if isinstance(out, dict) and isinstance(out.get("ai_voice"), dict):
+            return {"ai_voice": out.get("ai_voice")}
+        return None
+    except Exception as e:
+        print("premium_enrich_with_llm error:", e)
+        return None
 
 
 # =========================================================
@@ -4121,7 +4219,16 @@ async def analyze(req: AnalyzeRequest) -> Dict[str, Any]:
 
 @app.post("/premium_analyze")
 async def premium_analyze(req: AnalyzeRequest) -> Dict[str, Any]:
-    return premium_analyze_impl(req)
+    base = premium_analyze_impl(req)
+
+    # Premium'da "AI konuşuyor" hissi için opsiyonel LLM zenginleştirme (raporu bozmaz)
+    use_llm = (os.getenv("USE_LLM_PREMIUM", "1").strip().lower() in ("1", "true", "yes", "y"))
+    if use_llm:
+        enrich = premium_enrich_with_llm(base, req)
+        if isinstance(enrich, dict):
+            base.update(enrich)
+
+    return base
 
 
 @app.post("/manual_analyze")
