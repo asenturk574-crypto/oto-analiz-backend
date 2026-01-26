@@ -2777,22 +2777,58 @@ def premium_analyze_impl(req: AnalyzeRequest) -> Dict[str, Any]:
 # LLM HELPERS (optional)
 # =========================================================
 def call_llm_json(model_name: str, system_prompt: str, user_content: str) -> Optional[Dict[str, Any]]:
-    if client is None:
+    """
+    OpenAI çağrısı (JSON mode). Önce OpenAI Python SDK (client) dener.
+    Eğer SDK yoksa veya client None ise, HTTP (requests) fallback ile çağırır.
+    """
+    api_key = os.getenv("OPENAI_API_KEY", "").strip()
+    if not api_key:
+        print("LLM disabled: OPENAI_API_KEY missing")
         return None
+
+    # 1) SDK yolu
+    if client is not None:
+        try:
+            resp = client.chat.completions.create(
+                model=model_name,
+                response_format={"type": "json_object"},
+                messages=[
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content": user_content},
+                ],
+            )
+            content = resp.choices[0].message.content
+            return json.loads(content) if isinstance(content, str) else content
+        except Exception as e:
+            print("LLM error (sdk):", e)
+
+    # 2) HTTP fallback yolu
     try:
-        resp = client.chat.completions.create(
-            model=model_name,
-            response_format={"type": "json_object"},
-            messages=[
+        url = "https://api.openai.com/v1/chat/completions"
+        headers = {
+            "Authorization": f"Bearer {api_key}",
+            "Content-Type": "application/json",
+        }
+        payload = {
+            "model": model_name,
+            "response_format": {"type": "json_object"},
+            "messages": [
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_content},
             ],
-        )
-        content = resp.choices[0].message.content
+            "temperature": 0.7,
+        }
+        r = requests.post(url, headers=headers, json=payload, timeout=60)
+        if r.status_code != 200:
+            print("LLM error (http) status=", r.status_code, "body=", (r.text or "")[:300])
+            return None
+        data = r.json()
+        content = data["choices"][0]["message"]["content"]
         return json.loads(content) if isinstance(content, str) else content
     except Exception as e:
-        print("LLM error:", e)
+        print("LLM error (http):", e)
         return None
+
 
 
 SYSTEM_PROMPT_NORMAL = """
@@ -3076,8 +3112,6 @@ def premium_enrich_with_llm(base_report: Dict[str, Any], req: AnalyzeRequest) ->
     Premium raporu bozmaz; sadece ek bir 'ai_voice' alanı döner.
     Flutter tarafı isterse gösterir, istemezse yok sayar.
     """
-    if client is None:
-        return None
     try:
         v = req.vehicle
         p = req.profile
@@ -4222,12 +4256,15 @@ async def premium_analyze(req: AnalyzeRequest) -> Dict[str, Any]:
     base = premium_analyze_impl(req)
 
     # Premium'da "AI konuşuyor" hissi için opsiyonel LLM zenginleştirme (raporu bozmaz)
-    use_llm = (os.getenv("USE_LLM_PREMIUM", "1").strip().lower() in ("1", "true", "yes", "y"))
+    use_llm = (os.getenv("USE_LLM_PREMIUM", "0").strip().lower() in ("1", "true", "yes", "y"))
+    llm_used = False
     if use_llm:
         enrich = premium_enrich_with_llm(base, req)
-        if isinstance(enrich, dict):
+        if isinstance(enrich, dict) and enrich:
             base.update(enrich)
+            llm_used = True
 
+    base["meta"] = {"use_llm_premium": use_llm, "llm_used": llm_used}
     return base
 
 
@@ -4592,4 +4629,3 @@ def _passes_brand_model(alt: str, b: str, must_phrases: List[str], must_tokens: 
         if not any(t in alt for t in must_tokens):
             return False
     return True
-
