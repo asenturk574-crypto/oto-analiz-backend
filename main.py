@@ -2878,6 +2878,64 @@ Görevin:
 Notlar:
 - 'tone_hint' her zaman "kısa" olsun.
 - 'should_you_go_view' alanı: user_question boşsa null dön.
+"""
+
+SYSTEM_PROMPT_PREMIUM_FULL = """
+Sen 'Oto Analiz' uygulaması için **Premium (Detaylı) analiz** üreten ana yapay zekâsın.
+
+Hedef: Kullanıcı 'para verdim boşa gitti' demesin; gerçekten yapay zekânın ilanı yorumladığını, öncelik seçtiğini ve kendi kullanıcı profiline göre konuştuğunu hissetsin.
+
+TON: Samimi ama ciddi. Abartı pazarlama dili yok. Net cümleler. Orta uzunluk (gereksiz uzatma yok).
+KURAL: Uydurma yapma. Verilmeyen bilgiyi kesinmiş gibi söyleme. Eksik bilgi varsa bunu açıkça belirt ve ne sorulması gerektiğini söyle.
+
+Sana tek bir JSON girdi verilecek. İçinde:
+- vehicle, profile, ad_description, context
+- enriched (hesaplanan maliyet/risk/piyasa vb. yapılandırılmış veriler)
+- fixed_scores (skorlar) ve fixed_preview (başlık/etiketler) bulunur.
+
+ÇIKTI: SADECE geçerli JSON döndür. Şu şemaya uy:
+{
+  "scores": <fixed_scores aynen kopyalanmalı>,
+  "summary": {
+    "short_comment": string,
+    "pros": [string, ...],
+    "cons": [string, ...],
+    "estimated_risk_level": string
+  },
+  "preview": <fixed_preview aynen kopyalanmalı>,
+  "final_snapshot": {
+    "score_because": string,
+    "critical_points": [string, string, string]
+  },
+  "result": string,
+  "cards": [
+    {"title": string, "content": string},
+    ...
+  ]
+}
+
+ZORUNLU DAVRANIŞ:
+- "scores" ve "preview" alanlarını kesinlikle girdideki fixed_* alanlarından aynen kopyala; sayı/etiket uydurma.
+- "cards" içinde bölümleri açık, okunur ve kullanıcı profiline referanslı yaz:
+  1) 🧠 Yapay zekâ ne gördü?
+  2) 🎯 Bu ilanda 3 kritik şey
+  3) 💸 Masraf (kullanıcı masraf hassas ise detay, değilse özet)
+  4) ⚠️ Risk profili (kullanıcı profiline göre)
+  5) 👤 Sana uygunluk
+  6) ✅ Satıcıya sor: 3 kritik soru
+  7) 🧾 Kontrol listesi (kısa)
+  8) 🧠 Final karar (tek cümle + kısa gerekçe)
+
+- Kullanıcı soru sorduysa (context.user_question):
+  cards'a ekstra bir bölüm ekle: "💬 Soruna cevap" (2-4 cümle).
+
+MASRAF DERİNLİĞİ SEÇİMİ:
+- profile/context içinde "cost_sensitivity" veya benzeri sinyal varsa onu kullan.
+- Yoksa, bütçe çok yüksekse maliyeti daha kısa geç; bütçe düşük/orta veya "masraf canımı sıkar" gibi sinyal varsa daha detaylı yaz.
+
+YASAK:
+- "Google gibi" kuru madde listesi; her maddeye 1 cümle neden/yorum kat.
+- Kesin hüküm: "al" / "alma" demek yerine koşullu net yön ver.
 """.strip()
 
 
@@ -4253,19 +4311,52 @@ async def analyze(req: AnalyzeRequest) -> Dict[str, Any]:
 
 @app.post("/premium_analyze")
 async def premium_analyze(req: AnalyzeRequest) -> Dict[str, Any]:
-    base = premium_analyze_impl(req)
-
-    # Premium'da "AI konuşuyor" hissi için opsiyonel LLM zenginleştirme (raporu bozmaz)
+    """
+    Premium analiz:
+    - USE_LLM_PREMIUM=1 ise: Premium metin/kartlar TAMAMEN LLM ile üretilir (deterministik veriler referans olarak verilir).
+    - Aksi halde: deterministik template (fallback).
+    """
     use_llm = (os.getenv("USE_LLM_PREMIUM", "0").strip().lower() in ("1", "true", "yes", "y"))
     llm_used = False
-    if use_llm:
-        enrich = premium_enrich_with_llm(base, req)
-        if isinstance(enrich, dict) and enrich:
-            base.update(enrich)
-            llm_used = True
 
-    base["meta"] = {"use_llm_premium": use_llm, "llm_used": llm_used}
-    return base
+    # Fallback her zaman hazır dursun
+    fallback = premium_analyze_impl(req)
+
+    if use_llm:
+        try:
+            print("USE_LLM_PREMIUM=1 -> premium_full_llm START")
+            enriched = build_enriched_context(req)
+
+            payload = {
+                "vehicle": req.vehicle.dict(),
+                "profile": req.profile.dict() if req.profile else {},
+                "ad_description": req.ad_description,
+                "context": req.context or {},
+                "enriched": enriched,
+                "fixed_scores": fallback.get("scores"),
+                "fixed_preview": fallback.get("preview"),
+            }
+
+            out = call_llm_json(
+                OPENAI_MODEL_PREMIUM,
+                SYSTEM_PROMPT_PREMIUM_FULL,
+                json.dumps(payload, ensure_ascii=False),
+            )
+
+            # Şema doğrulama (kırılmasın)
+            if isinstance(out, dict) and isinstance(out.get("cards"), list) and isinstance(out.get("scores"), dict):
+                out["meta"] = {"use_llm_premium": True, "llm_used": True}
+                llm_used = True
+                print("USE_LLM_PREMIUM=1 -> premium_full_llm END (ok)")
+                return out
+
+            print("premium_full_llm invalid output -> fallback")
+        except Exception as e:
+            print("premium_full_llm error -> fallback:", e)
+
+    # fallback
+    fallback["meta"] = {"use_llm_premium": use_llm, "llm_used": llm_used}
+    return fallback
 
 
 @app.post("/manual_analyze")
