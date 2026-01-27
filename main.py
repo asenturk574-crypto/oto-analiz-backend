@@ -5023,3 +5023,37 @@ Kısa, net ve kullanıcı dostu şekilde cevap ver.
         return {"answer": answer}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+
+# =========================
+# Optimized Premium Question Endpoint (Short & Fast)
+# =========================
+
+@app.post("/premium_question")
+async def premium_question(payload: dict):
+    analysis_text = payload.get("analysis_text", "")[:6000]  # limit size
+    question = payload.get("question", "")
+
+    prompt = f"""
+Kısa ve öz cevap ver (max 6-8 cümle).
+
+Analiz özeti:
+{analysis_text}
+
+Soru:
+{question}
+"""
+
+    try:
+        response = client.chat.completions.create(
+            model=os.getenv("PREMIUM_QUESTION_MODEL", "gpt-5-mini"),
+            messages=[{"role": "user", "content": prompt}],
+            max_tokens=280,
+            temperature=0.4,
+        )
+
+        answer = response.choices[0].message.content.strip()
+        return {"answer": answer}
+
+    except Exception as e:
+        return {"error": str(e)}
