@@ -11,7 +11,7 @@ from urllib.parse import quote as urlquote
 import requests
 
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field, ConfigDict
 # The `dotenv` package is optional. When it is not installed in the
@@ -72,6 +72,32 @@ OPENAI_MODEL_PREMIUM = os.getenv("OPENAI_MODEL_PREMIUM", OPENAI_MODEL_DEFAULT)
 OPENAI_MODEL_COMPARE = os.getenv("OPENAI_MODEL_COMPARE", OPENAI_MODEL_DEFAULT)
 OPENAI_MODEL_OTOBOT = os.getenv("OPENAI_MODEL_OTOBOT", OPENAI_MODEL_DEFAULT)
 
+# =========================================================
+# SS OCR (AI Vision) – screenshot -> structured fields
+# =========================================================
+SS_OCR_MODEL = os.getenv("SS_OCR_MODEL", "gpt-5-mini")
+try:
+    SS_OCR_MAX_IMAGE_MB = float(os.getenv("SS_OCR_MAX_IMAGE_MB", "8"))
+except Exception:
+    SS_OCR_MAX_IMAGE_MB = 8.0
+try:
+    SS_OCR_MAX_SIDE = int(os.getenv("SS_OCR_MAX_SIDE", "1600"))
+except Exception:
+    SS_OCR_MAX_SIDE = 1600
+
+_BODY_TYPES = [
+    "Hatchback",
+    "Sedan",
+    "Station Wagon",
+    "SUV",
+    "Coupe",
+    "Cabrio",
+    "MPV",
+    "Pick-up",
+    "Van",
+    "Diğer",
+]
+
 DATA_DIR = os.getenv("DATA_DIR", "data")  # bundle içinde ./data
 
 
@@ -79,6 +105,153 @@ DATA_DIR = os.getenv("DATA_DIR", "data")  # bundle içinde ./data
 # APP
 # =========================================================
 app = FastAPI(title="Oto Analiz Backend")
+
+
+# =========================================================
+# SS OCR endpoint (Full AI) – kullanıcı SS seçer, alanlar otomatik dolar
+# =========================================================
+def _to_data_url(image_bytes: bytes, mime: str) -> str:
+    b64 = base64.b64encode(image_bytes).decode("utf-8")
+    return f"data:{mime};base64,{b64}"
+
+def _maybe_resize_image(image_bytes: bytes, mime: str) -> Tuple[bytes, str]:
+    """Resize the image to reduce cost/latency. If PIL is unavailable, return as-is."""
+    if Image is None:
+        return image_bytes, mime
+    try:
+        img = Image.open(BytesIO(image_bytes)).convert("RGB")
+        w, h = img.size
+        max_side = max(w, h)
+        if SS_OCR_MAX_SIDE and max_side > SS_OCR_MAX_SIDE:
+            scale = SS_OCR_MAX_SIDE / float(max_side)
+            new_w = max(1, int(w * scale))
+            new_h = max(1, int(h * scale))
+            img = img.resize((new_w, new_h))
+        out = BytesIO()
+        # Always encode to JPEG for smaller payload (vision still works well)
+        img.save(out, format="JPEG", quality=85, optimize=True)
+        return out.getvalue(), "image/jpeg"
+    except Exception:
+        return image_bytes, mime
+
+def _call_vision_json(model_name: str, system_prompt: str, user_text: str, image_data_url: str) -> Dict[str, Any]:
+    if client is None:
+        raise HTTPException(status_code=500, detail="OPENAI_API_KEY missing or OpenAI SDK not available on server.")
+    try:
+        resp = client.chat.completions.create(
+            model=model_name,
+            response_format={"type": "json_object"},
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {
+                    "role": "user",
+                    "content": [
+                        {"type": "text", "text": user_text},
+                        {"type": "image_url", "image_url": {"url": image_data_url}},
+                    ],
+                },
+            ],
+        )
+        txt = resp.choices[0].message.content
+        if not isinstance(txt, str):
+            raise ValueError("Model JSON output is not a string")
+        return json.loads(txt)
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"SS OCR failed: {e}")
+
+def _normalize_body_type(x: Optional[str]) -> Optional[str]:
+    if not x:
+        return None
+    s = str(x).strip().lower()
+    # quick Turkish/eng synonyms
+    if "hatch" in s or s in {"hb", "h/b", "hatcback"}:
+        return "Hatchback"
+    if "sedan" in s:
+        return "Sedan"
+    if "station" in s or "wagon" in s or "variant" in s or "sw" in s:
+        return "Station Wagon"
+    if "suv" in s or "crossover" in s or "cros" in s:
+        return "SUV"
+    if "coupe" in s or "kup" in s:
+        return "Coupe"
+    if "cabrio" in s or "convert" in s:
+        return "Cabrio"
+    if "mpv" in s or "minivan" in s:
+        return "MPV"
+    if "pick" in s or "pickup" in s or "kamyonet" in s:
+        return "Pick-up"
+    if "van" in s or "panelvan" in s or "minib" in s:
+        return "Van"
+    if "diğer" in s or "diger" in s or "other" in s:
+        return "Diğer"
+    # already exact?
+    for bt in _BODY_TYPES:
+        if s == bt.lower():
+            return bt
+    return None
+
+@app.post("/ss_ocr")
+async def ss_ocr(file: UploadFile = File(...)) -> Dict[str, Any]:
+    """Screenshot OCR via full AI (vision). Returns structured fields for auto-fill."""
+    if not file.content_type or not file.content_type.startswith("image/"):
+        raise HTTPException(status_code=400, detail="Lütfen bir görsel (image/*) dosyası yükleyin.")
+    raw = await file.read()
+    max_bytes = int(SS_OCR_MAX_IMAGE_MB * 1024 * 1024)
+    if max_bytes > 0 and len(raw) > max_bytes:
+        raise HTTPException(status_code=400, detail=f"Görsel çok büyük. Max {SS_OCR_MAX_IMAGE_MB}MB.")
+
+    resized_bytes, mime = _maybe_resize_image(raw, file.content_type)
+    data_url = _to_data_url(resized_bytes, mime)
+
+    system_prompt = (
+        "Sen Türkiye ikinci el araç ilanı ekran görüntülerinden alan çıkaran bir asistansın. "
+        "SADECE geçerli JSON döndür. Ekstra metin, açıklama, markdown YOK. "
+        "Emin olmadığın alanları null bırak. Uydurma yapma. "
+        "Fiyat TRY integer (sadece rakam) olmalı. Km integer (sadece rakam) olmalı. Yıl integer olmalı."
+    )
+
+    user_text = (
+        "Bu bir araç ilanı ekran görüntüsü. Aşağıdaki alanları çıkar ve JSON olarak döndür:\n"
+        "{\n"
+        "  \"brand\": string|null,\n"
+        "  \"model\": string|null,\n"
+        "  \"series\": string|null,\n"
+        "  \"year\": integer|null,\n"
+        "  \"km\": integer|null,\n"
+        "  \"price_try\": integer|null,\n"
+        "  \"power\": string|null,\n"
+        "  \"fuel\": string|null,\n"
+        "  \"transmission\": string|null,\n"
+        "  \"body_type\": string|null,\n"
+        "  \"location\": string|null,\n"
+        "  \"title\": string|null\n"
+        "}\n"
+        "body_type sadece şu listeden biri olsun: "
+        + ", ".join(_BODY_TYPES)
+        + ". Eşleşmiyorsa null bırak."
+    )
+
+    data = _call_vision_json(SS_OCR_MODEL, system_prompt, user_text, data_url)
+
+    # Normalize and sanitize
+    out: Dict[str, Any] = {
+        "brand": data.get("brand"),
+        "model": data.get("model"),
+        "series": data.get("series"),
+        "year": data.get("year"),
+        "km": data.get("km"),
+        "price_try": data.get("price_try"),
+        "power": data.get("power"),
+        "fuel": data.get("fuel"),
+        "transmission": data.get("transmission"),
+        "body_type": _normalize_body_type(data.get("body_type")),
+        "location": data.get("location"),
+        "title": data.get("title"),
+    }
+    return {"ok": True, "data": out, "model": SS_OCR_MODEL}
+
 
 # =========================================================
 # OTOBOT (Mini V1) – external module (otobot_min.py)
