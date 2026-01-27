@@ -4978,3 +4978,48 @@ def _passes_brand_model(alt: str, b: str, must_phrases: List[str], must_tokens: 
         if not any(t in alt for t in must_tokens):
             return False
     return True
+
+# ================================
+# Premium follow-up question (1 hak)
+# ================================
+
+class PremiumQuestionRequest(BaseModel):
+    analysis_text: str
+    question: str
+
+class PremiumQuestionResponse(BaseModel):
+    answer: str
+
+@app.post("/premium_question", response_model=PremiumQuestionResponse)
+async def premium_question(req: PremiumQuestionRequest):
+    if OpenAI is None:
+        raise HTTPException(status_code=500, detail="OpenAI client not available")
+
+    api_key = os.environ.get("OPENAI_API_KEY")
+    if not api_key:
+        raise HTTPException(status_code=500, detail="OPENAI_API_KEY not set")
+
+    client = OpenAI(api_key=api_key)
+
+    prompt = f"""
+Aşağıda bir araç için hazırlanmış premium analiz raporu var.
+Kullanıcı bu analizle ilgili bir soru soruyor.
+
+ANALİZ:
+{req.analysis_text}
+
+SORU:
+{req.question}
+
+Kısa, net ve kullanıcı dostu şekilde cevap ver.
+"""
+
+    try:
+        resp = client.responses.create(
+            model=os.environ.get("SS_OCR_MODEL", "gpt-5-mini"),
+            input=prompt,
+        )
+        answer = resp.output_text
+        return {"answer": answer}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
