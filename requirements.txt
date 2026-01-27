@@ -6,3 +6,4 @@ openai>=1.40.0
 firebase-admin>=6.5.0
 pillow
 requests
+python-multipart
