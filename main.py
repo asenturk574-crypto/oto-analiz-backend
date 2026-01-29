@@ -4781,21 +4781,15 @@ async def manual_analyze(req: AnalyzeRequest) -> Dict[str, Any]:
 @app.post("/compare_analyze")
 async def compare_analyze(req: CompareRequest) -> Dict[str, Any]:
     """
-    Premium-only compare endpoint:
-    - Switch kaldırıldı: her zaman Premium format.
-    - Sol ve Sağ için premium rapor üretir (USE_LLM_PREMIUM=1 ise full LLM).
-    - Ek olarak premium formatta "karar" raporu üretir (winner + gerekçe) ve response'a ekler.
+    Premium-only compare endpoint (v2):
+    - Her iki araç için de mevcut Premium Analiz formatının AYNISI üretilir.
+    - En sonda "hangi araç daha mantıklı" kararı verilir.
+    - Flutter tek kart gösterebilsin diye `premium_compare` ve `text` alanları birleşik metin döner.
+    Not: Başka endpoint/işleyişe dokunulmaz.
     """
-    # -------------------------
-    # Force premium (ignore any incoming mode/switch)
-    # -------------------------
-    mode_s = "premium"
-
     prof_obj = req.profile or Profile()
 
-    # -------------------------
     # Build per-side AnalyzeRequest
-    # -------------------------
     left_req = AnalyzeRequest(
         profile=prof_obj,
         vehicle=req.left.vehicle,
@@ -4811,22 +4805,34 @@ async def compare_analyze(req: CompareRequest) -> Dict[str, Any]:
         context={"compare_side": "right"},
     )
 
-    # -------------------------
-    # Produce premium reports (LLM if enabled)
-    # -------------------------
+    # Produce premium reports (same as /premium_analyze)
     left_report = premium_report_full(left_req)
     right_report = premium_report_full(right_req)
 
+    left_text = ""
+    right_text = ""
+    try:
+        left_text = (left_report.get("result") or "").strip()
+    except Exception:
+        left_text = ""
+    try:
+        right_text = (right_report.get("result") or "").strip()
+    except Exception:
+        right_text = ""
+
+    # Fallback titles
+    left_v = req.left.vehicle
+    right_v = req.right.vehicle
+    left_title = f"{left_v.year or ''} {left_v.make} {left_v.model}".strip()
+    right_title = f"{right_v.year or ''} {right_v.make} {right_v.model}".strip()
+
+    # Deterministic winner heuristic (used as fallback + hint for LLM)
     def _overall(rep: Dict[str, Any]) -> int:
         try:
             return int(((rep.get("scores") or {}).get("overall_100")) or 0)
-        except:
+        except Exception:
             return 0
 
-    left_overall = _overall(left_report)
-    right_overall = _overall(right_report)
-
-    # tie-breaker: personal_fit if exists (premium), else economy_100
     def _tiebreak(rep: Dict[str, Any]) -> int:
         sc = rep.get("scores") or {}
         for k in ("personal_fit_100", "economy_100", "mechanical_100", "body_100"):
@@ -4835,6 +4841,8 @@ async def compare_analyze(req: CompareRequest) -> Dict[str, Any]:
                 return v
         return 0
 
+    left_overall = _overall(left_report)
+    right_overall = _overall(right_report)
     if left_overall > right_overall:
         better = "left"
     elif right_overall > left_overall:
@@ -4842,111 +4850,94 @@ async def compare_analyze(req: CompareRequest) -> Dict[str, Any]:
     else:
         better = "left" if _tiebreak(left_report) >= _tiebreak(right_report) else "right"
 
-    # -------------------------
-    # Build a premium-formatted compare decision (LLM if available)
-    # -------------------------
-    left_v = req.left.vehicle
-    right_v = req.right.vehicle
+    # Decision (LLM JSON -> decision_text). If LLM fails, deterministic fallback.
+    decision_text = ""
+    winner = better
 
-    # fixed scores/preview for the compare report (must be copied exactly by LLM)
-    better_rep = left_report if better == "left" else right_report
-    fixed_scores = (better_rep.get("scores") or {"overall_100": max(left_overall, right_overall), "mechanical_100": 70, "body_100": 70, "economy_100": 70})
-    fixed_preview = {
-        "title": f"Karşılaştırma: {left_v.year or ''} {left_v.make} {left_v.model} vs {right_v.year or ''} {right_v.make} {right_v.model}".strip(),
-        "price_tag": None,
-        "spoiler": "Premium karşılaştırma hazır. Kazanan, profilin ve risk/masraf dengesine göre seçildi.",
-        "bullets": ["Skor & maliyet karşılaştırması", "Risk/kronik kontrol listesi", "Kime uygun? (şehir/km)"],
-    }
-    # If better report already has preview, keep compare preview but still valid schema.
-    # (Compare report has its own preview; do not reuse per-car preview to avoid confusion.)
-
-    payload = {
-        "mode": mode_s,
-        "winner_hint": better,
+    decision_payload = {
+        "profile": prof_obj.dict() if prof_obj else {},
         "left": {
+            "title": left_title,
             "vehicle": left_v.dict(),
-            "ad_description": req.left.ad_description or "",
-            "report": left_report,
+            "scores": (left_report.get("scores") or {}),
+            "estimated_yearly_cost": (left_report.get("summary") or {}).get("estimated_yearly_cost") if isinstance(left_report.get("summary"), dict) else None,
+            "premium_text": left_text,
         },
         "right": {
+            "title": right_title,
             "vehicle": right_v.dict(),
-            "ad_description": req.right.ad_description or "",
-            "report": right_report,
+            "scores": (right_report.get("scores") or {}),
+            "estimated_yearly_cost": (right_report.get("summary") or {}).get("estimated_yearly_cost") if isinstance(right_report.get("summary"), dict) else None,
+            "premium_text": right_text,
         },
-        "profile": prof_obj.dict(),
-        "fixed_scores": fixed_scores,
-        "fixed_preview": fixed_preview,
-        "rule": "Kazananı seç; İstanbul trafiği, yıllık km, kullanım tipi, yakıt/vites tercihleri ve bütçeye göre nedenlerini yaz. Sert hüküm yok.",
+        "winner_hint": winner,
+        "rule": "İKİ ARACIN da premium analizine dayanarak tek bir kazanan seç ve kısa/öz ama ikna edici gerekçeler yaz. Profil (şehir/km/kullanım/yakıt/vites/bütçe) mutlaka dikkate alınsın.",
     }
 
-    premium_compare = None
+    decision_system_prompt = """
+Sen 'Oto Analiz' uygulaması için **Premium Karşılaştırma Kararı** veren yapay zekâsın.
+
+ÇIKTI (SADECE GEÇERLİ JSON):
+{
+  "winner": "left" | "right",
+  "decision_text": "Türkçe, net karar + 3-6 madde gerekçe + kısa uyarı/checklist (kısa)."
+}
+
+Kurallar:
+- Geveze yok, lafı uzatma.
+- Kazanan seçmek ZORUNLU.
+- Profil (şehir/km/kullanım/yakıt/vites/bütçe) mutlaka değerlendir.
+- İlan/hasar/bakım belirsizliği varsa uyar.
+"""
+
     try:
-        premium_compare = call_llm_json(
+        dec = call_llm_json(
             OPENAI_MODEL_COMPARE,
-            SYSTEM_PROMPT_COMPARE_PREMIUM,
-            json.dumps(payload, ensure_ascii=False),
+            decision_system_prompt,
+            json.dumps(decision_payload, ensure_ascii=False),
         )
-        if isinstance(premium_compare, dict) and isinstance(premium_compare.get("cards"), list) and isinstance(premium_compare.get("scores"), dict):
-            premium_compare["mode"] = mode_s
-            premium_compare["winner"] = premium_compare.get("winner") or better
-            premium_compare["better_overall"] = better
-            premium_compare["meta"] = {"llm_used": True, "prompt": "SYSTEM_PROMPT_COMPARE_PREMIUM"}
-        else:
-            premium_compare = None
+        if isinstance(dec, dict):
+            w = dec.get("winner")
+            dt = dec.get("decision_text")
+            if w in ("left", "right"):
+                winner = w
+            if isinstance(dt, str) and dt.strip():
+                decision_text = dt.strip()
     except Exception as e:
-        print("compare premium llm error:", e)
-        premium_compare = None
+        print("compare decision llm error:", e)
 
-    if premium_compare is None:
-        # deterministic fallback compare report
-        left_title = f"{left_v.year or ''} {left_v.make} {left_v.model}".strip()
-        right_title = f"{right_v.year or ''} {right_v.make} {right_v.model}".strip()
-        winner_title = left_title if better == "left" else right_title
+    if not decision_text:
+        winner_title = left_title if winner == "left" else right_title
+        decision_text = (
+            f"✅ **Karar:** Bu profile göre **{winner_title}** daha mantıklı görünüyor.\n\n"
+            f"• Genel skor: Sol {left_overall}/100, Sağ {right_overall}/100.\n"
+            f"• Skorlar yakınsa **kullanıcı uyumu** ve **masraf/risk dengesi** önceliklendirildi.\n"
+            f"• Ekspertiz + tramer + bakım kayıtları netleşmeden kesin karar verme.\n"
+        )
 
-        premium_compare = {
-            "scores": fixed_scores,
-            "summary": {
-                "short_comment": f"Profiline ve skor/masraf dengesine göre daha mantıklı seçenek: {winner_title}.",
-                "pros": ["Karar, skor + risk + kullanıcı uyumu birlikte düşünülerek verildi."],
-                "cons": ["Ekspertiz/tramer ve bakım geçmişi doğrulanmadan nihai karar verilmemeli."],
-                "estimated_risk_level": (better_rep.get("summary") or {}).get("estimated_risk_level", "orta") if isinstance(better_rep.get("summary"), dict) else "orta",
-            },
-            "preview": fixed_preview,
-            "winner": better,
-            "decision": {
-                "why": "Skorlar yakınsa kullanıcı uyumu ve masraf riski önceliklendirildi.",
-                "top_reasons": [
-                    f"Genel skor: Sol {left_overall}/100, Sağ {right_overall}/100.",
-                    "Risk/kronik ve masraf bandı daha avantajlı görünen taraf seçildi.",
-                    "Şehir içi kullanım ve yakıt/vites tercihleri dikkate alındı.",
-                ],
-                "who_should_pick_left": "Sol araç, daha düşük risk/masraf ve şehir içi uyumu arayanlar için.",
-                "who_should_pick_right": "Sağ araç, daha iyi durum/performans ve uzun yol ağırlığı olanlar için.",
-            },
-            "result": f"""📌 Karar: Bu profile göre **{winner_title}** daha mantıklı görünüyor. Yine de ekspertiz + tramer + bakım kayıtlarıyla doğrulayıp, pazarlık payını buna göre kullan.\n\nNot: Aşağıdaki kıyas, verilen bilgiler ve ilan sinyallerine göre yapılmıştır.""",
-            "cards": [
-                {"title": "📌 Karar & Kime Uygun?", "content": f"**Kazanan:** {winner_title}\n\n- Skor/masraf dengesine göre öne çıkıyor.\n- Kullanım profiline (şehir/km/yakıt-vites) uyumu daha iyi görünüyor.\n- Ekspertiz şart: şasi, yürür, şanzıman ve elektronik kontroller."},
-                {"title": "📊 Skor & Maliyet Karşılaştırması", "content": f"- Genel skor: Sol **{left_overall}/100**, Sağ **{right_overall}/100**.\n- Sol rapor özet: {(left_report.get('summary') or {}).get('short_comment','').strip() if isinstance(left_report.get('summary'), dict) else ''}\n- Sağ rapor özet: {(right_report.get('summary') or {}).get('short_comment','').strip() if isinstance(right_report.get('summary'), dict) else ''}"},
-                {"title": "⚠️ Risk / Kırmızı Bayraklar", "content": "İki araçta da ilan detayları ve bakım geçmişi kritik. Tramer, şasi/hasar izi, şanzıman ve soğuk çalışma kontrolü mutlaka yapılmalı."},
-                {"title": "📝 İlan Sinyalleri (A vs B)", "content": f"Sol ilan notları: {(req.left.ad_description or '').strip()[:260]}\n\nSağ ilan notları: {(req.right.ad_description or '').strip()[:260]}"},
-                {"title": "✅ Kontrol Listesi (Ekspertiz)", "content": "- Tramer/hasar geçmişi\n- Şasi/podye/şase ucu\n- Motor kompresyon/yağ kaçakları\n- Şanzıman geçişleri/TCU hataları\n- Soğuk çalıştırma + test sürüşü\n- OBD hata taraması"},
-            ],
-            "meta": {"llm_used": False, "fallback": True},
-        }
+    # Build combined premium compare text for Flutter (single card)
+    combined = (
+        f"## Araç A Premium Analiz\n\n{left_text or '(Analiz metni üretilemedi)'}\n\n"
+        f"---\n\n"
+        f"## Araç B Premium Analiz\n\n{right_text or '(Analiz metni üretilemedi)'}\n\n"
+        f"---\n\n"
+        f"## Karar\n\n{decision_text}"
+    )
 
-    # -------------------------
-    # Return: keep old keys + add premium_compare (Flutter geçişi kolay olsun)
-    # -------------------------
     return {
-        "mode": mode_s,
-        "better_overall": better,
-        "left_overall_100": left_overall,
-        "right_overall_100": right_overall,
+        "ok": True,
+        "mode": "premium_compare_v2",
+        "winner": winner,
+        "a_premium_text": left_text,
+        "b_premium_text": right_text,
+        "decision_text": decision_text,
+        # For UI convenience
+        "premium_compare": combined,
+        "text": combined,
+        # Keep original reports for backward compatibility (UI can ignore)
         "left_report": left_report,
         "right_report": right_report,
-        "premium_compare": premium_compare,
     }
-
 
 
 @app.post("/premium_question")
