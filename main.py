@@ -3347,6 +3347,43 @@ def quick_analyze_impl(req: AnalyzeRequest) -> Dict[str, Any]:
     segment_label = (enriched.get("segment", {}) or {}).get("name") or (enriched.get("segment", {}) or {}).get("code") or ""
     target_line = infer_target_user_line(segment_label, req.vehicle.make, req.vehicle.model)
 
+    # -------------------------
+    # Olası sorunlar (kronik/dikkat) – LLM yok, sadece kural bazlı kısa ipuçları
+    # -------------------------
+    possible_issues: List[str] = []
+    fuel_s = (getattr(v, "fuel", None) or getattr(req.profile, "fuel_preference", None) or "").strip().lower()
+    usage_s = (getattr(req.profile, "usage", None) or "mixed").strip().lower()
+    trn_s = _infer_transmission(req) or ""
+    km = int(getattr(v, "mileage_km", 0) or 0)
+
+    # metinden ipucu (DSG/CVT/LPG vb.)
+    blob = f"{req.ad_description or ''} {json.dumps(req.context or {}, ensure_ascii=False)} {v.make} {v.model}"
+    tnorm = _norm(blob)
+
+    if fuel_s == "diesel" and usage_s in ("city", "şehir", "sehir"):
+        possible_issues.append("DPF/EGR: şehir içi kısa mesafe ağırlıktaysa kurum/arıza riski artar (rejenerasyon geçmişi önemli).")
+    if fuel_s == "lpg":
+        possible_issues.append("LPG: montaj/ayar kalitesi kritik; subap/ateşleme ve regülatör-enjektör bakımı kontrol edilmeli.")
+
+    if trn_s == "automatic":
+        if any(x in tnorm for x in ["dsg", "s tronic", "s-tronic", "dq200", "dq250", "mechatronic", "mekatronik"]):
+            possible_issues.append("DSG/S-Tronic: mekatronik + kavrama durumu ve yağ/bakım geçmişi kritik (test sürüşünde vuruntu/kararsız geçiş bak).")
+        elif "cvt" in tnorm:
+            possible_issues.append("CVT: şanzıman yağı/bakımı ve kayış/konvertör sağlığı önemli (yük altında bağırma/kaçırma kontrolü).")
+        else:
+            possible_issues.append("Otomatik şanzıman: yağ/bakım geçmişi önemli; test sürüşünde vuruntu/gecikme ve kaçak kontrolü yapılmalı.")
+    elif trn_s == "manual":
+        if km >= 120000:
+            possible_issues.append("Manuel şanzıman: km yükseldikçe debriyaj/volan yıpranması öne çıkar (kavrama, titreme, kaçırma kontrolü).")
+
+    if km >= 150000:
+        possible_issues.append("Yüksek km: alt takım, turbo/soğutma ve enjektör-yakıt sistemi gibi kalemlerde masraf olasılığı yükselir.")
+    if getattr(v, "year", None) and int(v.year or 0) <= 2012:
+        possible_issues.append("Yaşlı araç: sensör/elektronik ve trim detaylarında küçük arızalar daha sık görülebilir.")
+
+    # çok uzamasın
+    possible_issues = [x for x in possible_issues if x][:4]
+
     # skor metodolojisi (kısa)
     how_scored = [
         "- **Segment & karmaşıklık:** Premium/performans sınıfında parça-işçilik ve elektronik yoğunluğu skor tavanını düşürür.",
@@ -3377,6 +3414,17 @@ def quick_analyze_impl(req: AnalyzeRequest) -> Dict[str, Any]:
     result_lines.append("")
     result_lines.append("### Kime daha uygun?")
     result_lines.append(f"- {target_line}")
+    result_lines.append("")
+    # -------------------------
+    # Olası sorunlar bölümü (kronik/dikkat)
+    # -------------------------
+    result_lines.append("### Olası sorunlar (kronik/dikkat)")
+    if possible_issues:
+        for it in possible_issues:
+            result_lines.append(f"- {it}")
+    else:
+        result_lines.append("- Belirgin bir kronik sinyali yok; asıl belirleyici **bakım geçmişi + ekspertiz** sonucu olur.")
+    result_lines.append("")
     result_lines.append("")
     result_lines.append("### Hızlı kontrol (en kritik 3)")
     result_lines.append("- Tramer/hasar + şasi/podye kontrolü")
