@@ -3211,6 +3211,53 @@ Sadece JSON döndür:
 Dil Türkçe, sadece JSON.
 """.strip()
 
+SYSTEM_PROMPT_COMPARE_PREMIUM = """
+Sen 'Oto Analiz' uygulaması için **Premium Karşılaştırma (2 araç)** üreten ana yapay zekâsın.
+
+ÇIKTI (SADECE GEÇERLİ JSON):
+Aşağıdaki şemaya uy:
+{
+  "scores": <fixed_scores aynen kopyalanmalı>,
+  "summary": {
+    "short_comment": string,
+    "pros": [string, ...],
+    "cons": [string, ...],
+    "estimated_risk_level": string
+  },
+  "preview": <fixed_preview aynen kopyalanmalı>,
+  "winner": "left" | "right",
+  "decision": {
+    "why": string,
+    "top_reasons": [string, string, string],
+    "who_should_pick_left": string,
+    "who_should_pick_right": string
+  },
+  "result": string,
+  "cards": [
+    {"title": string, "content": string},
+    ...
+  ]
+}
+
+ZORUNLU:
+- "scores" ve "preview" alanlarını fixed_* alanlarından AYNEN kopyala. Skor/etiket uydurma.
+- Mutlaka bir kazanan seç: winner = "left" veya "right".
+- "result" metninin en başında **📌 Karar** başlığıyla 2–3 cümlede kazananı ve koşullu gerekçeyi yaz.
+- Metin Türkçe, net ve kullanıcı profiline (şehir/km/kullanım/yakıt/vites/bütçe) göre önceliklendirilmiş olsun.
+- Sert hüküm yok: "sakın/alınmaz" yasak. Bunun yerine "kontrol şartıyla", "dikkatli değerlendirilmeli" kullan.
+- Her kartta en az 1 cümle mutlaka bu iki araca özel olmalı (km/ilan detayı/kronik/şehir profili vb.).
+- Gereksiz uzatma yok; önemli 3–5 konuya odaklan.
+
+KARTLAR (başlıklar zorunlu):
+1) "📌 Karar & Kime Uygun?"
+2) "📊 Skor & Maliyet Karşılaştırması"
+3) "⚠️ Risk / Kırmızı Bayraklar"
+4) "📝 İlan Sinyalleri (A vs B)"
+5) "✅ Kontrol Listesi (Ekspertiz)"
+""".strip()
+
+
+
 
 SYSTEM_PROMPT_OTOBOT = """
 Çıktı sadece JSON:
@@ -4665,6 +4712,50 @@ async def premium_analyze(req: AnalyzeRequest) -> Dict[str, Any]:
     return fallback
 
 
+# ---------------------------------------------------------
+# Internal helper: produce premium report (LLM if enabled) for reuse in compare
+# ---------------------------------------------------------
+def premium_report_full(req: AnalyzeRequest) -> Dict[str, Any]:
+    """
+    Same behavior as /premium_analyze:
+    - USE_LLM_PREMIUM=1 -> uses SYSTEM_PROMPT_PREMIUM_FULL with fixed_scores/preview from deterministic fallback
+    - otherwise -> deterministic fallback
+    Returns a dict compatible with PremiumResultModern (scores/summary/preview/result/cards + meta).
+    """
+    use_llm = (os.getenv("USE_LLM_PREMIUM", "0").strip().lower() in ("1", "true", "yes", "y"))
+    llm_used = False
+
+    fallback = premium_analyze_impl(req)
+
+    if use_llm:
+        try:
+            enriched = build_enriched_context(req)
+            payload = {
+                "vehicle": req.vehicle.dict(),
+                "profile": req.profile.dict() if req.profile else {},
+                "ad_description": req.ad_description,
+                "context": req.context or {},
+                "enriched": enriched,
+                "fixed_scores": fallback.get("scores"),
+                "fixed_preview": fallback.get("preview"),
+            }
+            out = call_llm_json(
+                OPENAI_MODEL_PREMIUM,
+                SYSTEM_PROMPT_PREMIUM_FULL,
+                json.dumps(payload, ensure_ascii=False),
+            )
+            if isinstance(out, dict) and isinstance(out.get("cards"), list) and isinstance(out.get("scores"), dict):
+                out["meta"] = {"use_llm_premium": True, "llm_used": True, "via": "premium_report_full"}
+                llm_used = True
+                return out
+        except Exception as e:
+            print("premium_report_full error -> fallback:", e)
+
+    fallback["meta"] = {"use_llm_premium": use_llm, "llm_used": llm_used, "via": "premium_report_full"}
+    return fallback
+
+
+
 @app.post("/manual_analyze")
 @app.post("/manual")
 async def manual_analyze(req: AnalyzeRequest) -> Dict[str, Any]:
@@ -4690,39 +4781,17 @@ async def manual_analyze(req: AnalyzeRequest) -> Dict[str, Any]:
 @app.post("/compare_analyze")
 async def compare_analyze(req: CompareRequest) -> Dict[str, Any]:
     """
-    Compare endpoint now supports **mode switching**:
-    - quick/fast/normal  -> uses quick_analyze_impl (Hızlı Analiz)
-    - premium           -> uses premium_analyze_impl (Detaylı Premium)
-    Flutter tarafında switch ile şu alanlardan birini göndermen yeterli:
-      - req.analysis_mode = "quick" | "premium"
-      - veya profile içinde: {"analysis_mode":"premium"} / {"mode":"premium"} / {"is_premium": true}
+    Premium-only compare endpoint:
+    - Switch kaldırıldı: her zaman Premium format.
+    - Sol ve Sağ için premium rapor üretir (USE_LLM_PREMIUM=1 ise full LLM).
+    - Ek olarak premium formatta "karar" raporu üretir (winner + gerekçe) ve response'a ekler.
     """
     # -------------------------
-    # Resolve mode
+    # Force premium (ignore any incoming mode/switch)
     # -------------------------
-    mode = None
-    try:
-        mode = getattr(req, "analysis_mode", None)
-    except:
-        mode = None
+    mode_s = "premium"
 
     prof_obj = req.profile or Profile()
-    try:
-        # profile extra fields also supported (Config extra=allow)
-        mode = mode or getattr(prof_obj, "analysis_mode", None) or getattr(prof_obj, "mode", None)
-        is_premium = getattr(prof_obj, "is_premium", None)
-        if mode is None and isinstance(is_premium, bool):
-            mode = "premium" if is_premium else "quick"
-    except:
-        pass
-
-    mode_s = str(mode or "quick").strip().lower()
-    if mode_s in ("premium", "pro", "detailed"):
-        mode_s = "premium"
-    elif mode_s in ("quick", "fast", "normal", "hizli", "hızlı"):
-        mode_s = "quick"
-    else:
-        mode_s = "quick"
 
     # -------------------------
     # Build per-side AnalyzeRequest
@@ -4743,14 +4812,10 @@ async def compare_analyze(req: CompareRequest) -> Dict[str, Any]:
     )
 
     # -------------------------
-    # Produce reports
+    # Produce premium reports (LLM if enabled)
     # -------------------------
-    if mode_s == "premium":
-        left_report = premium_analyze_impl(left_req)
-        right_report = premium_analyze_impl(right_req)
-    else:
-        left_report = quick_analyze_impl(left_req)
-        right_report = quick_analyze_impl(right_req)
+    left_report = premium_report_full(left_req)
+    right_report = premium_report_full(right_req)
 
     def _overall(rep: Dict[str, Any]) -> int:
         try:
@@ -4761,7 +4826,7 @@ async def compare_analyze(req: CompareRequest) -> Dict[str, Any]:
     left_overall = _overall(left_report)
     right_overall = _overall(right_report)
 
-    # tie-breaker: personal_fit if exists (premium), else economy_100 (quick uses economy_100=parts_service_100)
+    # tie-breaker: personal_fit if exists (premium), else economy_100
     def _tiebreak(rep: Dict[str, Any]) -> int:
         sc = rep.get("scores") or {}
         for k in ("personal_fit_100", "economy_100", "mechanical_100", "body_100"):
@@ -4778,304 +4843,111 @@ async def compare_analyze(req: CompareRequest) -> Dict[str, Any]:
         better = "left" if _tiebreak(left_report) >= _tiebreak(right_report) else "right"
 
     # -------------------------
-    # Optional LLM compare summary (keeps old behavior, but now includes reports)
+    # Build a premium-formatted compare decision (LLM if available)
     # -------------------------
     left_v = req.left.vehicle
     right_v = req.right.vehicle
 
+    # fixed scores/preview for the compare report (must be copied exactly by LLM)
+    better_rep = left_report if better == "left" else right_report
+    fixed_scores = (better_rep.get("scores") or {"overall_100": max(left_overall, right_overall), "mechanical_100": 70, "body_100": 70, "economy_100": 70})
+    fixed_preview = {
+        "title": f"Karşılaştırma: {left_v.year or ''} {left_v.make} {left_v.model} vs {right_v.year or ''} {right_v.make} {right_v.model}".strip(),
+        "price_tag": None,
+        "spoiler": "Premium karşılaştırma hazır. Kazanan, profilin ve risk/masraf dengesine göre seçildi.",
+        "bullets": ["Skor & maliyet karşılaştırması", "Risk/kronik kontrol listesi", "Kime uygun? (şehir/km)"],
+    }
+    # If better report already has preview, keep compare preview but still valid schema.
+    # (Compare report has its own preview; do not reuse per-car preview to avoid confusion.)
+
     payload = {
         "mode": mode_s,
+        "winner_hint": better,
         "left": {
             "vehicle": left_v.dict(),
             "ad_description": req.left.ad_description or "",
-            "scores": left_report.get("scores", {}),
-            "summary": left_report.get("summary", {}),
+            "report": left_report,
         },
         "right": {
             "vehicle": right_v.dict(),
             "ad_description": req.right.ad_description or "",
-            "scores": right_report.get("scores", {}),
-            "summary": right_report.get("summary", {}),
+            "report": right_report,
         },
         "profile": prof_obj.dict(),
-        "rule": "Bütçe/kullanım amacı/şehir içi-uzun yol gibi profil verilerini dikkate al; kesin hüküm verme; Türkçe ve net yaz."
+        "fixed_scores": fixed_scores,
+        "fixed_preview": fixed_preview,
+        "rule": "Kazananı seç; İstanbul trafiği, yıllık km, kullanım tipi, yakıt/vites tercihleri ve bütçeye göre nedenlerini yaz. Sert hüküm yok.",
     }
 
-    out = call_llm_json(OPENAI_MODEL_COMPARE, SYSTEM_PROMPT_COMPARE, json.dumps(payload, ensure_ascii=False))
+    premium_compare = None
+    try:
+        premium_compare = call_llm_json(
+            OPENAI_MODEL_COMPARE,
+            SYSTEM_PROMPT_COMPARE_PREMIUM,
+            json.dumps(payload, ensure_ascii=False),
+        )
+        if isinstance(premium_compare, dict) and isinstance(premium_compare.get("cards"), list) and isinstance(premium_compare.get("scores"), dict):
+            premium_compare["mode"] = mode_s
+            premium_compare["winner"] = premium_compare.get("winner") or better
+            premium_compare["better_overall"] = better
+            premium_compare["meta"] = {"llm_used": True, "prompt": "SYSTEM_PROMPT_COMPARE_PREMIUM"}
+        else:
+            premium_compare = None
+    except Exception as e:
+        print("compare premium llm error:", e)
+        premium_compare = None
 
-    if isinstance(out, dict):
-        # ensure winner aligns with deterministic scores if model returns something else
-        out["better_overall"] = out.get("better_overall") or better
-        out["mode"] = mode_s
-        out["left_report"] = left_report
-        out["right_report"] = right_report
-        out["left_overall_100"] = left_overall
-        out["right_overall_100"] = right_overall
-        return out
+    if premium_compare is None:
+        # deterministic fallback compare report
+        left_title = f"{left_v.year or ''} {left_v.make} {left_v.model}".strip()
+        right_title = f"{right_v.year or ''} {right_v.make} {right_v.model}".strip()
+        winner_title = left_title if better == "left" else right_title
 
-    # deterministic fallback (no LLM)
-    left_title = f"{left_v.year or ''} {left_v.make} {left_v.model}".strip()
-    right_title = f"{right_v.year or ''} {right_v.make} {right_v.model}".strip()
+        premium_compare = {
+            "scores": fixed_scores,
+            "summary": {
+                "short_comment": f"Profiline ve skor/masraf dengesine göre daha mantıklı seçenek: {winner_title}.",
+                "pros": ["Karar, skor + risk + kullanıcı uyumu birlikte düşünülerek verildi."],
+                "cons": ["Ekspertiz/tramer ve bakım geçmişi doğrulanmadan nihai karar verilmemeli."],
+                "estimated_risk_level": (better_rep.get("summary") or {}).get("estimated_risk_level", "orta") if isinstance(better_rep.get("summary"), dict) else "orta",
+            },
+            "preview": fixed_preview,
+            "winner": better,
+            "decision": {
+                "why": "Skorlar yakınsa kullanıcı uyumu ve masraf riski önceliklendirildi.",
+                "top_reasons": [
+                    f"Genel skor: Sol {left_overall}/100, Sağ {right_overall}/100.",
+                    "Risk/kronik ve masraf bandı daha avantajlı görünen taraf seçildi.",
+                    "Şehir içi kullanım ve yakıt/vites tercihleri dikkate alındı.",
+                ],
+                "who_should_pick_left": "Sol araç, daha düşük risk/masraf ve şehir içi uyumu arayanlar için.",
+                "who_should_pick_right": "Sağ araç, daha iyi durum/performans ve uzun yol ağırlığı olanlar için.",
+            },
+            "result": f"""📌 Karar: Bu profile göre **{winner_title}** daha mantıklı görünüyor. Yine de ekspertiz + tramer + bakım kayıtlarıyla doğrulayıp, pazarlık payını buna göre kullan.\n\nNot: Aşağıdaki kıyas, verilen bilgiler ve ilan sinyallerine göre yapılmıştır.""",
+            "cards": [
+                {"title": "📌 Karar & Kime Uygun?", "content": f"**Kazanan:** {winner_title}\n\n- Skor/masraf dengesine göre öne çıkıyor.\n- Kullanım profiline (şehir/km/yakıt-vites) uyumu daha iyi görünüyor.\n- Ekspertiz şart: şasi, yürür, şanzıman ve elektronik kontroller."},
+                {"title": "📊 Skor & Maliyet Karşılaştırması", "content": f"- Genel skor: Sol **{left_overall}/100**, Sağ **{right_overall}/100**.\n- Sol rapor özet: {(left_report.get('summary') or {}).get('short_comment','').strip() if isinstance(left_report.get('summary'), dict) else ''}\n- Sağ rapor özet: {(right_report.get('summary') or {}).get('short_comment','').strip() if isinstance(right_report.get('summary'), dict) else ''}"},
+                {"title": "⚠️ Risk / Kırmızı Bayraklar", "content": "İki araçta da ilan detayları ve bakım geçmişi kritik. Tramer, şasi/hasar izi, şanzıman ve soğuk çalışma kontrolü mutlaka yapılmalı."},
+                {"title": "📝 İlan Sinyalleri (A vs B)", "content": f"Sol ilan notları: {(req.left.ad_description or '').strip()[:260]}\n\nSağ ilan notları: {(req.right.ad_description or '').strip()[:260]}"},
+                {"title": "✅ Kontrol Listesi (Ekspertiz)", "content": "- Tramer/hasar geçmişi\n- Şasi/podye/şase ucu\n- Motor kompresyon/yağ kaçakları\n- Şanzıman geçişleri/TCU hataları\n- Soğuk çalıştırma + test sürüşü\n- OBD hata taraması"},
+            ],
+            "meta": {"llm_used": False, "fallback": True},
+        }
 
-    def _short(rep: Dict[str, Any]) -> str:
-        s = rep.get("summary") or {}
-        if isinstance(s, dict):
-            return (s.get("short_comment") or "").strip()
-        return ""
-
-    summary = (
-        f"Karşılaştırma modu: **{('Premium' if mode_s=='premium' else 'Hızlı')}**. "
-        f"Genel skor: Sol **{left_overall}/100**, Sağ **{right_overall}/100**. "
-        f"Öneri (genel): **{('Sol' if better=='left' else 'Sağ')}** taraf daha dengeli görünüyor."
-    )
-
+    # -------------------------
+    # Return: keep old keys + add premium_compare (Flutter geçişi kolay olsun)
+    # -------------------------
     return {
         "mode": mode_s,
         "better_overall": better,
-        "summary": summary,
-        "left_pros": (left_report.get("summary", {}) or {}).get("pros", []) if isinstance(left_report.get("summary"), dict) else [],
-        "left_cons": (left_report.get("summary", {}) or {}).get("cons", []) if isinstance(left_report.get("summary"), dict) else [],
-        "right_pros": (right_report.get("summary", {}) or {}).get("pros", []) if isinstance(right_report.get("summary"), dict) else [],
-        "right_cons": (right_report.get("summary", {}) or {}).get("cons", []) if isinstance(right_report.get("summary"), dict) else [],
-        "use_cases": {
-            "family_use": "Aile kullanımı için iç hacim/konfor ve masraf bandı birlikte düşünülmeli.",
-            "long_distance": "Uzun yolda tüketim + bakım disiplini belirleyicidir; test sürüşü ve servis kaydı kritik.",
-            "city_use": "Şehir içinde vites tipi ve yakıt tercihi (özellikle dizel/DPF) daha kritik hale gelir.",
-        },
-        "left_report": left_report,
-        "right_report": right_report,
         "left_overall_100": left_overall,
         "right_overall_100": right_overall,
-        "left_title": left_title,
-        "right_title": right_title,
+        "left_report": left_report,
+        "right_report": right_report,
+        "premium_compare": premium_compare,
     }
 
 
-@app.post("/otobot_legacy")
-async def otobot(req: OtoBotRequest) -> Dict[str, Any]:
-    question = (req.question or "").strip()
-    if not question:
-        raise HTTPException(status_code=400, detail="Soru boş olamaz. 'question' alanına bir metin gönder.")
-    out = call_llm_json(OPENAI_MODEL_OTOBOT, SYSTEM_PROMPT_OTOBOT, question)
-    if isinstance(out, dict):
-        return out
-    return {
-        "answer": "Bütçe, yıllık km ve kullanım tipine göre segment seçmek en mantıklısıdır. Ekspertiz + tramer şart.",
-        "suggested_segments": ["C-sedan", "C-SUV", "B-Hatch"],
-        "example_models": ["Toyota Corolla", "Renault Megane", "Honda Civic", "Hyundai Tucson"]
-    }
-
-
-if __name__ == "__main__":
-    # Lokal çalıştırma için:
-    # uvicorn main:app --host 0.0.0.0 --port 8000 --reload
-    pass
-
-
-# ============================
-# YOL-1 FINAL OVERRIDE (FRONT/NET + MODEL-CORRECT)
-# ============================
-# NOTE: Python uses the *last* definition, so this overrides earlier helpers safely.
-
-from typing import Iterable
-from PIL import ImageFilter
-
-_FRONT_HINTS = [
-    "front", "front view", "front-angle", "frontal", "three quarter", "3/4", "three-quarter", "angle view",
-    "side", "side view",
-]
-_REAR_BAD = [
-    "rear", "back view", "back", "taillight", "tail light", "behind", "rear view",
-]
-_SCENE_BAD = [
-    "interior", "inside", "dashboard", "cockpit", "steering", "seat", "console", "gear",
-    "engine", "close up", "close-up", "detail", "rim", "tire", "tyre",
-    "showroom", "dealership", "parking", "traffic", "fleet",
-    "night", "dark", "low light", "low-light",
-    "door open", "open door", "trunk open", "boot open",
-]
-_MULTI_BAD = ["cars", "two cars", "three cars", "multiple cars", "many cars"]
-
-def _img_is_sharp_and_bright(img: "Image.Image") -> bool:
-    """
-    Cheap 'net' check:
-    - brightness: mean grayscale must be above a threshold
-    - sharpness: variance of edge map must be above a threshold
-    """
-    # downscale for speed
-    im = img.convert("L")
-    im = im.resize((320, int(320 * im.height / max(im.width, 1))), Image.Resampling.BILINEAR)
-    # brightness
-    px = list(im.getdata())
-    if not px:
-        return False
-    mean = sum(px) / len(px)
-    if mean < 55:  # too dark
-        return False
-
-    # sharpness via edge variance
-    edges = im.filter(ImageFilter.FIND_EDGES)
-    ex = list(edges.getdata())
-    if not ex:
-        return False
-    emean = sum(ex) / len(ex)
-    var = sum((v - emean) ** 2 for v in ex) / len(ex)
-    # Typical sharp photos will be well above this.
-    return var >= 120.0
-
-def _norm_brand_model_for_match(brand: str, model: str) -> Tuple[str, str, List[str], List[str]]:
-    """
-    Returns:
-      b: normalized brand token
-      m: normalized model token (cleaned)
-      must_phrases: phrases that MUST appear in alt (lowercase)
-      must_tokens: tokens any of which must appear in alt (lowercase)
-    """
-    def clean(x: str) -> str:
-        return re.sub(r"\s+", " ", re.sub(r"[^a-z0-9\s\-]", " ", (x or "").lower())).strip()
-
-    brand_alias = {
-        "mercdes": "mercedes",
-        "mercedes-benz": "mercedes",
-        "benz": "mercedes",
-        "wolkswagen": "vw",
-        "volkswagen": "vw",
-        "bmv": "bmw",
-        "hyundai ": "hyundai",
-    }
-    b = clean(brand)
-    b = brand_alias.get(b, b)
-
-    m_raw = clean(model)
-
-    must_phrases: List[str] = []
-    must_tokens: List[str] = []
-
-    # Mercedes class hard handling: "c class" is NOT the same as "s class"
-    if b in ("mercedes", "mb"):
-        # Normalize variants
-        m_raw = m_raw.replace("cclass", "c class").replace("c-class", "c class")
-        m_raw = m_raw.replace("sclass", "s class").replace("s-class", "s class")
-        m_raw = m_raw.replace("eclass", "e class").replace("e-class", "e class")
-        m_raw = m_raw.replace("aclass", "a class").replace("a-class", "a class")
-        m_raw = m_raw.replace("bclass", "b class").replace("b-class", "b class")
-
-        # If user says "C Class" or just "C"
-        if m_raw in ("c", "c class"):
-            must_phrases = ["c class", "c-class", "cclass"]
-            must_tokens = ["mercedes", "benz"]
-            return b, "c class", must_phrases, must_tokens
-        if m_raw in ("e", "e class"):
-            must_phrases = ["e class", "e-class", "eclass"]
-            must_tokens = ["mercedes", "benz"]
-            return b, "e class", must_phrases, must_tokens
-        if m_raw in ("s", "s class"):
-            must_phrases = ["s class", "s-class", "sclass"]
-            must_tokens = ["mercedes", "benz"]
-            return b, "s class", must_phrases, must_tokens
-
-    # General case:
-    toks = [t for t in re.split(r"[\s\-]+", m_raw) if t]
-    if len(m_raw) >= 3:
-        # require the full phrase if multi-token
-        if len(toks) >= 2:
-            must_phrases.append(m_raw)
-        # pick strongest tokens (avoid generic)
-        generic = {"class", "series", "model", "car", "auto"}
-        strong = [t for t in toks if t not in generic and len(t) >= 3]
-        if strong:
-            must_tokens.extend(strong[:2])
-        else:
-            must_tokens.extend([t for t in toks if len(t) >= 2][:2])
-
-    return b, m_raw, must_phrases, must_tokens
-
-def _alt_text(p: Dict[str, Any]) -> str:
-    return (p.get("alt") or "").lower().strip()
-
-def _passes_front_only(alt: str) -> bool:
-    if any(w in alt for w in _REAR_BAD):
-        return False
-    if any(w in alt for w in _SCENE_BAD):
-        return False
-    if any(w in alt for w in _MULTI_BAD):
-        return False
-    if not any(h in alt for h in _FRONT_HINTS):
-        return False
-    return True
-
-def _passes_brand_model(alt: str, b: str, must_phrases: List[str], must_tokens: List[str]) -> bool:
-    if b == "vw":
-        if "vw" not in alt and "volkswagen" not in alt:
-            return False
-    elif b == "mercedes":
-        if "mercedes" not in alt and "benz" not in alt:
-            return False
-    else:
-        if b and b not in alt:
-            return False
-
-    if must_phrases:
-        if not any(ph in alt for ph in must_phrases):
-            return False
-        # prevent C-class confusing with S/E/A/B/G
-        if any(ph in must_phrases for ph in ["c class", "c-class", "cclass"]):
-            if any(x in alt for x in [" s class", " s-class", "sclass", " e class", "eclass", " a class", "aclass", " b class", "bclass", " g class", "gclass"]):
-                return False
-    if must_tokens:
-        if not any(t in alt for t in must_tokens):
-            return False
-    return True
-
-# ================================
-# Premium follow-up question (1 hak)
-# ================================
-
-class PremiumQuestionRequest(BaseModel):
-    analysis_text: str
-    question: str
-
-class PremiumQuestionResponse(BaseModel):
-    answer: str
-
-@app.post("/premium_question", response_model=PremiumQuestionResponse)
-async def premium_question(req: PremiumQuestionRequest):
-    if OpenAI is None:
-        raise HTTPException(status_code=500, detail="OpenAI client not available")
-
-    api_key = os.environ.get("OPENAI_API_KEY")
-    if not api_key:
-        raise HTTPException(status_code=500, detail="OPENAI_API_KEY not set")
-
-    client = OpenAI(api_key=api_key)
-
-    prompt = f"""
-Aşağıda bir araç için hazırlanmış premium analiz raporu var.
-Kullanıcı bu analizle ilgili bir soru soruyor.
-
-ANALİZ:
-{req.analysis_text}
-
-SORU:
-{req.question}
-
-Kısa, net ve kullanıcı dostu şekilde cevap ver.
-"""
-
-    try:
-        resp = client.responses.create(
-            model=os.environ.get("SS_OCR_MODEL", "gpt-5-mini"),
-            input=prompt,
-        )
-        answer = resp.output_text
-        return {"answer": answer}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
-
-# =========================
-# Optimized Premium Question Endpoint (Short & Fast)
-# =========================
 
 @app.post("/premium_question")
 async def premium_question(payload: dict):
