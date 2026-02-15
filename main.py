@@ -4942,8 +4942,8 @@ Kurallar:
 
 @app.post("/premium_question")
 async def premium_question(payload: dict):
-    analysis_text = payload.get("analysis_text", "")[:6000]  # limit size
-    question = payload.get("question", "")
+    analysis_text = (payload.get("analysis_text", "") or "")[:6000]  # limit size
+    question = (payload.get("question", "") or "").strip()
 
     prompt = f"""
 Kısa ve öz cevap ver (max 6-8 cümle).
@@ -4953,34 +4953,69 @@ Analiz özeti:
 
 Soru:
 {question}
-"""
+""".strip()
+
+    def _extract_text_from_responses(resp) -> str:
+        try:
+            ot = getattr(resp, "output_text", None)
+            if isinstance(ot, str) and ot.strip():
+                return ot.strip()
+            out = getattr(resp, "output", None)
+            texts: List[str] = []
+            if out:
+                for item in out:
+                    content = getattr(item, "content", None)
+                    if content is None and isinstance(item, dict):
+                        content = item.get("content")
+                    if not content:
+                        continue
+                    for part in content:
+                        t = getattr(part, "text", None)
+                        if t is None and isinstance(part, dict):
+                            t = part.get("text")
+                        if isinstance(t, str) and t.strip():
+                            texts.append(t.strip())
+            return "\n".join(texts).strip()
+        except Exception:
+            return ""
+
+    def _extract_text_from_chat(resp) -> str:
+        try:
+            choices = getattr(resp, "choices", None)
+            if choices:
+                msg = choices[0].message
+                content = getattr(msg, "content", None)
+                if isinstance(content, str):
+                    return content.strip()
+        except Exception:
+            pass
+        return ""
 
     try:
-        model_name = os.getenv("PREMIUM_QUESTION_MODEL", "gpt-5-mini")
+        model = os.getenv("PREMIUM_QUESTION_MODEL", "gpt-5-mini")
 
-        # Some newer models may return empty `message.content` via Chat Completions.
-        # Use Responses API when available for maximum compatibility.
+        # 1) Prefer Responses API (more consistent with newer models)
         answer = ""
-        try:
-            resp = client.responses.create(
-                model=model_name,
+        if hasattr(client, "responses") and hasattr(client.responses, "create"):
+            r = client.responses.create(
+                model=model,
                 input=prompt,
                 max_completion_tokens=280,
             )
-            answer = (getattr(resp, "output_text", "") or "").strip()
-        except Exception:
-            # Fallback to Chat Completions for older models / SDKs
-            resp = client.chat.completions.create(
-                model=model_name,
+            answer = _extract_text_from_responses(r)
+
+        # 2) Fallback to Chat Completions if needed
+        if not answer and hasattr(client, "chat") and hasattr(client.chat, "completions"):
+            r = client.chat.completions.create(
+                model=model,
                 messages=[{"role": "user", "content": prompt}],
                 max_completion_tokens=280,
             )
-            msg = resp.choices[0].message
-            answer = ((getattr(msg, "content", "") or "")).strip()
+            answer = _extract_text_from_chat(r)
 
+        answer = (answer or "").strip()
         if not answer:
-            # Graceful fallback message so UI doesn't treat this as "empty response"
-            answer = "Net cevap üretilemedi. Soruyu biraz daha net yazar mısın?"
+            return {"answer": "Cevap üretilemedi. Soruyu biraz daha net yazar mısın?"}
 
         return {"answer": answer}
 
