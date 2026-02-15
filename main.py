@@ -4960,7 +4960,6 @@ Soru:
             model=os.getenv("PREMIUM_QUESTION_MODEL", "gpt-5-mini"),
             messages=[{"role": "user", "content": prompt}],
             max_completion_tokens=280,
-            temperature=0.4,
         )
 
         answer = response.choices[0].message.content.strip()
