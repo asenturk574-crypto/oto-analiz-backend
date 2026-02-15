@@ -4959,7 +4959,7 @@ Soru:
         response = client.chat.completions.create(
             model=os.getenv("PREMIUM_QUESTION_MODEL", "gpt-5-mini"),
             messages=[{"role": "user", "content": prompt}],
-            max_tokens=280,
+            max_completion_tokens=280,
             temperature=0.4,
         )
 
