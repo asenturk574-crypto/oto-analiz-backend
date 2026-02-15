@@ -4942,26 +4942,61 @@ Kurallar:
 
 @app.post("/premium_question")
 async def premium_question(payload: dict):
-    analysis_text = (payload.get("analysis_text", "") or "")[:6000]  # limit size
-    question = (payload.get("question", "") or "").strip()
+    """Premium analiz sonrası 1 soru hakkı.
 
-    prompt = f"""
-Kısa ve öz cevap ver (max 6-8 cümle).
+    Mobile tarafı farklı key isimleri gönderebildiği için burada hepsini destekliyoruz:
+    - analysis_text / analysisText
+    - premium_text / premiumText
+    """
+    if client is None:
+        # Uygulama tarafı "answer" bekliyor; 500 yerine açıklayıcı mesaj dönelim.
+        return {"answer": "Sunucuda OpenAI istemcisi yok (OPENAI_API_KEY eksik veya SDK yüklenmemiş)."}
 
-Analiz özeti:
+    # ✅ Esnek alan okuma
+    analysis_text = (
+        payload.get("analysis_text")
+        or payload.get("analysisText")
+        or payload.get("premium_text")
+        or payload.get("premiumText")
+        or ""
+    )
+    analysis_text = (str(analysis_text) if analysis_text is not None else "")[:12000]
+
+    question = (payload.get("question") or "").strip()
+    if not question:
+        return {"answer": "Soru boş görünüyor. Lütfen soruyu yazıp tekrar dene."}
+
+    prompt = f"""Sen Türkiye ikinci el araç analizi yapan bir asistansın.
+Kullanıcının sorusuna **kısa, net ve uygulanabilir** cevap ver.
+- 6–10 cümle hedefle.
+- Gerekirse 3 madde ile kontrol listesi ekle.
+- Bilgi eksikse 1–2 net takip sorusu sor.
+- Uydurma yapma.
+
+PREMIUM ANALİZ (özet/metin):
 {analysis_text}
 
-Soru:
+KULLANICI SORUSU:
 {question}
 """.strip()
 
-    def _extract_text_from_responses(resp) -> str:
+    def _extract_text_any(resp) -> str:
+        """Responses API ve Chat Completions farklı şekillerde dönebilir; hepsini yakala."""
         try:
+            # 1) Modern Responses API: output_text
             ot = getattr(resp, "output_text", None)
             if isinstance(ot, str) and ot.strip():
                 return ot.strip()
+        except Exception:
+            pass
+
+        # 2) Responses API: output[].content[].text / output_text
+        try:
             out = getattr(resp, "output", None)
-            texts: List[str] = []
+            if out is None and isinstance(resp, dict):
+                out = resp.get("output")
+            texts = []
+
             if out:
                 for item in out:
                     content = getattr(item, "content", None)
@@ -4970,61 +5005,114 @@ Soru:
                     if not content:
                         continue
                     for part in content:
-                        t = getattr(part, "text", None)
-                        if t is None and isinstance(part, dict):
-                            t = part.get("text")
+                        # dict/obj farkı
+                        ptype = getattr(part, "type", None) if not isinstance(part, dict) else part.get("type")
+                        # bazı SDK'larda text objesi {"text": "..."} veya {"text": {"value": "..."}}
+                        t = getattr(part, "text", None) if not isinstance(part, dict) else part.get("text")
+                        if isinstance(t, dict):
+                            t = t.get("value") or t.get("text")
                         if isinstance(t, str) and t.strip():
                             texts.append(t.strip())
-            return "\n".join(texts).strip()
-        except Exception:
-            return ""
+                        # output_text part
+                        if ptype == "output_text":
+                            tt = getattr(part, "text", None) if not isinstance(part, dict) else part.get("text")
+                            if isinstance(tt, dict):
+                                tt = tt.get("value") or tt.get("text")
+                            if isinstance(tt, str) and tt.strip():
+                                texts.append(tt.strip())
 
-    def _extract_text_from_chat(resp) -> str:
+            joined = "\n".join([x for x in texts if x]).strip()
+            if joined:
+                return joined
+        except Exception:
+            pass
+
+        # 3) Chat Completions: choices[0].message.content
         try:
             choices = getattr(resp, "choices", None)
             if choices:
                 msg = choices[0].message
                 content = getattr(msg, "content", None)
-                if isinstance(content, str):
+                if isinstance(content, str) and content.strip():
                     return content.strip()
         except Exception:
             pass
+
+        # 4) Dict fallback
+        try:
+            if isinstance(resp, dict):
+                # sometimes: {"choices":[{"message":{"content":"..."}}]}
+                ch = resp.get("choices")
+                if ch and isinstance(ch, list):
+                    msg = (ch[0] or {}).get("message") or {}
+                    c = msg.get("content")
+                    if isinstance(c, str) and c.strip():
+                        return c.strip()
+        except Exception:
+            pass
+
         return ""
 
     try:
-        model = os.getenv("PREMIUM_QUESTION_MODEL", "gpt-5-mini")
+        # ✅ Model: env varsa onu kullan, yoksa premium modelden türet
+        model = (os.getenv("PREMIUM_QUESTION_MODEL") or OPENAI_MODEL_PREMIUM or "gpt-4.1-mini").strip()
 
-        # 1) Prefer Responses API (more consistent with newer models)
         answer = ""
+
+        # 1) Responses API (gpt-5 gibi yeni modellerde daha stabil)
         if hasattr(client, "responses") and hasattr(client.responses, "create"):
             try:
                 r = client.responses.create(
                     model=model,
                     input=prompt,
-                    max_output_tokens=280,
+                    max_output_tokens=320,
                 )
             except TypeError:
-                # Older SDKs / signatures may not support token kwargs on Responses API
                 r = client.responses.create(
                     model=model,
                     input=prompt,
                 )
-            answer = _extract_text_from_responses(r)
+            answer = _extract_text_any(r)
 
-        # 2) Fallback to Chat Completions if needed
+        # 2) Chat Completions fallback
         if not answer and hasattr(client, "chat") and hasattr(client.chat, "completions"):
-            r = client.chat.completions.create(
-                model=model,
-                messages=[{"role": "user", "content": prompt}],
-                max_completion_tokens=280,
-            )
-            answer = _extract_text_from_chat(r)
+            # bazı modeller max_completion_tokens istemeyebilir; try/except ile güvenli yap
+            try:
+                r = client.chat.completions.create(
+                    model=model,
+                    messages=[{"role": "user", "content": prompt}],
+                    max_completion_tokens=320,
+                )
+            except TypeError:
+                r = client.chat.completions.create(
+                    model=model,
+                    messages=[{"role": "user", "content": prompt}],
+                    max_tokens=320,
+                )
+            answer = _extract_text_any(r)
+
+        # 3) Son çare: daha garanti bir modele düş
+        if not answer and model != "gpt-4.1-mini" and hasattr(client, "chat") and hasattr(client.chat, "completions"):
+            try:
+                r = client.chat.completions.create(
+                    model="gpt-4.1-mini",
+                    messages=[{"role": "user", "content": prompt}],
+                    max_completion_tokens=320,
+                )
+            except TypeError:
+                r = client.chat.completions.create(
+                    model="gpt-4.1-mini",
+                    messages=[{"role": "user", "content": prompt}],
+                    max_tokens=320,
+                )
+            answer = _extract_text_any(r)
 
         answer = (answer or "").strip()
         if not answer:
-            return {"answer": "Cevap üretilemedi. Soruyu biraz daha net yazar mısın?"}
+            return {"answer": "Cevap üretilemedi. Lütfen soruyu biraz daha netleştir (örn. bütçe/şehir/km/öncelik) ve tekrar dene."}
 
         return {"answer": answer}
 
     except Exception as e:
-        return {"error": str(e)}
+        # App tarafı "answer" bekliyor; hata olsa bile kırmayalım.
+        return {"answer": f"Sistem hatası: {str(e)}"}
