@@ -4956,13 +4956,32 @@ Soru:
 """
 
     try:
-        response = client.chat.completions.create(
-            model=os.getenv("PREMIUM_QUESTION_MODEL", "gpt-5-mini"),
-            messages=[{"role": "user", "content": prompt}],
-            max_completion_tokens=280,
-        )
+        model_name = os.getenv("PREMIUM_QUESTION_MODEL", "gpt-5-mini")
 
-        answer = response.choices[0].message.content.strip()
+        # Some newer models may return empty `message.content` via Chat Completions.
+        # Use Responses API when available for maximum compatibility.
+        answer = ""
+        try:
+            resp = client.responses.create(
+                model=model_name,
+                input=prompt,
+                max_completion_tokens=280,
+            )
+            answer = (getattr(resp, "output_text", "") or "").strip()
+        except Exception:
+            # Fallback to Chat Completions for older models / SDKs
+            resp = client.chat.completions.create(
+                model=model_name,
+                messages=[{"role": "user", "content": prompt}],
+                max_completion_tokens=280,
+            )
+            msg = resp.choices[0].message
+            answer = ((getattr(msg, "content", "") or "")).strip()
+
+        if not answer:
+            # Graceful fallback message so UI doesn't treat this as "empty response"
+            answer = "Net cevap üretilemedi. Soruyu biraz daha net yazar mısın?"
+
         return {"answer": answer}
 
     except Exception as e:
