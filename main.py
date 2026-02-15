@@ -4997,11 +4997,18 @@ Soru:
         # 1) Prefer Responses API (more consistent with newer models)
         answer = ""
         if hasattr(client, "responses") and hasattr(client.responses, "create"):
-            r = client.responses.create(
-                model=model,
-                input=prompt,
-                max_completion_tokens=280,
-            )
+            try:
+                r = client.responses.create(
+                    model=model,
+                    input=prompt,
+                    max_output_tokens=280,
+                )
+            except TypeError:
+                # Older SDKs / signatures may not support token kwargs on Responses API
+                r = client.responses.create(
+                    model=model,
+                    input=prompt,
+                )
             answer = _extract_text_from_responses(r)
 
         # 2) Fallback to Chat Completions if needed
