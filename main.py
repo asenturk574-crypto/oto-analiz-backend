@@ -1664,6 +1664,139 @@ def _score_from_risk(risk_level: str) -> int:
     return 74
 
 
+import hashlib
+
+def _stable_int_hash(s: str) -> int:
+    """Deterministic hash -> int (no randomness)."""
+    s = (s or "").encode("utf-8", "ignore")
+    h = hashlib.sha256(s).digest()
+    return int.from_bytes(h[:4], "big", signed=False)
+
+def _deterministic_jitter(seed: str, span: int = 2) -> int:
+    """Return an integer in [-span, +span] deterministically from seed."""
+    span = int(span) if span is not None else 2
+    span = _clamp(span, 0, 4)
+    if span == 0:
+        return 0
+    v = _stable_int_hash(seed)
+    return int(v % (2 * span + 1)) - span
+
+def _adj_from_1_5(x: Any, weight: float) -> float:
+    """Map 1..5 to -2..+2 and apply weight."""
+    try:
+        xi = int(x)
+    except Exception:
+        xi = 3
+    xi = _clamp(xi, 1, 5)
+    return float(xi - 3) * float(weight)
+
+def _compute_overall_100(req: AnalyzeRequest, enriched: Dict[str, Any], base_risk: Optional[str] = None) -> int:
+    """
+    Produce a more 'organic' overall score:
+    - Not random: deterministic from inputs (vehicle + profile + ad_description)
+    - Wide distribution: can yield any integer 0-100 (after rounding)
+    """
+    v = req.vehicle
+    p = req.profile or Profile()
+
+    risk = enriched.get("risk", {}) or {}
+    market = enriched.get("market", {}) or {}
+    idx = (market.get("indices") or {}) if isinstance(market, dict) else {}
+    costs = enriched.get("costs", {}) or {}
+    iq = enriched.get("info_quality", {}) or {}
+
+    br = (base_risk or risk.get("baseline_risk_level") or "orta")
+    br = str(br).strip().lower()
+    if br not in ("düşük", "orta", "orta-yüksek", "yüksek"):
+        br = "orta"
+
+    # Wider base than the old 4-step mapping
+    base_map = {"düşük": 90.0, "orta": 82.0, "orta-yüksek": 74.0, "yüksek": 62.0}
+    score = float(base_map.get(br, 80.0))
+
+    # Age & mileage nudge (kept moderate)
+    age = int(risk.get("age") or (date.today().year - int(getattr(v, "year", 0) or 0) if getattr(v, "year", None) else 0) or 0)
+    if age >= 20:
+        score -= 10
+    elif age >= 15:
+        score -= 7
+    elif age >= 10:
+        score -= 4
+    elif age >= 6:
+        score -= 2
+
+    km = int(risk.get("mileage_km") or getattr(v, "mileage_km", 0) or 0)
+    if km >= 250000:
+        score -= 12
+    elif km >= 200000:
+        score -= 9
+    elif km >= 150000:
+        score -= 6
+    elif km >= 100000:
+        score -= 3
+
+    # Market/vehicle indices: reliability/service/resale/parts
+    score += _adj_from_1_5(idx.get("reliability_1_5"), 2.0)          # -4..+4
+    score += _adj_from_1_5(idx.get("service_network_1_5"), 1.6)      # -3.2..+3.2
+    score += _adj_from_1_5(idx.get("resale_speed_1_5"), 1.8)         # -3.6..+3.6
+    score += _adj_from_1_5(idx.get("parts_availability_1_5"), 1.2)   # -2.4..+2.4
+
+    # Info quality / uncertainty: penalize poor info
+    missing = iq.get("missing_fields", []) or []
+    miss_pen = min(6.0, 1.2 * float(len(missing)))
+    score -= miss_pen
+    lvl = str(iq.get("level") or "orta").strip().lower()
+    if lvl == "yüksek":
+        score -= 4
+    elif lvl == "orta":
+        score -= 2
+
+    # Text-based signals from ad description + context
+    blob = f"{req.ad_description or ''} {json.dumps(req.context or {}, ensure_ascii=False)} {v.make} {v.model} {getattr(v,'fuel', '')} {getattr(v,'transmission','')}"
+    t = _norm(blob)
+
+    # Strong negative signals
+    if any(k in t for k in ["şasi", "sasi", "direk", "podye", "airbag aç", "airbag ac", "airbag pat"]):
+        score -= 18
+    if any(k in t for k in ["değişen", "degisen"]):
+        score -= 6
+    if any(k in t for k in ["tramer ağır", "agir hasar", "pert", "ağır hasar", "agir hasar kaydi"]):
+        score -= 10
+    if any(k in t for k in ["km düş", "km dus", "change km", "odometre"]):
+        score -= 8
+    if any(k in t for k in ["modifiye", "yazılım", "yazilim", "stage 1", "stage1", "chip"]):
+        score -= 4
+
+    # Positive signals (small)
+    if any(k in t for k in ["hatasiz", "hatâsiz", "hatasız", "değişensiz", "degisensiz"]):
+        score += 4
+    if any(k in t for k in ["yetkili servis", "servis bakımlı", "servis bakimli", "bakımlı", "bakimli", "tam bakim", "bakım kayıt"]):
+        score += 3
+    if any(k in t for k in ["ilk sahib", "ilk sahibinden", "garaj"]):
+        score += 1
+
+    # Fuel/usage mismatch nudges
+    usage = str(getattr(p, "usage", "") or "mixed").strip().lower()
+    fuel = str(getattr(v, "fuel", "") or getattr(p, "fuel_preference", "") or "").strip().lower()
+    trn = _infer_transmission(req) or ""
+
+    if fuel == "diesel" and usage in ("city", "şehir", "sehir"):
+        score -= 3  # DPF/EGR city penalty
+    if fuel == "lpg":
+        score -= 1  # small caution
+
+    # Deterministic micro-variation so every integer can appear
+    city = str(getattr(p, "city", "") or "").strip().lower()
+    seed = f"{_norm(v.make)}|{_norm(v.model)}|{v.year or ''}|{km}|{fuel}|{trn}|{usage}|{city}|{br}|{(req.ad_description or '')[:120]}"
+    span = 2 if lvl in ("düşük", "dusuk") else 1  # if info is poor, keep jitter smaller
+    score += float(_deterministic_jitter(seed, span=span))
+
+    # Final clamp + integer rounding (no 5-10 step)
+    score = float(_clamp(int(round(score)), 35, 97))
+    return int(score)
+
+
+
 def _level_to_uncertainty(level: str) -> Tuple[str, int]:
     if level == "yüksek":
         return ("düşük", 22)
@@ -2184,14 +2317,10 @@ def build_premium_template(req: AnalyzeRequest, enriched: Dict[str, Any]) -> Dic
     if base_risk not in ("düşük", "orta", "orta-yüksek", "yüksek"):
         base_risk = "orta"
 
-    overall = _score_from_risk(base_risk)
+    overall = _compute_overall_100(req, enriched, base_risk=base_risk)
 
-    # Uncertainty nudge
+    # Uncertainty (kept for UI/text)
     uncertainty = build_uncertainty(enriched)
-    if (uncertainty or {}).get("level") == "yüksek":
-        overall = _clamp(overall - 5, 0, 100)
-    elif (uncertainty or {}).get("level") == "orta":
-        overall = _clamp(overall - 2, 0, 100)
 
     # -------------------------
     # Indices -> sub scores (keep existing fields)
@@ -3319,14 +3448,10 @@ def quick_analyze_impl(req: AnalyzeRequest) -> Dict[str, Any]:
     idx = (market.get("indices") or {})
 
     base_risk = (risk.get("baseline_risk_level") or "orta").strip().lower()
-    overall = _score_from_risk(base_risk)
+    overall = _compute_overall_100(req, enriched, base_risk=base_risk)
 
-    # belirsizlik -> genel skoru biraz aşağı çekebilir
+    # belirsizlik (UI için)
     uncertainty = build_uncertainty(enriched)
-    if (uncertainty or {}).get("level") == "yüksek":
-        overall = _clamp(overall - 4, 0, 100)
-    elif (uncertainty or {}).get("level") == "orta":
-        overall = _clamp(overall - 2, 0, 100)
 
     # premium / çok karmaşık modeller için tavanı biraz kıs
     seg_code = (enriched.get("segment", {}) or {}).get("code", "C_SEDAN")
